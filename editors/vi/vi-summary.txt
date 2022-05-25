@@ -1,0 +1,462 @@
+
+
+
+                       EExx QQuuiicckk RReeffeerreennccee
+
+
+          EEnntteerriinngg//lleeaavviinngg eexx
+
+           %% eexx _n_a_m_e         edit _n_a_m_e, start at end
+           %% eexx ++_n _n_a_m_e      ... at line _n
+           %% eexx --tt _t_a_g       start at _t_a_g
+           %% eexx --rr           list saved files
+           %% eexx --rr _n_a_m_e      recover file _n_a_m_e
+           %% eexx _n_a_m_e ......     edit first; rest via ::nn
+           %% eexx --RR _n_a_m_e      read only mode
+           :: xx               exit, saving changes
+           :: qq!!              exit, discarding changes
+
+          EExx ssttaatteess
+
+          Command       Normal  and  initial
+                        state.         Input
+                        prompted  for  by ::.
+                        Your kill  character
+                        cancels partial com-
+                        mand.
+          Insert        Entered by aa  ii  and
+                        cc.   Arbitrary  text
+                        then terminates with
+                        line  having  only ..
+                        character on  it  or
+                        abnormally  with in-
+                        terrupt.
+          Open/visual   Entered by  ooppeenn  or
+                        vvii,  terminates with
+                        QQ or ^\.
+
+          EExx ccoommmmaannddss
+
+          abbrev   aabb   next         nn     unabbrev     uunnaa
+          append   aa    number       nnuu    undo         uu
+          args     aarr   open         oo     unmap        uunnmm
+          change   cc    preserve     pprree   version      vvee
+          copy     ccoo   print        pp     visual       vvii
+          delete   dd    put          ppuu    write        ww
+          edit     ee    quit         qq     xit          xx
+          file     ff    read         rree    yank         yyaa
+          global   gg    recover      rreecc   _w_i_n_d_o_w       zz
+          insert   ii    rewind       rreeww   _e_s_c_a_p_e       !!
+          join     jj    set          ssee    _l_s_h_i_f_t       <<
+          list     ll    shell        sshh    _p_r_i_n_t _n_e_x_t   CR
+          map           source       ssoo    _r_e_s_u_b_s_t      &&
+          mark     mmaa   stop         sstt    _r_s_h_i_f_t       >>
+          move     mm    substitute   ss     _s_c_r_o_l_l       ^^DD
+
+          EExx ccoommmmaanndd aaddddrreesssseess
+
+          _n     line _n      //_p_a_t   next with _p_a_t
+          ..     current     ??_p_a_t   previous with _p_a_t
+          $$     last        _x--_n    _n before _x
+          ++     next        _x,,_y    _x through _y
+          --     previous    ''_x     marked with _x
+          ++_n    _n forward   ''''     previous context
+          %%     1,$
+
+
+
+
+
+          SSppeecciiffyyiinngg tteerrmmiinnaall ttyyppee
+
+           %% sseetteennvv TTEERRMM _t_y_p_e           _c_s_h and all version 6
+           $$ TTEERRMM==_t_y_p_e;; eexxppoorrtt TTEERRMM     _s_h in Version 7
+           SSeeee aallssoo _t_s_e_t(1)
+
+          SSoommee tteerrmmiinnaall ttyyppeess
+
+          2621   43     adm31    dw1     h19
+          2645   733    adm3a    dw2     i100
+          300s   745    c100     gt40    mime
+          33     act4   dm1520   gt42    owl
+          37     act5   dm2500   h1500   t1061
+          4014   adm3   dm3025   h1510   vt52
+
+          IInniittiiaalliizziinngg ooppttiioonnss
+
+          EEXXIINNIITT       place sseett's here in environment var.
+          sseett _x        enable option
+          sseett nnoo_x      disable option
+          sseett _x==_v_a_l    give value _v_a_l
+          sseett          show changed options
+          sseett aallll      show all options
+          sseett _x??       show value of option _x
+
+          UUsseeffuull ooppttiioonnss
+
+          aauuttooiinnddeenntt   ai     supply indent
+          aauuttoowwrriittee    aw     write before changing files
+          iiggnnoorreeccaassee   ic     in scanning
+          lliisspp                (( )) {{ }} are s-exp's
+          lliisstt                print ^I for tab, $ at end
+          mmaaggiicc               .. [[ ** special in patterns
+          nnuummbbeerr       nu     number lines
+          ppaarraaggrraapphhss   para   macro names which start ...
+          rreeddrraaww              simulate smart terminal
+          ssccrroollll              command mode lines
+          sseeccttiioonnss     sect   macro names ...
+          sshhiiffttwwiiddtthh   sw     for << >>, and input ^^DD
+          sshhoowwmmaattcchh    sm     to )) and }} as typed
+          sslloowwooppeenn     slow   choke updates during insert
+          wwiinnddooww              visual mode lines
+          wwrraappssccaann     ws     around end of buffer?
+          wwrraappmmaarrggiinn   wm     automatic line splitting
+
+
+          SSccaannnniinngg ppaatttteerrnn ffoorrmmaattiioonn
+
+           ||^^           beginning of line
+           $$           end of line
+           ..           any character
+           \\<<          beginning of word
+           \\>>          end of word
+           [[_s_t_r]]       any char in _s_t_r
+           [[||^^_s_t_r]]      ... not in _s_t_r
+           [[_x_-_y]]       ... between _x and _y
+           **           any number of preceding
+
+
+
+
+
+
+
+
+
+                       VVii QQuuiicckk RReeffeerreennccee
+
+
+          EEnntteerriinngg//lleeaavviinngg vvii
+
+           %% vvii _n_a_m_e           edit _n_a_m_e at top
+           %% vvii ++_n _n_a_m_e        ... at line _n
+           %% vvii ++ _n_a_m_e         ... at end
+           %% vvii --rr             list saved files
+           %% vvii --rr _n_a_m_e        recover file _n_a_m_e
+           %% vvii _n_a_m_e ......       edit first; rest via ::nn
+           %% vvii --tt _t_a_g         start at _t_a_g
+           %% vvii ++//_p_a_t _n_a_m_e     search for _p_a_t
+           %% vviieeww _n_a_m_e         read only mode
+           ZZZZ                  exit from vi, saving changes
+           ^^ZZ                  stop vi for later resumption
+
+          TThhee ddiissppllaayy
+
+          Last line   Error messages, echoing input  to
+                      ::  //  ?? and !!, feedback about i/o
+                      and large changes.
+          @ lines     On screen only, not in file.
+          ~ lines     Lines past end of file.
+          ^_x          Control characters, ^? is delete.
+          tabs        Expand to spaces, cursor at last.
+
+
+          VVii ssttaatteess
+
+          Command     Normal   and   initial
+                      state.   Others return
+                      here.   ESC   (escape)
+                      cancels  partial  com-
+                      mand.
+          Insert      Entered by aa ii AA II oo OO
+                      cc  CC ss SS RR.  Arbitrary
+                      text  then  terminates
+                      with ESC character, or
+                      abnormally with inter-
+                      rupt.
+          Last line   Reading  input for :: //
+                      ?? or !!; terminate with
+                      ESC  or CR to execute,
+                      interrupt to cancel.
+
+          CCoouunnttss bbeeffoorree vvii ccoommmmaannddss
+
+          line/column number   zz  GG  ||
+          scroll amount        ^^DD  ^^UU
+          replicate insert     aa  ii  AA  II
+          repeat effect        most rest
+
+          SSiimmppllee ccoommmmaannddss
+
+          ddww                delete a word
+          ddee                ... leaving punctuation
+          dddd                delete a line
+          33dddd               ... 3 lines
+          ii_t_e_x_tESC          insert text _a_b_c
+          ccww_n_e_wESC          change word to _n_e_w
+
+
+
+
+
+          eeaa_sESC            pluralize word
+          xxpp                transpose characters
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          IInntteerrrruuppttiinngg,, ccaanncceelllliinngg
+
+            EESSCC      end insert or incomplete cmd
+            ^^??       (delete or rubout) interrupts
+            ^^LL       reprint screen if ^^?? scrambles it
+
+          FFiillee mmaanniippuullaattiioonn
+
+           ::ww            write back changes
+           ::wwqq           write and quit
+           ::qq            quit
+           ::qq!!           quit, discard changes
+           ::ee _n_a_m_e       edit file _n_a_m_e
+           ::ee!!           reedit, discard changes
+           ::ee ++ _n_a_m_e     edit, starting at end
+           ::ee ++_n         edit starting at line _n
+           ::ee ##          edit alternate file
+           ^^||^^            synonym for ::ee ##
+           ::ww _n_a_m_e       write file _n_a_m_e
+           ::ww!! _n_a_m_e      overwrite file _n_a_m_e
+           ::sshh           run shell, then return
+           ::!!_c_m_d         run _c_m_d, then return
+           ::nn            edit next file in arglist
+           ::nn _a_r_g_s       specify new arglist
+           ::ff            show current file and line
+           ^^GG            synonym for ::ff
+           ::ttaa _t_a_g       to tag file entry _t_a_g
+           ^^]]            ::ttaa, following word is _t_a_g
+
+          PPoossiittiioonniinngg wwiitthhiinn ffiillee
+
+           ^^FF          forward screenfull
+           ^^BB          backward screenfull
+           ^^DD          scroll down half screen
+           ^^UU          scroll up half screen
+           GG           goto line (end default)
+           //_p_a_t        next line matching _p_a_t
+           ??_p_a_t        prev line matching _p_a_t
+           nn           repeat last // or ??
+           NN           reverse last // or ??
+           //_p_a_t//++_n     n'th line after _p_a_t
+           ??_p_a_t??--_n     n'th line before _p_a_t
+           ]]]]          next section/function
+           [[[[          previous section/function
+           %%           find matching (( )) {{ or }}
+
+          AAddjjuussttiinngg tthhee ssccrreeeenn
+
+           ^^LL          clear and redraw
+           ^^RR          retype, eliminate @ lines
+           zzCR         redraw, current at window top
+           zz--          ... at bottom
+           zz..          ... at center
+           //_p_a_t//zz--     _p_a_t line at bottom
+           zz_n..         use _n line window
+           ^^EE          scroll window down 1 line
+           ^^YY          scroll window up 1 line
+
+
+
+
+
+
+
+
+
+          MMaarrkkiinngg aanndd rreettuurrnniinngg
+
+           ````      previous context
+           ''''      ... at first non-white in line
+           mm_x      mark position with letter _x
+           ``_x      to mark _x
+           ''_x      ... at first non-white in line
+
+          LLiinnee ppoossiittiioonniinngg
+
+           HH          home window line
+           LL          last window line
+           MM          middle window line
+           ++          next line, at first non-white
+           --          previous line, at first non-white
+           CR         return, same as +
+           ||vv or jj     next line, same column
+           ||^^ or kk     previous line, same column
+
+          CChhaarraacctteerr ppoossiittiioonniinngg
+
+           ||^^           first non white
+           00           beginning of line
+           $$           end of line
+           hh or -->>     forward
+           ll or <<--     backwards
+           ^^HH          same as <<--
+           space       same as -->>
+           ff_x          find _x forward
+           FF_x          ff backward
+           tt_x          upto _x forward
+           TT_x          back upto _x
+           ;;           repeat last ff FF tt or TT
+           ,,           inverse of ;;
+           ||           to specified column
+           %%           find matching (( {{ )) or }}
+
+          WWoorrddss,, sseenntteenncceess,, ppaarraaggrraapphhss
+
+            ww      word forward
+            bb      back word
+            ee      end of word
+            ))      to next sentence
+            }}      to next paragraph
+            ((      back sentence
+            {{      back paragraph
+            WW      blank delimited word
+            BB      back WW
+            EE      to end of WW
+
+          CCoommmmaannddss ffoorr LLIISSPP
+
+            ))      Forward s-expression
+            }}      ... but don't stop at atoms
+            ((      Back s-expression
+            {{      ... but don't stop at atoms
+
+
+
+
+
+
+
+
+
+
+          CCoorrrreeccttiioonnss dduurriinngg iinnsseerrtt
+
+           ^^HH        erase last character
+           ^^WW        erases last word
+           erase     your erase, same as ^^HH
+           kill      your kill, erase input this line
+           \\         escapes ^^HH, your erase and kill
+           ESC       ends insertion, back to command
+           ^^??        interrupt, terminates insert
+           ^^DD        backtab over _a_u_t_o_i_n_d_e_n_t
+           ||^^^^DD       kill _a_u_t_o_i_n_d_e_n_t, save for next
+           00^^DD       ... but at margin next also
+           ^^VV        quote non-printing character
+
+          IInnsseerrtt aanndd rreeppllaaccee
+
+           aa       append after cursor
+           ii       insert before
+           AA       append at end of line
+           II       insert before first non-blank
+           oo       open line below
+           OO       open above
+           rr_x      replace single char with _x
+           RR       replace characters
+
+          OOppeerraattoorrss ((ddoouubbllee ttoo aaffffeecctt lliinneess))
+
+            dd      delete
+            cc      change
+            <<      left shift
+            >>      right shift
+            !!      filter through command
+            ==      indent for LISP
+            yy      yank lines to buffer
+
+          MMiisscceellllaanneeoouuss ooppeerraattiioonnss
+
+            CC      change rest of line
+            DD      delete rest of line
+            ss      substitute chars
+            SS      substitute lines
+            JJ      join lines
+            xx      delete characters
+            XX      ... before cursor
+            YY      yank lines
+
+          YYaannkk aanndd ppuutt
+
+           pp       put back lines
+           PP       put before
+           ""_xpp     put from buffer _x
+           ""_xyy     yank to buffer _x
+           ""_xdd     delete into buffer _x
+
+          UUnnddoo,, rreeddoo,, rreettrriieevvee
+
+           uu       undo last change
+           UU       restore current line
+           ..       repeat last change
+           ""_dpp     retrieve _d'th last delete
+
+
+

@@ -1,0 +1,528 @@
+
+
+
+
+
+
+              EExx//EEddiitt CCoommmmaanndd SSuummmmaarryy ((VVeerrssiioonn 22..00))
+
+
+   _E_x  and  _e_d_i_t are text edi-        During an  editing  session
+tors, used  for  creating  and     there  are  two usual modes of
+modifying files of text on the     operation:  _c_o_m_m_a_n_d  mode  and
+UNIX computer system.  _E_d_i_t is     _t_e_x_t _i_n_p_u_t mode.  (This disre-
+a  variant of _e_x with features     gards, for  the  moment,  _o_p_e_n
+designed to make it less  com-     and  _v_i_s_u_a_l  modes,  discussed
+plicated to learn and use.  In     below.)  In command mode,  the
+terms of  command  syntax  and     editor  issues  a colon prompt
+effect  the editors are essen-     (:) to show that it  is  ready
+tially  identical,  and   this     to  accept  and execute a com-
+command   summary  applies  to     mand.  In text input mode,  on
+both.                              the  other  hand,  there is no
+   The summary is meant  as  a     prompt and the  editor  merely
+quick  reference for users al-     accepts  text  to  be added to
+ready acquainted with _e_d_i_t  or     the buffer.  Text  input  mode
+_e_x.   Fuller  explanations  of     is  initiated  by the commands
+the editors are  available  in     _a_p_p_e_n_d,  _i_n_s_e_r_t,  and  _c_h_a_n_g_e,
+the documents _E_d_i_t_: _A _T_u_t_o_r_i_a_l     and  is terminated by typing a
+(a self-teaching introduction)     period as the first  and  only
+and  the  _E_x  _R_e_f_e_r_e_n_c_e _M_a_n_u_a_l     character on a line.
+(the  comprehensive  reference     LLiinnee  NNuummbbeerrss aanndd CCoommmmaanndd SSyynn--
+source  for both _e_d_i_t and _e_x).     ttaaxx
+Both  of  these  writeups  are        The editor keeps  track  of
+available   in  the  Computing     lines of text in the buffer by
+Services Library.                  numbering  them  consecutively
+   In  the  examples  included     starting  with 1 and renumber-
+with the summary, commands and     ing  as  lines  are  added  or
+text entered by the  user  are     deleted.   At  any  given time
+printed in bboollddffaaccee to distin-     the editor  is  positioned  at
+guish  them   from   responses     one of these lines; this posi-
+printed by the computer.           tion  is  called  the  _c_u_r_r_e_n_t
+TThhee EEddiittoorr BBuuffffeerr                  _l_i_n_e.    Generally,   commands
+   In  order  to  perform  its     that change  the  contents  of
+tasks the editor sets aside  a     the  buffer print the new cur-
+temporary work space, called a     rent line at the end of  their
+_b_u_f_f_e_r,  separate   from   the     execution.
+user's permanent file.  Before        Most  commands  can be pre-
+starting to work on an  exist-     ceded by one or two  line-num-
+ing  file  the  editor makes a     ber  addresses  which indicate
+copy  of  it  in  the  buffer,     the lines to be affected.   If
+leaving   the   original   un-     one  number  is given the com-
+touched.  All editing  changes     mand  operates  on  that  line
+are  made  to the buffer copy,     only;  if two, on an inclusive
+which  must  then  be  written     range of lines.  Commands that
+back  to the permanent file in     can  take line-number prefixes
+order to update the  old  ver-     also assume  default  prefixes
+sion.   The  buffer disappears     if  none  are  given.  The de-
+at the end of the editing ses-     fault assumed by each  command
+sion.                              is  designed to make it conve-
+EEddiittiinngg::  CCoommmmaanndd aanndd TTeexxtt IInn--     nient to use in many instances
+ppuutt MMooddeess                          without     any    line-number
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+prefix.  For the most part,  a     following  additional  special
+command  used without a prefix     characters:
+operates on the current  line,     ..     &&     **     [[     ]]     ~~
+though exceptions to this rule     To  use  one  of  the  special
+should be  noted.   The  _p_r_i_n_t     characters   as   its   simple
+command  by  itself,  for  in-     graphic  representation rather
+stance, causes one  line,  the     than with its special meaning,
+current line, to be printed at     precede it by a backslash (\).
+the terminal.                      The  backslash  always  has  a
+   The summary shows the  num-     special meaning.
+ber of line addresses that can
+be prefixed to each command as
+well  as  the defaults assumed
+if they are omitted.  For  ex-
+ample, _(_._,_._)  means that up to
+2 line-numbers may  be  given,
+and  that if none is given the
+command operates on  the  cur-
+rent  line.   (In  the address
+prefix notation, ``.''  stands
+for the current line and ``$''
+stands for the  last  line  of
+the buffer.)  If no such nota-
+tion appears,  no  line-number
+prefix may be used.
+   Some commands take trailing
+information; only the more im-
+portant  instances of this are
+mentioned in the summary.
+OOppeenn aanndd VViissuuaall MMooddeess
+   Besides  command  and  text
+input  modes, _e_x and _e_d_i_t pro-
+vide  on  some  CRT  terminals
+other  modes  of editing, _o_p_e_n
+and _v_i_s_u_a_l.   In  these  modes
+the cursor can be moved to in-
+dividual words  or  characters
+in  a line.  The commands then
+given are very different  from
+the  standard editor commands;
+most  do  not  appear  on  the
+screen  when typed.  _A_n _I_n_t_r_o_-
+_d_u_c_t_i_o_n  _t_o  _D_i_s_p_l_a_y   _E_d_i_t_i_n_g
+_w_i_t_h  _V_i  provides a full dis-
+cussion.
+SSppeecciiaall CChhaarraacctteerrss
+   Some  characters  take   on
+special  meanings when used in
+context searches and  in  pat-
+terns  given to the _s_u_b_s_t_i_t_u_t_e
+command.  For _e_d_i_t, these  are
+``^''  and  ``$'', meaning the
+beginning and end of  a  line,
+respectively.    _E_x   has  the
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+
+
+     Name        Abbr           Description                      Examples
+
+
+(.)aappppeenndd        aa     Begins text input mode, adding   :aa
+                       lines to the buffer after  the   TThhrreeee lliinneess ooff tteexxtt
+                       line specified. Appending con-   aarree aaddddeedd ttoo tthhee bbuuffffeerr
+                       tinues until  ``.''  is  typed   aafftteerr tthhee ccuurrrreenntt lliinnee..
+                       alone  at  the  beginning of a   ..
+                       new line, followed by  a  car-   :
+                       riage  return. _0_a places lines
+                       at the beginning of  the  buf-
+                       fer.
+
+(.,.)cchhaannggee      cc     Deletes  indicated line(s) and   :55,,66cc
+                       initiates text input  mode  to   LLiinneess 55 aanndd 66 aarree
+                       replace  them  with  new  text   ddeelleetteedd aanndd rreeppllaacceedd bbyy
+                       which follows.   New  text  is   tthheessee tthhrreeee lliinneess..
+                       terminated  the  same  way  as   ..
+                       with _a_p_p_e_n_d.                     :
+
+(.,.)ccooppyy _a_d_d_r   ccoo    Places a copy of the specified   :88,,1122ccoo 2255
+                       lines after the line indicated   Last line copied is printed
+                       by _a_d_d_r.  The example places a   :
+                       copy  of  lines  8 through 12,
+                       inclusive, after line 25.
+
+(.,.)ddeelleettee      dd     Removes lines from the  buffer   :1133,,1155dd
+                       and  prints  the  current line   New current line is printed
+                       after the deletion.              :
+
+
+eeddiitt _f_i_l_e      ee        Clears the editor  buffer  and   :ee cchh1100
+eeddiitt!! _f_i_l_e     ee!!       then  copies into it the named   No write since last change
+                        _f_i_l_e, which becomes  the  cur-   :ee!! cchh1100
+                        rent  file.   This is a way of   "ch10" 3 lines, 62 characters
+                        shifting to a  different  file   :
+                        without  leaving  the  editor.
+                        The editor  issues  a  warning
+                        message  if  this  command  is
+                        used  before  saving   changes
+                        made  to  the  file already in
+                        the buffer; using the form  ee!!
+                        overrides    this   protective
+                        mechanism.
+
+ffiillee _n_a_m_e      ff        If followed by a _n_a_m_e, renames   :ff cchh99
+                        the  current file to _n_a_m_e.  If   "ch9" [Modified] 3 lines ...
+                        used without _n_a_m_e, prints  the   :ff
+                        name of the current file.        "ch9" [Modified] 3 lines ...
+                                                         :
+
+
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+(1,$)gglloobbaall    gg        gglloobbaall//_p_a_t_t_e_r_n//_c_o_m_m_a_n_d_s          :gg//nnoonnsseennssee//dd
+(1,$)gglloobbaall!!   gg!! or vv  Searches   the  entire  buffer   :
+                        (unless  a  smaller  range  is
+                        specified  by line-number pre-
+                        fixes) and  executes  _c_o_m_m_a_n_d_s
+                        on  every line with an expres-
+                        sion  matching  _p_a_t_t_e_r_n.   The
+                        second  form,  abbreviated ei-
+                        ther gg!! or  vv,  executes  _c_o_m_-
+                        _m_a_n_d_s  on  lines  that  _d_o _n_o_t
+                        contain  the  expression  _p_a_t_-
+                        _t_e_r_n.
+
+(.)iinnsseerrtt      ii        Inserts  new lines of text im-   :11ii
+                        mediately before the specified   TThheessee lliinneess ooff tteexxtt wwiillll
+                        line.    Differs  from  _a_p_p_e_n_d   bbee aaddddeedd pprriioorr ttoo lliinnee 11..
+                        only in that  text  is  placed   ..
+                        before, rather than after, the   :
+                        indicated  line.    In   other
+                        words,  11ii has the same effect
+                        as 00aa.
+
+(.,.+1)jjooiinn    jj        Join lines together, adjusting   :22,,55jj
+                        white  space (spaces and tabs)   Resulting line is printed
+                        as necessary.                    :
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+   Name      Abbr           Description                  Examples
+
+
+(.,.)lliisstt    ll     Prints lines in a  more  unam-   :99ll
+                   biguous  way  than  the  _p_r_i_n_t   This is line 9$
+                   command does.  The  end  of  a   :
+                   line,  for  example, is marked
+                   with a ``$'', and tabs printed
+                   as ``^I''.
+
+
+(.,.)mmoovvee _a_d_d_r   mm     Moves the specified lines to a   :1122,,1155mm 2255
+                       position after the line  indi-   New current line is printed
+                       cated by _a_d_d_r.                   :
+
+(.,.)nnuummbbeerr      nnuu    Prints  each  line preceded by   :nnuu
+                       its buffer line number.            10  This is line 10
+                                                        :
+
+(.)ooppeenn          oo     Too involved to discuss  here,
+                       but if you enter open mode ac-
+                       cidentally, press the ESC  key
+                       followed by qq to get back into
+                       normal  editor  command  mode.
+                       _E_d_i_t  is  designed  to prevent
+                       accidental  use  of  the  open
+                       command.
+
+pprreesseerrvvee         pprree   Saves  a  copy  of the current   :pprreesseerrvvee
+                       buffer contents as though  the   File preserved.
+                       system had just crashed.  This   :
+                       is for  use  in  an  emergency
+                       when   a   _w_r_i_t_e  command  has
+                       failed and you don't know  how
+                       else to save your work.<*>
+
+(.,.)pprriinntt       pp     Prints the text of line(s).      :++22,,++33pp
+                                                        The second and third lines
+                                                        after the current line
+                                                        :
+
+
+
+
+
+
+
+
+-----------
+<*>  You  should  seek  assistance from a system administrator as
+soon as possible after saving a file with the  _p_r_e_s_e_r_v_e  command,
+because  the  preserved  copy of the file is saved in a directory
+used to store temporary files, and thus, the preserved  copy  may
+only be available for a short period of time.
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+qquuiitt              qq     Ends the editing session.  You      :qq
+qquuiitt!!             qq!!    will receive a warning if  you      No write since last change
+                        have  changed the buffer since      :qq!!
+                        last writing its  contents  to      %
+                        the  file.  In  this event you
+                        must either type ww  to  write,
+                        or  type  qq!!  to exit from the
+                        editor  without  saving   your
+                        changes.
+
+(.)rreeaadd _f_i_l_e      rr     Places  a  copy of _f_i_l_e in the      :00rr nneewwffiillee
+                        buffer  after  the   specified      "newfile" 5 lines, 86 characters
+                        line.   Address 0 is permissi-      :
+                        ble and  causes  the  copy  of
+                        _f_i_l_e  to  be placed at the be-
+                        ginning of  the  buffer.   The
+                        _r_e_a_d  command  does  not erase
+                        any text already in  the  buf-
+                        fer.   If  no  line  number is
+                        specified, _f_i_l_e is placed  af-
+                        ter the current line.
+
+rreeccoovveerr _f_i_l_e      rreecc   Retrieves a copy of the editor
+                        buffer after a  system  crash,
+                        editor  crash, phone line dis-
+                        connection, or  _p_r_e_s_e_r_v_e  com-
+                        mand.
+
+(.,.)ssuubbssttiittuuttee   ss     ssuubbssttiittuuttee//_p_a_t_t_e_r_n//_r_e_p_l_a_c_e_m_e_n_t//     :33pp
+                        ssuubbssttiittuuttee//_p_a_t_t_e_r_n//_r_e_p_l_a_c_e_m_e_n_t//ggcc   Line 3 contains a misstake
+                        Replaces  the first occurrence      :ss//mmiissssttaakkee//mmiissttaakkee//
+                        of _p_a_t_t_e_r_n on a line with  _r_e_-      Line 3 contains a mistake
+                        _p_l_a_c_e_m_e_n_t.   Including a gg af-      :
+                        ter the  command  changes  all
+                        occurrences  of _p_a_t_t_e_r_n on the
+                        line.  The cc option allows the
+                        user to confirm each substitu-
+                        tion before it  is  made;  see
+                        the manual for details.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+      Name         Abbr           Description                         Examples
+
+
+uunnddoo               uu     Reverses  the  changes made in   :11,,1155dd
+                         the buffer by the last buffer-   15 lines deleted
+                         editing  command.   Note  that   new line number 1 is printed
+                         this example contains a  noti-   :uu
+                         fication  about  the number of   15 more lines in file ...
+                         lines affected.                  old line number 1 is printed
+                                                          :
+
+(1,$)wwrriittee _f_i_l_e    ww     Copies data  from  the  buffer   :ww
+(1,$)wwrriittee!! _f_i_l_e   ww!!    onto  a  permanent file. If no   "file7" 64 lines, 1122 characters
+                         _f_i_l_e  is  named,  the  current   :ww ffiillee88
+                         filename is used.  The file is   "file8" File exists ...
+                         automatically  created  if  it   :ww!! ffiillee88
+                         does  not  yet  exist.   A re-   "file8" 64 lines, 1122 characters
+                         sponse containing  the  number   :
+                         of lines and characters in the
+                         file indicates that the  write
+                         has  been  completed  success-
+                         fully.  The editor's  built-in
+                         protections  against overwrit-
+                         ing  existing  files  will  in
+                         some  circumstances  inhibit a
+                         write.  The form ww!! forces the
+                         write,  confirming that an ex-
+                         isting file is to be overwrit-
+                         ten.
+
+
+(.)zz _c_o_u_n_t   zz     Prints  a  screen full of text
+                   starting with the  line  indi-
+                   cated;  or, if _c_o_u_n_t is speci-
+                   fied, prints  that  number  of
+                   lines.  Variants of the _z com-
+                   mand are described in the man-
+                   ual.
+
+!!_c_o_m_m_a_n_d           Executes  the remainder of the   :!!ddaattee
+                   line after !! as  a  UNIX  com-   Fri Jun 9 12:15:11 PDT 1978
+                   mand.  The buffer is unchanged   !
+                   by this, and  control  is  re-   :
+                   turned  to the editor when the
+                   execution of _c_o_m_m_a_n_d  is  com-
+                   plete.
+
+control-d          Prints   the  next  _s_c_r_o_l_l  of
+                   text,  normally  half   of   a
+                   screen. See the manual for de-
+                   tails of the _s_c_r_o_l_l option.
+
+
+
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+
+
+
+
+
+
+
+(.+1)<cr>          An address alone followed by a   :<cr>
+                   carriage   return  causes  the   the line after the current line
+                   line to be  printed.   A  car-   :
+                   riage  return by itself prints
+                   the line following the current
+                   line.
+
+
+//_p_a_t_t_e_r_n//          Searches  for the next line in      ://TThhiiss ppaatttteerrnn//
+                   which   _p_a_t_t_e_r_n   occurs   and      This pattern next occurs here.
+                   prints it.                          :
+
+////                 Repeats the most recent search.     :////
+                                                       This pattern also occurs here.
+                                                       :
+
+??_p_a_t_t_e_r_n??          Searches in the reverse direction
+                   for _p_a_t_t_e_r_n.
+
+????                 Repeats the most recent search,
+                   moving in the reverse direction
+                   through the buffer.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Computing Services, U.C. Berkeley                   April 3, 1979
+
+

@@ -1,0 +1,2310 @@
+
+
+
+
+
+
+
+
+
+                      AA TTRROOFFFF TTuuttoorriiaall
+
+
+                     _B_r_i_a_n _W_. _K_e_r_n_i_g_h_a_n
+            _(_u_p_d_a_t_e_d _f_o_r _4_._3_B_S_D _b_y _M_a_r_k _S_e_i_d_e_n_)
+
+
+
+
+
+                          _A_B_S_T_R_A_C_T
+
+          _t_r_o_f_f  is a text-formatting program for type-
+     setting on the UNIX(R) operating system.  This de-
+     vice  is  capable  of producing high quality text;
+     this paper is an example of _t_r_o_f_f output.
+
+          The phototypesetter itself normally runs with
+     four fonts, containing roman, italic and bold let-
+     ters (as on this page), a full greek alphabet, and
+     a  substantial  number  of  special characters and
+     mathematical symbols.  Characters can  be  printed
+     in  a  range  of sizes, and placed anywhere on the
+     page.
+
+          _t_r_o_f_f  allows  the  user  full  control  over
+     fonts,  sizes, and character positions, as well as
+     the usual features of a formatter --  right-margin
+     justification, automatic hyphenation, page titling
+     and  numbering,  and  so  on.   It  also  provides
+     macros,  arithmetic  variables and operations, and
+     conditional testing,  for  complicated  formatting
+     tasks.
+
+          This  document is an introduction to the most
+     basic use of _t_r_o_f_f_.  It presents just  enough  in-
+     formation  to enable the user to do simple format-
+     ting tasks like making viewgraphs, and to make in-
+     cremental  changes  to  existing packages of _t_r_o_f_f
+     commands.  In most respects,  the  UNIX  formatter
+     _n_r_o_f_f  and  a more recent version _(_d_e_v_i_c_e_-_i_n_d_e_p_e_n_-
+     _d_e_n_t _t_r_o_f_f_) are identical to the version described
+     here,  so  this document also serves as a tutorial
+     for them as well.
+
+          NNOOTTEE:: TThhiiss ddooccuummeenntt rreeffeerrss ttoo tthhee  hhiissttoorriiccaall
+     _tt_rr_oo_ff_ff  pprrooggrraamm,, aanndd nnoott ttoo _gg_rr_oo_ff_ff..  TThhiiss iiss aa ffiirrsstt
+     ccuutt aatt iimmppoorrttiinngg tthhee  ttuuttoorriiaall  ffrroomm  44..44BBSSDD,,  nnooww
+     tthhaatt  tthhee  ccooddee  hhaass  bbeeeenn rreelleeaasseedd..  IItt sshhoouulldd aatt
+     ssoommee ttiimmee bbee mmooddiiffiieedd ttoo ddeessccrriibbee _gg_rr_oo_ff_ff.
+
+
+
+
+
+
+
+
+
+
+USD:22-2                                    A TROFF Tutorial
+
+
+11..  IInnttrroodduuccttiioonn
+
+     _t_r_o_f_f [1] is a text-formatting program,  written  originally
+by  J. F. Ossanna, for producing high-quality printed output from
+the phototypesetter on the UNIX operating system.  This  document
+is an example of _t_r_o_f_f output.
+
+     The  single most important rule of using _t_r_o_f_f is not to use
+it directly, but through some intermediary.  In many ways,  _t_r_o_f_f
+resembles an assembly language -- a remarkably powerful and flex-
+ible one -- but nonetheless such that  many  operations  must  be
+specified at a level of detail and in a form that is too hard for
+most people to use effectively.
+
+     For two special applications, there are programs  that  pro-
+vide  an  interface  to _t_r_o_f_f for the majority of users.  _e_q_n [2]
+provides an easy to learn language for  typesetting  mathematics;
+the  _e_q_n  user need know no _t_r_o_f_f whatsoever to typeset mathemat-
+ics.  _t_b_l [3] provides the same convenience for producing  tables
+of arbitrary complexity.
+
+     For  producing  straight text (which may well contain mathe-
+matics or tables), there are a number of  `macro  packages'  that
+define  formatting  rules  and  operations for specific styles of
+documents, and reduce the amount of direct  contact  with  _t_r_o_f_f_.
+In  particular, the `-ms' [4], PWB/MM [5], and `-me' [6] packages
+for internal memoranda and external papers provide  most  of  the
+facilities needed for a wide range  of  document  preparation.<*>
+(This memo was prepared with `-ms'.)  There are also packages for
+viewgraphs, for simulating the older  _r_o_f_f  formatters,  and  for
+other  special applications.  Typically you will find these pack-
+ages easier to use than _t_r_o_f_f once you get beyond the most  triv-
+ial operations; you should always consider them first.
+
+     In  the few cases where existing packages don't do the whole
+job, the solution is _n_o_t to write an entirely new  set  of  _t_r_o_f_f
+instructions  from  scratch,  but  to make small changes to adapt
+packages that already exist.
+
+
+     In accordance with this philosophy of letting  someone  else
+do  the  work,  the  part of _t_r_o_f_f described here is only a small
+part of the whole, although it tries to concentrate on  the  more
+useful  parts.   In any case, there is no attempt to be complete.
+Rather, the emphasis is on showing how to do simple  things,  and
+how to make incremental changes to what already exists.  The con-
+tents of the remaining sections are:
+
+  2.Point sizes and line spacing
+  3.Fonts and special characters
+  4.Indents and line length
+-----------
+<*>  Most  Berkeley  Unix  sites only have -ms and
+-me.
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                         USD:22-3
+
+
+  5.Tabs
+  6.Local motions: Drawing lines and characters
+  7.Strings
+  8.Introduction to macros
+  9.Titles, pages and numbering
+ 10.Number registers and arithmetic
+ 11.Macros with arguments
+ 12.Conditionals
+ 13.Environments
+ 14.Diversions
+    Appendix: Typesetter character set
+
+The _t_r_o_f_f described here is the C-language version supplied  with
+UNIX Version 7 and 32V as documented in [1].
+
+
+     To  use  _t_r_o_f_f  you have to prepare not only the actual text
+you want printed, but some information that tells _h_o_w you want it
+printed.  (Readers who use _r_o_f_f will find the approach familiar.)
+For _t_r_o_f_f the text and the formatting information are  often  in-
+tertwined quite intimately.  Most commands to _t_r_o_f_f are placed on
+a line separate from the text itself,  beginning  with  a  period
+(one command per line).  For example,
+
+     Some text.
+     .ps 14
+     Some more text.
+
+will  change  the  `point size', that is, the size of the letters
+
+being printed, to `14 point' (one point is 1/72 inch) like this:
+
+     Some text.  Some more text.
+
+
+     Occasionally, though, something special occurs in the middle
+of a line -- to produce
+
+     Area = <pi>_r2
+
+you have to type
+
+     Area = \(*p\fIr\fR\|\s8\u2\d\s0
+
+(which  we  will  explain shortly).  The backslash character \\ is
+
+used to introduce _t_r_o_f_f commands and special characters within  a
+
+line of text.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:22-4                                         A TROFF Tutorial
+
+
+22..  PPooiinntt SSiizzeess;; LLiinnee SSppaacciinngg
+
+     As  mentioned  above,  the  command ..ppss sets the point size.
+One point is 1/72 inch, so 6-point characters are  at  most  1/12
+inch  high,  and  36-point characters are 1/2 inch.  There are 15
+point sizes, listed below.
+
+ 6 point: Pack my box with five dozen liquor jugs.
+ 7 point: Pack my box with five dozen liquor jugs.
+ 8 point: Pack my box with five dozen liquor jugs.
+ 9 point: Pack my box with five dozen liquor jugs.
+ 10 point: Pack my box with five dozen liquor
+ 11 point: Pack my box with five dozen
+ 12 point: Pack my box with five dozen
+ 14 point: Pack my box with five
+
+ 16 point 18 point 20 point
+
+
+ 22 24 28 36
+
+
+     If the number after ..ppss is not one of these legal sizes,  it
+is  rounded up to the next valid value, with a maximum of 36.  If
+no number follows ..ppss, _t_r_o_f_f reverts to the previous size,  what-
+ever  it  was.  _t_r_o_f_f begins with point size 10, which is usually
+fine.  The original of this document (on 8.5 by 11 inch paper) is
+in 9 point.
+
+     The  point  size can also be changed in the middle of a line
+or even a word with the in-line command \\ss. To produce
+
+     UNIX runs on a PDP-11/45
+
+type
+
+     \s8UNIX\s10 runs on a \s8PDP-\s1011/45
+
+As above, \\ss should be followed by a  legal  point  size,  except
+
+that \\ss00 causes the size to revert to its previous value.  Notice
+
+that \\ss11001111 can be understood correctly as `size 10, followed  by
+
+an  11',  if  the  size is legal, but not otherwise.  Be cautious
+
+with similar constructions.
+
+
+     Relative size changes are also legal and useful:
+
+     \s-2UNIX\s+2
+
+temporarily decreases the size, whatever it is,  by  two  points,
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                         USD:22-5
+
+
+then  restores it.  Relative size changes have the advantage that
+
+the size difference is independent of the starting  size  of  the
+
+document.   The  amount of the relative change is restricted to a
+
+single digit.
+
+
+
+     The other parameter that determines what the type looks like
+is  the  spacing between lines, which is set independently of the
+point size.  Vertical spacing is measured from the bottom of  one
+line  to the bottom of the next.  The command to control vertical
+spacing is ..vvss. For running text, it is usually best to  set  the
+vertical  spacing  about 20% bigger than the character size.  For
+example, so far in this document, we have used ``9 on 11'',  that
+is,
+
+     .ps 9
+     .vs 11p
+
+If we changed to
+
+     .ps 9
+     .vs 9p
+
+the  running  text  would look like this.  After a few lines, you
+
+will agree it looks a little cramped.  The right vertical spacing
+
+is  partly a matter of taste, depending on how much text you want
+
+to squeeze into a given space, and partly a matter of traditional
+
+printing style.  By default, _t_r_o_f_f uses 10 on 12.
+
+
+     Point  size  and vertical spacing make a substantial differ-
+ence in the amount of text per square inch.  This is 12 on 14.
+
+     Point size and vertical spacing make a  substantial  differ-
+ence  in  the amount of text per square inch.  For example, 10 on
+12 uses about twice as much space as 7 on 8.  This  is  6  on  7,
+which  is  even smaller.  It packs a lot more words per line, but
+you can go blind trying to read it.
+
+     When used without arguments, ..ppss and ..vvss revert to the  pre-
+vious size and vertical spacing respectively.
+
+
+     The  command  ..sspp  is used to get extra vertical space.  Un-
+adorned, it gives you one extra blank  line  (one  ..vvss,  whatever
+that  has  been set to).  Typically, that's more or less than you
+
+
+
+
+
+
+
+
+
+USD:22-6                                         A TROFF Tutorial
+
+
+want, so ..sspp can be followed by information about how much  space
+you want --
+
+     .sp 2i
+
+means `two inches of vertical space'.
+
+     .sp 2p
+
+means `two points of vertical space'; and
+
+     .sp 2
+
+means  `two  vertical  spaces'  --  two of whatever ..vvss is set to
+
+(this can also be made explicit with ..sspp 22vv); _t_r_o_f_f  also  under-
+
+stands decimal fractions in most places, so
+
+     .sp 1.5i
+
+is  a  space of 1.5 inches.  These same scale factors can be used
+
+after ..vvss to define line spacing, and in fact after most commands
+
+that deal with physical dimensions.
+
+
+     It  should  be noted that all size numbers are converted in-
+ternally to `machine units', which are 1/432  inch  (1/6  point).
+For  most purposes, this is enough resolution that you don't have
+to worry about the accuracy of the representation.  The situation
+is  not  quite so good vertically, where resolution is 1/144 inch
+(1/2 point).
+
+33..  FFoonnttss aanndd SSppeecciiaall CChhaarraacctteerrss
+
+     _t_r_o_f_f and the typesetter allow four different fonts  at  any
+one  time.   Normally  three fonts (Times roman, italic and bold)
+and one collection of special characters are permanently mounted.
+
+  abcdefghijklmnopqrstuvwxyz 0123456789
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  _a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s_t_u_v_w_x_y_z _0_1_2_3_4_5_6_7_8_9
+  _A_B_C_D_E_F_G_H_I_J_K_L_M_N_O_P_Q_R_S_T_U_V_W_X_Y_Z
+  aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz 00112233445566778899
+  AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPPQQRRSSTTUUVVWWXXYYZZ
+
+The greek, mathematical symbols and  miscellany  of  the  special
+
+font are listed in Appendix A.
+
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                         USD:22-7
+
+
+     _t_r_o_f_f prints in roman unless told otherwise.  To switch into
+bold, use the ..fftt command
+
+     .ft B
+
+and for italics,
+
+     .ft I
+
+To return to roman, use ..fftt RR; to return to  the  previous  font,
+
+whatever  it  was,  use either ..fftt PP or just ..fftt. The `underline'
+
+command
+
+     .ul
+
+causes the next input line to print in italics.  ..uull can be  fol-
+
+lowed  by  a  count  to indicate that more than one line is to be
+
+italicized.
+
+
+     Fonts can also be changed within a line or word with the in-
+line command \\ff:
+
+     bboolldd_f_a_c_e text
+
+is produced by
+
+     \fBbold\fIface\fR text
+
+If  you want to do this so the previous font, whatever it was, is
+
+left undisturbed, insert extra \\ffPP commands, like this:
+
+     \fBbold\fP\fIface\fP\fR text\fP
+
+Because only the immediately previous  font  is  remembered,  you
+
+have  to  restore  the previous font after each change or you can
+
+lose it.  The same is true of ..ppss and ..vvss when  used  without  an
+
+argument.
+
+
+     There  are  other  fonts available besides the standard set,
+although you can still use only four at any given time.  The com-
+mand  ..ffpp  tells  _t_r_o_f_f  what fonts are physically mounted on the
+typesetter:
+
+
+
+
+
+
+
+
+
+
+
+USD:22-8                                         A TROFF Tutorial
+
+
+     .fp 3 H
+
+says that the Helvetica font is mounted on position 3.  (The com-
+
+plete list of font sizes and styles depends on your typesetter or
+
+laser printer.)  Appropriate ..ffpp commands should  appear  at  the
+
+beginning of your document if you do not use the standard fonts.
+
+
+     It  is possible to make a document relatively independent of
+the actual fonts used to print it by using font  numbers  instead
+of  names;  for  example,  \\ff33  and  ..fftt 33 mean `whatever font is
+mounted at position 3', and thus work for  any  setting.   Normal
+settings are roman font on 1, italic on 2, bold on 3, and special
+on 4.
+
+     There is also a way to get `synthetic' bold fonts  by  over-
+striking  letters  with a slight offset.  Look at the ..bbdd command
+in [1].
+
+
+     Special characters have four-character names beginning  with
+\\((, and they may be inserted anywhere.  For example,
+
+     1/4 + 1/2 = 3/4
+
+is produced by
+
+     \(14 + \(12 = \(34
+
+In particular, greek letters are all of the form \\((**--, where -- is
+
+an upper or lower case roman letter  reminiscent  of  the  greek.
+
+Thus to get
+
+     <Sigma>(<alpha>x<beta>) -> <infinity>
+
+in bare _t_r_o_f_f we have to type
+
+     \(*S(\(*a\(mu\(*b) \(-> \(if
+
+That line is unscrambled as follows:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                         USD:22-9
+
+
+     \(*S      <Sigma>
+     (         (
+     \(*a      <alpha>
+     \(mu      x
+     \(*b      <beta>
+     )         )
+     \(->      ->
+     \(if      <infinity>
+
+A complete list of these special names occurs in Appendix A.
+
+
+     In _e_q_n [2] the same effect can be achieved with the input
+
+     SIGMA ( alpha times beta ) -> inf
+
+which is less concise, but clearer to the uninitiated.
+
+
+     Notice  that  each four-character name is a single character
+as far as _t_r_o_f_f is concerned -- the `translate' command
+
+     .tr \(mi\(em
+
+is perfectly clear, meaning
+
+     .tr ---
+
+that is, to translate - into --.
+
+
+     Some characters are automatically  translated  into  others:
+grave   `   and  acute   '  accents (apostrophes) become open and
+close single quotes `'; the combination of ``...''  is  generally
+preferable  to  the double quotes "...".  Similarly a typed minus
+sign becomes a hyphen -.  To print an explicit - sign, use \\--. To
+get a backslash printed, use \\ee.
+
+44..  IInnddeennttss aanndd LLiinnee LLeennggtthhss
+
+     _t_r_o_f_f  starts  with  a line length of 6.5 inches, which some
+people think is too wide for 81/2x11 paper.  To  reset  the  line
+length, use the ..llll command, as in
+
+     .ll 6i
+
+As  with ..sspp, the actual length can be specified in several ways;
+
+inches are probably the most intuitive.
+
+
+     The maximum line length provided by the  typesetter  is  7.5
+inches,  by the way.  To use the full width, you will have to re-
+set the default physical left margin (``page offset''), which  is
+
+
+
+
+
+
+
+
+
+USD:22-10                                        A TROFF Tutorial
+
+
+normally  slightly  less  than one inch from the left edge of the
+paper.  This is done by the ..ppoo command.
+
+     .po 0
+
+sets the offset as far to the left as it will go.
+
+
+
+     The indent command ..iinn causes the left margin to be indented
+by  some specified amount from the page offset.  If we use ..iinn to
+move the left margin in, and ..llll to move the right margin to  the
+left, we can make offset blocks of text:
+
+     .in 0.3i
+     .ll -0.3i
+     text to be set into a block
+     .ll +0.3i
+     .in -0.3i
+
+will create a block that looks like this:
+
+     Pater  noster qui est in caelis sanctificetur nomen tuum;
+     adveniat regnum tuum; fiat voluntas tua, sicut in  caelo,
+     et in terra. ...  Amen.
+
+Notice  the  use  of `+' and `-' to specify the amount of change.
+
+These change the previous setting by the specified amount, rather
+
+than  just  overriding  it.   The distinction is quite important:
+
+..llll ++11ii makes lines one inch longer; ..llll 11ii makes them  one  inch
+
+_l_o_n_g_.
+
+
+     With  ..iinn, ..llll and ..ppoo, the previous value is used if no ar-
+gument is specified.
+
+     To indent a single line, use the `temporary indent'  command
+..ttii.  For  example, all paragraphs in this memo effectively begin
+with the command
+
+     .ti 3
+
+Three of what?  The default unit for ..ttii, as  for  most  horizon-
+
+tally oriented commands (..llll, ..iinn, ..ppoo), is ems; an em is roughly
+
+the width of the letter `m' in the  current  point  size.   (Pre-
+
+cisely,  an  em  in  size  _p  is  _p points.)  Although inches are
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-11
+
+
+usually clearer than ems to people who don't set type for a  liv-
+
+ing, ems have a place: they are a measure of size that is propor-
+
+tional to the current point size.  If you want to make text  that
+
+keeps  its  proportions  regardless of point size, you should use
+
+ems for all dimensions.  Ems can be specified  as  scale  factors
+
+directly, as in ..ttii 22..55mm.
+
+
+     Lines  can  also be indented negatively if the indent is al-
+ready positive:
+
+     .ti -0.3i
+
+causes the next line to be moved back three tenths  of  an  inch.
+
+Thus  to  make  a decorative initial capital, we indent the whole
+
+paragraph, then move the letter `P' back with a ..ttii command:
+
+      ater noster qui est in caelis sanctificetur nomen  tuum;
+        adveniat  regnum  tuum;  fiat  voluntas  tua, sicut in
+     Pcaelo, et in terra. ...  Amen.
+
+Of course, there is also some trickery to  make  the  `P'  bigger
+
+(just a `\s36P\s0'), and to move it down from its normal position
+
+(see the section on local motions).
+
+
+55..  TTaabbss
+
+     Tabs (the ASCII `horizontal tab' character) can be  used  to
+produce  output  in columns, or to set the horizontal position of
+output.  Typically tabs are used  only  in  unfilled  text.   Tab
+stops are set by default every half inch from the current indent,
+but can be changed by the ..ttaa command.  To set stops every  inch,
+for example,
+
+     .ta 1i 2i 3i 4i 5i 6i
+
+
+     Unfortunately  the  stops  are  left-justified only (as on a
+typewriter), so lining up columns of right-justified numbers  can
+be  painful.   If you have many numbers, or if you need more com-
+plicated table layout, _d_o_n_'_t use _t_r_o_f_f directly; use the _t_b_l pro-
+gram described in [3].
+
+
+
+
+
+
+
+
+
+
+
+USD:22-12                                        A TROFF Tutorial
+
+
+     For  a  handful  of numeric columns, you can do it this way:
+Precede every number by enough blanks to make  it  line  up  when
+typed.
+
+     .nf
+     .ta 1i 2i 3i
+       1 _t_a_b   2 _t_a_b   3
+      40 _t_a_b  50 _t_a_b  60
+     700 _t_a_b 800 _t_a_b 900
+     .fi
+
+Then  change  each  leading  blank  into the string \\00. This is a
+
+character that does not print, but that has the same width  as  a
+
+digit.  When printed, this will produce
+
+       1         2         3
+      40        50        60
+     700       800       900
+
+
+     It  is  also possible to fill up tabbed-over space with some
+character other than blanks by setting the `tab replacement char-
+acter' with the ..ttcc command:
+
+     .ta 1.5i 2.5i
+     .tc \(ru       (\(ru is "_")
+     Name _t_a_b Age _t_a_b
+
+produces
+
+   Name___________ Age _____
+
+To  reset  the tab replacement character to a blank, use ..ttcc with
+
+no argument.  (Lines can also be drawn with the \\ll  command,  de-
+
+scribed in Section 6.)
+
+
+     _t_r_o_f_f also provides a very general mechanism called `fields'
+for setting up complicated columns.  (This is used by  _t_b_l_)_.   We
+will not go into it in this paper.
+
+66..  LLooccaall MMoottiioonnss:: DDrraawwiinngg lliinneess aanndd cchhaarraacctteerrss
+
+     Remember `Area = <pi>r2' and the big `P' in the Paternoster.
+How are they done?  _t_r_o_f_f provides a host of commands for placing
+characters  of  any  size at any place.  You can use them to draw
+special characters or to tune your output for  a  particular  ap-
+pearance.   Most of these commands are straightforward, but messy
+to read and tough to type correctly.
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-13
+
+
+     If you won't use _e_q_n_, subscripts and superscripts  are  most
+easily  done  with  the  half-line local motions \\uu and \\dd. To go
+back up the page half a point-size, insert a \\uu  at  the  desired
+place;  to go down, insert a \\dd. (\\uu and \\dd should always be used
+in pairs, as explained below.)  Thus
+
+     Area = \(*pr\u2\d
+
+produces
+
+     Area = <pi>r2
+
+To make the `2' smaller, bracket it with \\ss--22......\\ss00. Since \\uu and
+
+\\dd  refer  to  the current point size, be sure to put them either
+
+both inside or both outside the size changes, or you will get  an
+
+unbalanced vertical motion.
+
+
+     Sometimes  the  space  given  by  \\uu  and \\dd isn't the right
+amount.  The \\vv command can  be  used  to  request  an  arbitrary
+amount of vertical motion.  The in-line command
+
+     \v'(amount)'
+
+causes  motion  up  or  down  the page by the amount specified in
+
+`(amount)'.  For example, to move the `P' down, we used
+
+  .in +0.6i (move paragraph in)
+  .ll -0.3i (shorten lines)
+  .ti -0.3i (move P back)
+  \v'2'\s36P\s0\v'-2'ater noster qui est
+  in caelis ...
+
+A minus sign causes upward motion, while no sign or a  plus  sign
+
+means  down  the page.  Thus \\vv''--22'' causes an upward vertical mo-
+
+tion of two line spaces.
+
+
+     There are many other ways to specify the amount of motion --
+
+     \v'0.1i'
+     \v'3p'
+     \v'-0.5m'
+
+and so on are all legal.  Notice that the scale specifier ii or  pp
+
+or  mm goes inside the quotes.  Any character can be used in place
+
+
+
+
+
+
+
+
+
+
+USD:22-14                                        A TROFF Tutorial
+
+
+of the quotes; this is also true of all other _t_r_o_f_f commands  de-
+
+scribed in this section.
+
+
+     Since  _t_r_o_f_f  does not take within-the-line vertical motions
+into account when figuring out where it is on  the  page,  output
+lines  can  have  unexpected positions if the left and right ends
+aren't at the same vertical position.  Thus \\vv, like \\uu  and  \\dd,
+should  always  balance upward vertical motion in a line with the
+same amount in the downward direction.
+
+     Arbitrary horizontal motions are also  available  --  \\hh  is
+quite  analogous  to  \\vv, except that the default scale factor is
+ems instead of line spaces.  As an example,
+
+     \h'-0.1i'
+
+causes a backwards motion of a tenth of an inch.  As a  practical
+
+matter,  consider printing the mathematical symbol `>>'.  The de-
+
+fault spacing is too wide, so _e_q_n replaces this by
+
+     >\h'-0.3m'>
+
+to produce >>.
+
+
+     Frequently \\hh is used with the `width function' \\ww to gener-
+ate  motions  equal  to  the width of some character string.  The
+construction
+
+     \w'thing'
+
+is a number equal to the width of `thing' in machine units (1/432
+
+inch).   All  _t_r_o_f_f  computations  are  ultimately  done in these
+
+units.  To move horizontally the width of an `x', we can say
+
+     \h'\w'x'u'
+
+As we mentioned above, the default scale factor for all  horizon-
+
+tal  dimensions is mm, ems, so here we must have the uu for machine
+
+units, or the motion produced will be far too  large.   _t_r_o_f_f  is
+
+quite  happy  with  the nested quotes, by the way, so long as you
+
+don't leave any out.
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-15
+
+
+     As a live example of this kind of construction, all  of  the
+command  names  in  the text, like ..sspp, were done by overstriking
+with a slight offset.  The commands for ..sspp are
+
+     .sp\h'-\w'.sp'u'\h'1u'.sp
+
+That is, put out `.sp', move left by the  width  of  `.sp',  move
+
+right  1  unit, and print `.sp' again.  (Of course there is a way
+
+to avoid typing that much input for each command name,  which  we
+
+will discuss in Section 11.)
+
+
+
+     There  are  also  several special-purpose _t_r_o_f_f commands for
+local motion.  We have already seen \\00, which  is  an  unpaddable
+white  space  of  the  same width as a digit.  `Unpaddable' means
+that it will never be widened or split across a line by line jus-
+tification  and filling.  There is also \\(blank), which is an un-
+paddable character the width of a space, \\||, which is  half  that
+width,  \\^^, which is one quarter of the width of a space, and \\&&,
+which has zero width.  (This last one is useful, for example,  in
+entering a text line which would otherwise begin with a `.'.)
+
+     The command \\oo, used like
+
+     \o'set of characters'
+
+causes  (up  to  9)  characters to be overstruck, centered on the
+
+widest.  This is nice for accents, as in
+
+  syst\o"e\(ga"me t\o"e\(aa"l\o"e\(aa"phonique
+
+which makes
+
+     syste`me te'le'phonique
+
+The accents are \\((ggaa and \\((aaaa, or \\`` and \\''; remember  that  each
+
+is just one character to _t_r_o_f_f_.
+
+
+     You  can make your own overstrikes with another special con-
+vention, \\zz, the zero-motion command.  \\zzxx suppresses the  normal
+horizontal  motion  after printing the single character xx, so an-
+other character can be laid on top of it.  Although sizes can  be
+changed  within  \\oo, it centers the characters on the widest, and
+there can be no horizontal or vertical motions, so \\zz may be  the
+only way to get what you want:
+
+
+
+
+
+
+
+
+
+
+
+USD:22-16                                        A TROFF Tutorial
+
+
+     [[[[]]]]
+
+is produced by
+
+     .sp 2
+     \s8\z\(sq\s14\z\(sq\s22\z\(sq\s36\(sq
+
+The ..sspp is needed to leave room for the result.
+
+
+     As another example, an extra-heavy semicolon that looks like
+
+     ,.  instead of  ;  or  ;
+
+can be constructed with a big comma and a big period above it:
+
+     \s+6\z,\v'-0.25m'.\v'0.25m'\s0
+
+`0.25m' is an experimentally-derived constant.
+
+
+     A more ornate overstrike is given by the bracketing function
+\\bb, which piles up characters vertically, centered on the current
+baseline.   Thus  we can get big brackets, constructing them with
+piled-up smaller pieces:
+
+     ,- |~    ~|  -.
+     {  |-- x --| }
+     `-           -'
+
+by typing in only this:
+
+.sp
+\b'\(lt\(lk\(lb' \b'\(lc\(lf' x \b'\(rc\(rf' \b'\(rt\(rk\(rb'
+
+
+     _t_r_o_f_f also provides a convenient facility for drawing  hori-
+zontal  and  vertical  lines  of  arbitrary length with arbitrary
+characters.  \\ll''11ii'' draws  a  line  one  inch  long,  like  this:
+__________.   The  length can be followed by the character to use
+if the _ isn't appropriate; \\ll''00..55ii..'' draws a half-inch  line  of
+dots:  ......   The construction \\LL is entirely analogous, except
+that it draws a vertical line instead of horizontal.
+
+77..  SSttrriinnggss
+
+     Obviously if a paper contains a large number of  occurrences
+of  an  acute accent over a letter `e', typing \\oo""ee\\''"" for each e'
+would be a great nuisance.
+
+     Fortunately, _t_r_o_f_f provides a way in which you can store  an
+arbitrary  collection  of  text in a `string', and thereafter use
+the string name as a shorthand for its contents.  Strings are one
+of  several  _t_r_o_f_f mechanisms whose judicious use lets you type a
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-17
+
+
+document with less effort and organize it so that extensive  for-
+mat changes can be made with few editing changes.
+
+     A  reference  to  a  string is replaced by whatever text the
+string was defined as.  Strings are defined with the command ..ddss.
+The line
+
+     .ds e \o"e\'"
+
+defines the string ee to have the value \\oo""ee\\''""
+
+
+     String  names  may be either one or two characters long, and
+are referred to by \\**xx for one character names or \\**((xxyy  for  two
+character  names.  Thus to get te'le'phone, given the definition of
+the string ee as above, we can say t\*el\*ephone.
+
+     If a string must begin with blanks, define it as
+
+     .ds xx "      text
+
+The double quote signals the beginning of the definition.   There
+
+is no trailing quote; the end of the line terminates the string.
+
+
+     A  string  may  actually be several lines long; if _t_r_o_f_f en-
+counters a \\ at the end of _a_n_y line, it is thrown  away  and  the
+next  line  added  to  the  current  one.  So you can make a long
+string simply by ending each line but the last with a backslash:
+
+     .ds xx this \
+     is a very \
+     long string
+
+
+     Strings may be defined in terms of other strings, or even in
+terms  of themselves; we will discuss some of these possibilities
+later.
+
+88..  IInnttrroodduuccttiioonn ttoo MMaaccrrooss
+
+     Before we can go much further in _t_r_o_f_f_, we need to  learn  a
+bit  about  the macro facility.  In its simplest form, a macro is
+just a shorthand notation quite similar to a string.  Suppose  we
+want  every  paragraph to start in exactly the same way -- with a
+space and a temporary indent of two ems:
+
+     .sp
+     .ti +2m
+
+Then to save typing, we would like to  collapse  these  into  one
+
+shorthand line, a _t_r_o_f_f `command' like
+
+
+
+
+
+
+
+
+
+USD:22-18                                        A TROFF Tutorial
+
+
+     .PP
+
+that would be treated by _t_r_o_f_f exactly as
+
+     .sp
+     .ti +2m
+
+..PPPP  is  called a _m_a_c_r_o_.  The way we tell _t_r_o_f_f what ..PPPP means is
+
+to _d_e_f_i_n_e it with the ..ddee command:
+
+     .de PP
+     .sp
+     .ti +2m
+     ..
+
+The first line names the macro (we used  `..PPPP'  for  `paragraph',
+
+and  upper  case so it wouldn't conflict with any name that _t_r_o_f_f
+
+might already know about).  The last line .... marks the end of the
+
+definition.   In  between  is  the text, which is simply inserted
+
+whenever _t_r_o_f_f sees the `command' or macro call
+
+     .PP
+
+A macro can contain any mixture of text and formatting commands.
+
+
+     The definition of ..PPPP has to precede its  first  use;  unde-
+fined  macros are simply ignored.  Names are restricted to one or
+two characters.
+
+     Using macros for commonly occurring sequences of commands is
+critically important.  Not only does it save typing, but it makes
+later changes much easier.  Suppose we decide that the  paragraph
+indent  is too small, the vertical space is much too big, and ro-
+man font should be forced.  Instead of changing the  whole  docu-
+ment, we need only change the definition of ..PPPP to something like
+
+     .de PP \" paragraph macro
+     .sp 2p
+     .ti +3m
+     .ft R
+     ..
+
+and the change takes effect everywhere we used ..PPPP.
+
+
+     \\"" is a _t_r_o_f_f command that causes the rest of the line to be
+ignored.  We use it here to add comments to the macro  definition
+(a wise idea once definitions get complicated).
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-19
+
+
+     As another example of macros, consider these two which start
+and end a block of offset, unfilled text, like most of the  exam-
+ples in this paper:
+
+     .de BS \" start indented block
+     .sp
+     .nf
+     .in +0.3i
+     ..
+     .de BE \" end indented block
+     .sp
+     .fi
+     .in -0.3i
+     ..
+
+Now we can surround text like
+
+     Copy to
+     John Doe
+     Richard Roberts
+     Stanley Smith
+
+by  the  commands  ..BBSS  and  ..BBEE,  and it will come out as it did
+
+above.  Notice that we indented by ..iinn ++00..33ii instead of ..iinn 00..33ii.
+
+This  way we can nest our uses of ..BBSS and BBEE to get blocks within
+
+blocks.
+
+
+     If later on we decide that the indent should be  0.5i,  then
+it  is  only  necessary to change the definitions of ..BBSS and ..BBEE,
+not the whole paper.
+
+99..  TTiittlleess,, PPaaggeess aanndd NNuummbbeerriinngg
+
+     This is an area where things get tougher, because nothing is
+done  for  you automatically.  Of necessity, some of this section
+is a cookbook, to be copied literally until you get some  experi-
+ence.
+
+     Suppose  you  want  a  title at the top of each page, saying
+just
+left top center topright top
+In _r_o_f_f_, one can say
+
+  .he 'left top'center top'right top'
+  .fo 'left bottom'center bottom'right bottom'
+
+to get headers and footers automatically on  every  page.   Alas,
+
+this  doesn't work so easily in _t_r_o_f_f_, a serious hardship for the
+
+
+
+
+
+
+
+
+
+
+USD:22-20                                        A TROFF Tutorial
+
+
+novice.  Instead you have to do a lot of specification (or use  a
+
+macro package, which makes it effortless).
+
+
+     You  have  to  say  what the actual title is (easy); when to
+print it (easy enough); and what to do at and  around  the  title
+line  (harder).  Taking these in reverse order, first we define a
+macro ..NNPP (for `new page') to process titles and the like at  the
+end of one page and the beginning of the next:
+
+     .de NP
+     'bp
+     'sp 0.5i
+     .tl 'left top'center top'right top'
+     'sp 0.3i
+     ..
+
+To  make sure we're at the top of a page, we issue a `begin page'
+
+command ''bbpp, which causes a skip to  top-of-page  (we'll  explain
+
+the '' shortly).  Then we space down half an inch, print the title
+
+(the use of ..ttll should be self explanatory; later we will discuss
+
+parameterizing  the  titles), space another 0.3 inches, and we're
+
+done.
+
+
+     To ask for ..NNPP at the bottom of each page, we  have  to  say
+something  like `when the text is within an inch of the bottom of
+the page, start the processing for a new  page.'   This  is  done
+with a `when' command ..wwhh:
+
+     .wh  -1i  NP
+
+(No  `.'  is  used before NP; this is simply the name of a macro,
+
+not a macro call.)  The minus sign means  `measure  up  from  the
+
+bottom of the page', so `-1i' means `one inch from the bottom'.
+
+
+     The  ..wwhh command appears in the input outside the definition
+of ..NNPP; typically the input would be
+
+     .de NP
+     ...
+     ..
+     .wh -1i NP
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-21
+
+
+     Now what happens?  As text is actually being  output,  _t_r_o_f_f
+keeps  track  of  its  vertical position on the page, and after a
+line is printed within one inch from the bottom, the ..NNPP macro is
+activated.   (In  the  jargon, the ..wwhh command sets a _t_r_a_p at the
+specified place, which is `sprung' when that  point  is  passed.)
+..NNPP  causes  a  skip to the top of the next page (that's what the
+''bbpp was for), then prints the title with the appropriate margins.
+
+     Why ''bbpp and ''sspp instead of ..bbpp and ..sspp? The answer  is  that
+..sspp  and  ..bbpp, like several other commands, cause a _b_r_e_a_k to take
+place.  That is, all the input text collected but not yet printed
+is  flushed  out  as soon as possible, and the next input line is
+guaranteed to start a new line of output.  If we had used ..sspp  or
+..bbpp  in  the ..NNPP macro, this would cause a break in the middle of
+the current output line when a new page is started.   The  effect
+would  be  to print the left-over part of that line at the top of
+the page, followed by the next input line on a new  output  line.
+This  is  _n_o_t  what  we want.  Using '' instead of .. for a command
+tells _t_r_o_f_f that no break is to take place  --  the  output  line
+currently  being filled should _n_o_t be forced out before the space
+or new page.
+
+     The list of commands that cause a break is short  and  natu-
+ral:
+
+     .bp   .br   .ce   .fi   .nf   .sp   .in   .ti
+
+All others cause _n_o break, regardless of whether you use a .. or a
+
+''. If you really need a break, add a ..bbrr command at the appropri-
+
+ate place.
+
+
+     One  other thing to beware of -- if you're changing fonts or
+point sizes a lot, you may find that if you cross a page boundary
+in  an unexpected font or size, your titles come out in that size
+and font instead of what you intended.  Furthermore,  the  length
+of  a  title is independent of the current line length, so titles
+will come out at the default length  of  6.5  inches  unless  you
+change it, which is done with the ..lltt command.
+
+     There  are  several  ways to fix the problems of point sizes
+and fonts in titles.   For  the  simplest  applications,  we  can
+change  ..NNPP  to  set the proper size and font for the title, then
+restore the previous values, like this:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:22-22                                        A TROFF Tutorial
+
+
+  .de NP
+  'bp
+  'sp 0.5i
+  .ft R   \" set title font to roman
+  .ps 10  \" and size to 10 point
+  .lt 6i  \" and length to 6 inches
+  .tl 'left'center'right'
+  .ps     \" revert to previous size
+  .ft P   \" and to previous font
+  'sp 0.3i
+  ..
+
+
+     This version of ..NNPP does _n_o_t work if the fields in  the  ..ttll
+command contain size or font changes.  To cope with that requires
+_t_r_o_f_f_'_s `environment' mechanism, which we will discuss in Section
+13.
+
+     To  get a footer at the bottom of a page, you can modify ..NNPP
+so it does some processing before the ''bbpp command, or  split  the
+job into a footer macro invoked at the bottom margin and a header
+macro invoked at the top of the page.  These variations are  left
+as exercises.
+
+
+     Output  page numbers are computed automatically as each page
+is produced (starting at 1), but no numbers  are  printed  unless
+you  ask  for  them explicitly.  To get page numbers printed, in-
+clude the character %% in the ..ttll line at the position  where  you
+want the number to appear.  For example
+
+     .tl ''- % -''
+
+centers the page number inside hyphens, as on this page.  You can
+
+set the page number at any time with either ..bbpp nn, which  immedi-
+
+ately starts a new page numbered nn, or with ..ppnn nn, which sets the
+
+page number for the next page but doesn't cause a skip to the new
+
+page.  Again, ..bbpp ++nn sets the page number to nn more than its cur-
+
+rent value; ..bbpp means ..bbpp ++11.
+
+
+1100..  NNuummbbeerr RReeggiisstteerrss aanndd AArriitthhmmeettiicc
+
+     _t_r_o_f_f has a facility for doing arithmetic, and for  defining
+and using variables with numeric values, called _n_u_m_b_e_r _r_e_g_i_s_t_e_r_s_.
+Number registers, like strings and macros, can be useful in  set-
+ting  up a document so it is easy to change later.  And of course
+they serve for any sort of arithmetic computation.
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-23
+
+
+     Like strings, number registers have  one  or  two  character
+names.   They are set by the ..nnrr command, and are referenced any-
+where by \\nnxx (one character name) or \\nn((xxyy (two character name).
+
+     There are quite a few  pre-defined  number  registers  main-
+tained by _t_r_o_f_f_, among them %% for the current page number; nnll for
+the current vertical position on the page; ddyy, mmoo and yyrr for  the
+current  day,  month and year; and ..ss and ..ff for the current size
+and font.  (The font is a number from 1 to 4.)  Any of these  can
+be  used  in computations like any other register, but some, like
+..ss and ..ff, cannot be changed with ..nnrr.
+
+     As an example of the use of number  registers,  in  the  --mmss
+macro  package  [4],  most  significant parameters are defined in
+terms of the values of a handful of number registers.  These  in-
+clude the point size for text, the vertical spacing, and the line
+and title lengths.  To set the point size  and  vertical  spacing
+for the following paragraphs, for example, a user may say
+
+     .nr PS 9
+     .nr VS 11
+
+The paragraph macro ..PPPP is defined (roughly) as follows:
+
+     .de PP
+     .ps \\n(PS\" reset size
+     .vs \\n(VSp\" spacing
+     .ft R     \" font
+     .sp 0.5v  \" half a line
+     .ti +3m
+     ..
+
+This  sets  the font to Roman and the point size and line spacing
+
+to whatever values are stored in the number registers PPSS and VVSS.
+
+
+     Why are there two backslashes?  This is the eternal  problem
+of  how  to quote a quote.  When _t_r_o_f_f originally reads the macro
+definition, it peels off one backslash to see what's coming next.
+To  ensure  that another is left in the definition when the macro
+is _u_s_e_d_, we have to put in two backslashes in the definition.  If
+only  one backslash is used, point size and vertical spacing will
+be frozen at the time the macro is defined, not when it is used.
+
+     Protecting by an extra layer of backslashes is  only  needed
+for  \\nn,  \\**,  \\$$  (which  we haven't come to yet), and \\ itself.
+Things like \\ss, \\ff, \\hh, \\vv, and so on do not need an extra  back-
+slash,  since they are converted by _t_r_o_f_f to an internal code im-
+mediately upon being seen.
+
+
+     Arithmetic expressions can appear anywhere that a number  is
+expected.  As a trivial example,
+
+
+
+
+
+
+
+
+
+USD:22-24                                        A TROFF Tutorial
+
+
+     .nr PS \\n(PS-2
+
+decrements PS by 2.  Expressions can use the arithmetic operators
+
++, -, *, /, % (mod), the relational operators >, >=,  <,  <=,  =,
+
+and != (not equal), and parentheses.
+
+
+     Although  the  arithmetic  we  have  done  so  far  has been
+straightforward, more complicated  things  are  somewhat  tricky.
+First,  number  registers  hold  only integers.  _t_r_o_f_f arithmetic
+uses truncating integer division, just like Fortran.  Second,  in
+the  absence  of  parentheses,  evaluation  is done left-to-right
+without any operator precedence (including relational operators).
+Thus
+
+     7*-4+3/13
+
+becomes  `-1'.  Number registers can occur anywhere in an expres-
+
+sion, and so can scale indicators like pp, ii, mm, and so on (but no
+
+spaces).   Although integer division causes truncation, each num-
+
+ber and its scale indicator is converted to machine units  (1/432
+
+inch)  before  any arithmetic is done, so 1i/2u evaluates to 0.5i
+
+correctly.
+
+
+     The scale indicator uu often has to appear when you  wouldn't
+expect  it  --  in particular, when arithmetic is being done in a
+context that implies horizontal or vertical dimensions.  For  ex-
+ample,
+
+     .ll 7/2i
+
+would  seem obvious enough -- 31/2 inches.  Sorry.  Remember that
+
+the default units for horizontal parameters  like  ..llll  are  ems.
+
+That's  really  `7  ems / 2 inches', and when translated into ma-
+
+chine units, it becomes zero.  How about
+
+     .ll 7i/2
+
+Sorry, still no good -- the `2' is `2 ems', so `7i/2'  is  small,
+
+although not zero.  You _m_u_s_t use
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-25
+
+
+     .ll 7i/2u
+
+So  again,  a  safe  rule is to attach a scale indicator to every
+
+number, even constants.
+
+
+     For arithmetic done within a ..nnrr command, there is no impli-
+cation  of horizontal or vertical dimension, so the default units
+are `units', and 7i/2 and 7i/2u mean the same thing.  Thus
+
+     .nr ll 7i/2
+     .ll \\n(llu
+
+does just what you want, so long as you don't forget the uu on the
+
+..llll command.
+
+
+1111..  MMaaccrrooss wwiitthh aarrgguummeennttss
+
+     The  next  step is to define macros that can change from one
+use to the next according to parameters  supplied  as  arguments.
+To  make this work, we need two things: first, when we define the
+macro, we have to indicate that some parts of it will be provided
+as  arguments  when  the macro is called.  Then when the macro is
+called we have to provide actual arguments to be plugged into the
+definition.
+
+     Let  us  illustrate  by defining a macro ..SSMM that will print
+its argument two points smaller than the surrounding text.   That
+is, the macro call
+
+     .SM TROFF
+
+will produce TROFF.
+
+
+     The definition of ..SSMM is
+
+     .de SM
+     \s-2\\$1\s+2
+     ..
+
+Within  a macro definition, the symbol \\\\$$nn refers to the nnth ar-
+
+gument that the macro was called with.  Thus \\\\$$11 is  the  string
+
+to be placed in a smaller point size when ..SSMM is called.
+
+
+     As  a slightly more complicated version, the following defi-
+nition of ..SSMM permits optional second and  third  arguments  that
+will be printed in the normal size:
+
+
+
+
+
+
+
+
+
+USD:22-26                                        A TROFF Tutorial
+
+
+     .de SM
+     \\$3\s-2\\$1\s+2\\$2
+     ..
+
+Arguments  not  provided  when the macro is called are treated as
+
+empty, so
+
+     .SM  TROFF  ),
+
+produces TROFF), while
+
+     .SM  TROFF  ).  (
+
+produces (TROFF).  It is convenient to reverse the order of argu-
+
+ments because trailing punctuation is much more common than lead-
+
+ing.
+
+
+     By the way, the number of arguments that a macro was  called
+with is available in number register ..$$.
+
+     The  following  macro  ..BBDD is the one used to make the `bold
+roman' we have been using for _t_r_o_f_f command names  in  text.   It
+combines horizontal motions, width computations, and argument re-
+arrangement.
+
+  .de BD
+  \&\\$3\f1\\$1\h'-\w'\\$1'u+1u'\\$1\fP\\$2
+  ..
+
+The \\hh and \\ww commands need no extra backslash, as  we  discussed
+
+above.   The  \\&&  is there in case the argument begins with a pe-
+
+riod.
+
+
+
+     Two backslashes are needed with the \\\\$$nn  commands,  though,
+to  protect one of them when the macro is being defined.  Perhaps
+a second example will make this clearer.  Consider a macro called
+..SSHH which produces section headings rather like those in this pa-
+per, with the sections numbered automatically, and the  title  in
+bold in a smaller size.  The use is
+
+     .SH  "Section title ..."
+
+(If the argument to a macro is to contain blanks, then it must be
+
+_s_u_r_r_o_u_n_d_e_d by double quotes, unlike  a  string,  where  only  one
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-27
+
+
+leading quote is permitted.)
+
+
+     Here is the definition of the ..SSHH macro:
+
+     .nr SH 0   \" initialize section number
+     .de SH
+     .sp 0.3i
+     .ft B
+     .nr SH \\n(SH+1\" increment number
+     .ps \\n(PS-1\" decrease PS
+     \\n(SH.  \\$1\" number. title
+     .ps \\n(PS \" restore PS
+     .sp 0.3i
+     .ft R
+     ..
+
+The section number is kept in number register SH, which is incre-
+
+mented each time just before it is used.  (A number register  may
+
+have  the  same name as a macro without conflict but a string may
+
+not.)
+
+
+     We used \\\\nn((SSHH instead of \\nn((SSHH and \\\\nn((PPSS instead of \\nn((PPSS.
+If  we  had used \\nn((SSHH, we would get the value of the register at
+the time the macro was _d_e_f_i_n_e_d_, not at the time it was _u_s_e_d_.   If
+that's  what  you  want, fine, but not here.  Similarly, by using
+\\\\nn((PPSS, we get the point size at the time the macro is called.
+
+
+     As an example that does not involve numbers, recall our  ..NNPP
+macro which had a
+
+     .tl 'left'center'right'
+
+We could make these into parameters by using instead
+
+     .tl '\\*(LT'\\*(CT'\\*(RT'
+
+so  the  title comes from three strings called LT, CT and RT.  If
+
+these are empty, then the title will be a blank  line.   Normally
+
+CT would be set with something like
+
+     .ds  CT  - % -
+
+to  give  just  the page number between hyphens (as on the top of
+
+this page), but a user could supply private definitions  for  any
+
+
+
+
+
+
+
+
+
+
+USD:22-28                                        A TROFF Tutorial
+
+
+of the strings.
+
+
+1122..  CCoonnddiittiioonnaallss
+
+     Suppose  we  want the ..SSHH macro to leave two extra inches of
+space just before section 1, but nowhere else.  The cleanest  way
+to  do  that  is to test inside the ..SSHH macro whether the section
+number is 1, and add some space if it is.  The ..iiff  command  pro-
+vides  the conditional test that we can add just before the head-
+ing line is output:
+
+    .if \\n(SH=1 .sp 2i   \" first section only
+
+
+     The condition after the ..iiff can be any arithmetic or logical
+expression.   If  the  condition is logically true, or arithmeti-
+cally greater than zero, the rest of the line is treated as if it
+were  text -- here a command.  If the condition is false, or zero
+or negative, the rest of the line is skipped.
+
+     It is possible to do more than one command if a condition is
+true.   Suppose  several operations are to be done before section
+1.  One possibility is to define a macro ..SS11 and invoke it if  we
+are about to do section 1 (as determined by an ..iiff).
+
+     .de S1
+     ---  processing for section 1 ---
+     ..
+     .de SH
+     ...
+     .if \\n(SH=1 .S1
+     ...
+     ..
+
+
+     An  alternate  way  is  to use the extended form of the ..iiff,
+like this:
+
+     .if \\n(SH=1 \{--- processing
+     for section 1 ----\}
+
+The braces \\{{ and \\}} must occur in the  positions  shown  or  you
+
+will  get unexpected extra lines in your output.  _t_r_o_f_f also pro-
+
+vides an `if-else' construction, which we will not go into here.
+
+
+     A condition can be negated by preceding it with  !!;  we  get
+the same effect as above (but less clearly) by using
+
+     .if !\\n(SH>1 .S1
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-29
+
+
+     There  are  a handful of other conditions that can be tested
+with ..iiff. For example, is the current page even or odd?
+
+     .if o .tl 'odd page title''- % -'
+     .if e .tl '- % -''even page title'
+
+gives facing pages different titles and page numbers on the  out-
+
+side edge when used inside an appropriate new page macro.
+
+
+     Two other conditions are tt and nn, which tell you whether the
+formatter is _t_r_o_f_f or _n_r_o_f_f_.
+
+     .if t troff stuff ...
+     .if n nroff stuff ...
+
+
+     Finally, string comparisons may be made in an ..iiff:
+
+     .if  'string1'string2'  stuff
+
+does `stuff' if _s_t_r_i_n_g_1 is the same as  _s_t_r_i_n_g_2_.   The  character
+
+separating  the  strings  can  be anything reasonable that is not
+
+contained in either string.  The strings themselves can reference
+
+strings with \\**, arguments with \\$$, and so on.
+
+
+1133..  EEnnvviirroonnmmeennttss
+
+     As  we  mentioned,  there  is a potential problem when going
+across a page boundary: parameters like size and font for a  page
+title may well be different from those in effect in the text when
+the page boundary occurs.  _t_r_o_f_f provides a very general  way  to
+deal with this and similar situations.  There are three `environ-
+ments', each of which has independently settable versions of many
+of  the  parameters  associated  with processing, including size,
+font, line and title lengths, fill/nofill mode,  tab  stops,  and
+even  partially collected lines.  Thus the titling problem may be
+readily solved by processing the main text in one environment and
+titles in a separate one with its own suitable parameters.
+
+     The command ..eevv nn shifts to environment nn; nn must be 0, 1 or
+2.  The command ..eevv with no argument returns to the previous  en-
+vironment.  Environment names are maintained in a stack, so calls
+for different environments may  be  nested  and  unwound  consis-
+tently.
+
+     Suppose  we  say that the main text is processed in environ-
+ment 0, which is where _t_r_o_f_f begins by default.  Then we can mod-
+ify  the  new  page  macro ..NNPP to process titles in environment 1
+
+
+
+
+
+
+
+
+
+USD:22-30                                        A TROFF Tutorial
+
+
+like this:
+
+  .de NP
+  .ev 1  \" shift to new environment
+  .lt 6i \" set parameters here
+  .ft R
+  .ps 10
+  ... any other processing ...
+  .ev    \" return to previous environment
+  ..
+
+It is also possible to initialize the parameters for an  environ-
+
+ment  outside  the ..NNPP macro, but the version shown keeps all the
+
+processing in one place and is  thus  easier  to  understand  and
+
+change.
+
+
+1144..  DDiivveerrssiioonnss
+
+     There  are numerous occasions in page layout when it is nec-
+essary to store some text for a period of time  without  actually
+printing it.  Footnotes are the most obvious example: the text of
+the footnote usually appears in the input well before  the  place
+on  the  page where it is to be printed is reached.  In fact, the
+place where it is output normally depends on how big it is, which
+implies that there must be a way to process the footnote at least
+enough to decide its size without printing it.
+
+     _t_r_o_f_f provides a mechanism called a diversion for doing this
+processing.   Any part of the output may be diverted into a macro
+instead of being printed, and then at some  convenient  time  the
+macro may be put back into the input.
+
+     The command ..ddii xxyy begins a diversion -- all subsequent out-
+put is collected into the macro xxyy until the command ..ddii with  no
+arguments  is  encountered.   This terminates the diversion.  The
+processed text is available at any  time  thereafter,  simply  by
+giving the command
+
+     .xy
+
+The  vertical size of the last finished diversion is contained in
+
+the built-in number register ddnn.
+
+
+     As a simple example, suppose we want to implement  a  `keep-
+release' operation, so that text between the commands ..KKSS and ..KKEE
+will not be split across a page boundary (as for a figure or  ta-
+ble).   Clearly,  when a ..KKSS is encountered, we have to begin di-
+verting the output so we can find out how big it is.  Then when a
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-31
+
+
+..KKEE  is seen, we decide whether the diverted text will fit on the
+current page, and print it either there if it fits, or at the top
+of the next page if it doesn't.  So:
+
+  .de KS\" start keep
+  .br   \" start fresh line
+  .ev 1 \" collect in new environment
+  .fi   \" make it filled text
+  .di XX\" collect in XX
+  ..
+
+
+  .de KE\" end keep
+  .br   \" get last partial line
+  .di   \" end diversion
+  .if \\n(dn>=\\n(.t .bp   \" bp if doesn't fit
+  .nf   \" bring it back in no-fill
+  .XX   \" text
+  .ev   \" return to normal environment
+  ..
+
+Recall  that  number  register  nnll is the current position on the
+
+output page.  Since output was being diverted,  this  remains  at
+
+its  value  when the diversion started.  ddnn is the amount of text
+
+in the diversion; ..tt (another built-in register) is the  distance
+
+to  the next trap, which we assume is at the bottom margin of the
+
+page.  If the diversion is large enough to go past the trap,  the
+
+..iiff  is  satisfied, and a ..bbpp is issued.  In either case, the di-
+
+verted output is then brought back with ..XXXX. It is  essential  to
+
+bring  it  back  in no-fill mode so _t_r_o_f_f will do no further pro-
+
+cessing on it.
+
+
+     This is not the most general keep-release, nor is it  robust
+in  the face of all conceivable inputs, but it would require more
+space than we have here to write it  in  full  generality.   This
+section is not intended to teach everything about diversions, but
+to sketch out enough that you can read  existing  macro  packages
+with some comprehension.
+
+AAcckknnoowwlleeddggeemmeennttss
+
+     I  am deeply indebted to J. F. Ossanna, the author of _t_r_o_f_f_,
+for his repeated patient explanations of fine points, and for his
+continuing  willingness to adapt _t_r_o_f_f to make other uses easier.
+
+
+
+
+
+
+
+
+
+USD:22-32                                        A TROFF Tutorial
+
+
+I am also grateful to Jim Blinn, Ted Dolotta, Doug McIlroy,  Mike
+Lesk and Joel Sturman for helpful comments on this paper.
+
+RReeffeerreenncceess
+
+
+[1]  J.  F. Ossanna, _N_R_O_F_F_/_T_R_O_F_F User's Manual, Bell Laboratories
+     Computing Science Technical Report 54, 1976.
+
+[2]  B. W. Kernighan, _A _S_y_s_t_e_m  _f_o_r  _T_y_p_e_s_e_t_t_i_n_g  _M_a_t_h_e_m_a_t_i_c_s  _-_-
+     _U_s_e_r_'_s  _G_u_i_d_e  _(_S_e_c_o_n_d _E_d_i_t_i_o_n_)_, Bell Laboratories Computing
+     Science Technical Report 17, 1977.
+
+[3]  M. E. Lesk, _T_B_L _-_- _A _P_r_o_g_r_a_m _t_o _F_o_r_m_a_t _T_a_b_l_e_s_, Bell  Labora-
+     tories Computing Science Technical Report 49, 1976.
+
+[4]  M.  E.  Lesk,  _T_y_p_i_n_g  _D_o_c_u_m_e_n_t_s _o_n _U_N_I_X_, Bell Laboratories,
+     1978.
+
+[5]  J. R. Mashey and D. W. Smith, _P_W_B_/_M_M _-_-  _P_r_o_g_r_a_m_m_e_r_'_s  _W_o_r_k_-
+     _b_e_n_c_h _M_e_m_o_r_a_n_d_u_m _M_a_c_r_o_s_, Bell Laboratories internal memoran-
+     dum.
+
+[6]  Eric P. Allman, _W_r_i_t_i_n_g _P_a_p_e_r_s _w_i_t_h _N_R_O_F_F _u_s_i_n_g _-_m_e_, Univer-
+     sity of California, Berkeley.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-33
+
+
+
+
+AAppppeennddiixx AA:: PPhhoottoottyyppeesseetttteerr CChhaarraacctteerr SSeett ((AAPPSS--55))
+
+These  characters  exist  in roman, italic, and bold.  To get the
+one on the left, type the four-character name on the right.
+
+     ff      \(ff    fi      \(fi    fl      \(fl    ffi     \(Fiffl\(Fl
+     _ \(ru  --      \(em    1/4     \(14    1/2     \(12    3/4\(34
+     (C)     \(co    <degree>  \(de  <*>     \(dg    ' \(fm  /c \(ct
+     (R)     \(rg    +o \(bu  []      \(sq    - \(hy
+                     (In bold, \(sq is [[]].)
+
+The following are special-font characters:
+
+     +  \(pl   -  \(mi   x  \(mu   /  \(di
+     =  \(eq   == \(==   >= \(>=   <= \(<=
+     != \(!=   +- \(+-   ~  \(no   /  \(sl
+     ~  \(ap   ~= \(~=   <proportional to>\(pt<nabla>\(gr
+     -> \(->   <- \(<-   |.  \(ua   |v  \(da
+     <integral>   \(is   <del>     \(pd<infinity>\(if<sqrt>\(sr
+     <proper subset>     \(sb      <proper superset>\(sp<union>\(cu<intersection>\(ca
+     <subset or equal>   \(ib      <superset or equal>\(ip<element of>\(mo{}\(es
+     '  \(aa   `  \(ga   O  \(ci   (gone)\(bs
+     <section> \(sc      <**>      \(dd<=\(lh=>\(rh
+     ,- \(lt   -. \(rt   |~ \(lc   ~| \(rc
+     `- \(lb   -' \(rb   |_ \(lf   _| \(rf
+     {  \(lk   }  \(rk   |  \(bv   <_sigma>\(ts
+     |  \(br   |  \(or   _  \(ul      \(rn
+     *  \(**
+
+These four characters also have two-character names.   The  '  is
+the apostrophe on terminals; the ` is the other quote mark.
+
+     '  \'     `  \`     -  \-     _  \_
+
+These  characters exist only on the special font, but they do not
+have four-character names:
+
+     "      {      }      <      >      ~      ^      \      #      @
+
+For greek, precede the roman letter by \\((** to get the correspond-
+ing greek; for example, \\((**aa is <alpha>.
+
+     abgdezyhiklmncoprstufxqw
+  <al<<pbg<<headeatmep>amls<>atiz<<>aleet>otth<<naaeik<>>>toalatpa>apm<>abm<>dun<a>ux>>io<<<>prs<ihi<u>ogtp>mas<auip<>>lhc<<oihpon>ism>>ie>ga>
+
+     ABGDEZYHIKLMNCOPRSTUFXQW
+    <AG<BaDmemlatE<>aZT>Hhe<tILaKa>mbMdN<aX>iO<<>PSiPi>gmT<aYP>h<<iXPO>smie>ga>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:22-34                                        A TROFF Tutorial
+
+
+
+                                   break-causing commmands 9
+IInnddeexx                              centering (^ce) 2
+                                   changing fonts (^ft, #f) 5
+! (negating conditionals) 17       changing macros 15
+#$ (macro argument) 16             character set 4,5,19
+#*x, #(xy (invoke string macro) 14 character translation (^tr) 2,6
+#b (bracketing function) 13        columnated output 10
+#d (subscript) 11                  commands 1
+#f (font change) 5                 commands that cause break 9
+#h (horizontal motion) 12          conditionals (^if) 16
+#nx, #n(xy (number register) 15    constant proportion 7
+#o (overstrike) 13                 default break list 9
+#s (size change) 3                 define macro (^de) 7
+#u (superscript) 11                define string macro (^ds) 14
+#v (vertical motion) 11            drawing lines 11
+#w (width function) 12             em 7,11
+#z (zero motion) 13                end of macro (^^) 7
+'command instead of ^command 9     even page test (e) 17
+% (page number register) 10,15     fill (^fi) 2
+^^ (end of macro definition) 7     fonts (^ft) 4,19
+^bp 9,10                           Greek (#(*-) 5,19
+^br (break) 9                      hanging indent (^ti) 12
+^ce (center) 2                     hints 20
+^ds (define string macro) 7,14     horizontal motion (#h) 12
+^fi (fill) 2                       hp (horizontal position register) 15
+^ft (change font) 5                hyphen 6
+^if (conditional test) 16          i scale indicator 4
+^in (indent) 6                     indent (^in) 6
+^lg (set ligatures 5               index 21
+^ll (line length) 6                italic font (.ft I) 4
+^nf (nofill) 2                     italicize (^ul) 6
+^nr (set number register) 14       legal point sizes 3
+^pn (page number) 10               ligatures (ff,fi,fl; ^lg) 5
+^ps (change point size) 1,3        line length (^ll) 6
+^sp (space) 4                      line spacing (^vs) 3
+^ss (set space size) 10            local motions (#u,#d,#v,#h,#w,#o,#z,#b) 11 ff
+^ta (set tab stops) 11             m scale indicator 7
+^tc (set tab character) 10         machine units 4,12
+^tl (title) 9                      macro arguments 15
+^tr (translate characters) 2,6     macros 7
+^ul (italicize) 6                  macros that change 15
+^vs (vertical spacing) 3           multiple backslashes 14
+^wh (when conditional) 9,17        negating conditionals (!) 17
+accents 6,13                       new page macro (NP) 8
+apostrophes 6                      nl (current vertical position register) 15
+arithmetic 15                      nofill (^nf) 2
+backslash 1,3,5,14,16              NROFF test (n) 17
+begin page (^bp) 9                 nested quotes 12
+block macros (B1,B2) 8             number registers (^nr,#n) 14
+bold font (.ft B) 5                numbered paragraphs 12
+boustrophedon 12                   odd page test (o) 17
+bracketing function (##b) 13       order of evaluation 14
+break (^br) 9                      overstrike (#o) 13
+
+
+
+
+
+
+
+
+
+A TROFF Tutorial                                        USD:22-35
+
+
+p scale indicator 3
+page number register (%) 10
+page numbers (^pn, ^bp) 10
+paragraph macro (PG) 7
+Paternoster 6
+point size (^ps) 1,3
+previous font (#fP, ^ft P) 5
+previous point size (#s0,^ps) 3
+quotes 6
+relative change (+-) 6
+ROFF 1
+ROFF header and footer 8
+Roman font (.ft R) 4
+scale indicator i 4
+scale indicator m 7
+scale indicator p 3
+scale indicator u 12
+scale indicators in arithmetic 15
+section heading macro (SC) 15
+set space size (^ss) 10
+size _ see point size
+space (^sp) 4
+space between lines (^vs) 3
+special characters (#(xx) 5,19
+string macros (^ds,#*) 14
+subscripts (#d) 11
+superscripts (#u) 11
+tab character (^tc) 11
+tabs (^ta) 10
+temporary indent (^ti) 7
+titles (^tl) 8
+translate (^tr) 2,6,12
+TROFF examples 19
+TROFF test (t) 17
+truncating division 15
+type faces _ see fonts
+u scale indicator 12
+underline (^ul) 6
+valid point sizes 3
+vertical motion (#v) 11
+vertical position on page 9
+vertical spacing (^vs) 3
+when (^wh) 9,17
+width function (#w) 12
+width of digits 10
+zero motion (#z) 13
+
+
+
+
+
+
+
+
+
+
+
+
+
+

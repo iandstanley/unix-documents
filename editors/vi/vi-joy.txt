@@ -1,0 +1,4686 @@
+
+
+
+
+
+
+
+
+
+           AAnn IInnttrroodduuccttiioonn ttoo DDiissppllaayy EEddiittiinngg wwiitthh VVii
+
+
+                           _W_i_l_l_i_a_m _J_o_y
+                           _M_a_r_k _H_o_r_t_o_n
+                    Computer Science Division
+    Department of Electrical Engineering and Computer Science
+               University of California, Berkeley
+                      Berkeley, Ca.  94720
+
+
+                            _A_B_S_T_R_A_C_T
+
+          _V_i (visual) is a display oriented interactive text
+     editor.  When using _v_i the screen of your terminal acts
+     as  a  window  into  the  file  which  you are editing.
+     Changes which you make to the  file  are  reflected  in
+     what you see.
+
+          Using  _v_i you can insert new text any place in the
+     file quite easily.  Most of the commands to _v_i move the
+     cursor  around in the file.  There are commands to move
+     the cursor forward and backward in units of characters,
+     words, sentences and paragraphs.  A small set of opera‐
+     tors, like dd for delete and cc for change, are  combined
+     with  the  motion  commands  to form operations such as
+     delete word or change paragraph, in a simple and  natu‐
+     ral  way.   This regularity and the mnemonic assignment
+     of commands to keys makes the editor command  set  easy
+     to remember and to use.
+
+          _V_i  will  work on a large number of display termi‐
+     nals, and new terminals are easily driven after editing
+     a  terminal description file.  While it is advantageous
+     to have an intelligent terminal which can  locally  in‐
+     sert  and delete lines and characters from the display,
+     the editor will function quite well on  dumb  terminals
+     over  slow phone lines.  The editor makes allowance for
+     the low bandwidth in these situations and uses  smaller
+     window  sizes and different display updating algorithms
+     to make best use of the limited speed available.
+
+          It is also possible to use the command set  of  _v_i
+     on   hardcopy  terminals,  storage  tubes  and  ‘‘glass
+     tty’s’’ using a one line editing window; thus _v_i_’_s com‐
+     mand  set is available on all terminals.  The full com‐
+     mand set of the more traditional, line oriented  editor
+     _e_x is available within _v_i_; it is quite simple to switch
+     between the two modes of editing.
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐2               An Introduction to Display Editing with Vi
+
+
+11..  GGeettttiinngg ssttaarrtteedd
+
+     This document provides a quick introduction  to  _v_i_.   (Pro‐
+nounced _v_e_e_‐_e_y_e.)  You should be running _v_i on a file you are fa‐
+miliar with while you are reading this.  The first part  of  this
+document (sections 1 through 5) describes the basics of using _v_i_.
+Some topics of special interest are presented in section  6,  and
+some  nitty‐gritty  details of how the editor functions are saved
+for section 7 to avoid cluttering the presentation here.
+
+     There is also a short appendix here, which  gives  for  each
+character  the  special  meanings which this character has in _v_i.
+Attached to this document should be a quick reference card.  This
+card summarizes the commands of _v_i in a very compact format.  You
+should have the card handy while you are learning _v_i_.
+
+11..11..  SSppeecciiffyyiinngg tteerrmmiinnaall ttyyppee
+
+     Before you can start _v_i you must tell the system  what  kind
+of  terminal  you  are using.  Here is a (necessarily incomplete)
+list of terminal type codes.  If your terminal  does  not  appear
+here,  you  should  consult with one of the staff members on your
+system to find out the code for your terminal.  If your  terminal
+does  not  have a code, one can be assigned and a description for
+the terminal can be created.
+
+
+       CCooddee       FFuullll nnaammee                    TTyyppee
+      ──────────────────────────────────────────────────────
+       2621       Hewlett‐Packard 2621A/P      Intelligent
+       2645       Hewlett‐Packard 264x         Intelligent
+       act4       Microterm ACT‐IV             Dumb
+       act5       Microterm ACT‐V              Dumb
+       adm3a      Lear Siegler ADM‐3a          Dumb
+       adm31      Lear Siegler ADM‐31          Intelligent
+       c100       Human Design Concept 100     Intelligent
+       dm1520     Datamedia 1520               Dumb
+       dm2500     Datamedia 2500               Intelligent
+       dm3025     Datamedia 3025               Intelligent
+       fox        Perkin‐Elmer Fox             Dumb
+       h1500      Hazeltine 1500               Intelligent
+       h19        Heathkit h19                 Intelligent
+       i100       Infoton 100                  Intelligent
+       mime       Imitating a smart act4       Intelligent
+       t1061      Teleray 1061                 Intelligent
+       vt52       Dec VT‐52                    Dumb
+
+
+     Suppose for example that you have a Hewlett‐Packard  HP2621A
+terminal.   The  code  used  by  the  system for this terminal is
+───────────
+The financial support of an IBM Graduate Fellowship and  the  Na‐
+tional   Science  Foundation  under  grants  MCS74‐07644‐A03  and
+MCS78‐07291 is gratefully acknowledged.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi               USD:11‐3
+
+
+‘2621’.  In this case you can use one of the  following  commands
+to tell the system the type of your terminal:
+
+     % sseetteennvv TTEERRMM 2621
+
+This  command  works  with  the  _c_s_h shell.  If you are using the
+standard Bourne shell _s_h then you should give the commands
+
+     $ TTEERRMM==2621
+     $ eexxppoorrtt TTEERRMM
+
+
+     If you want to arrange to have your terminal type set up au‐
+tomatically  when  you  log in, you can use the _t_s_e_t program.  If
+you dial in on a _m_i_m_e, but often use hardwired ports,  a  typical
+line for your _._l_o_g_i_n file (if you use csh) would be
+
+     sseetteennvv TTEERRMM ``ttsseett − −d mime`
+
+or for your _._p_r_o_f_i_l_e file (if you use sh)
+
+     TTEERRMM==``ttsseet − −d mime`
+
+_T_s_e_t  knows  which terminals are hardwired to each port and needs
+only to be told that when you dial in you are probably on a _m_i_m_e.
+_T_s_e_t  is  usually  used  to change the erase and kill characters,
+too.
+
+11..22..  EEddiittiinngg aa ffiillee
+
+     After telling the system which kind of  terminal  you  have,
+you  should  make a copy of a file you are familiar with, and run
+_v_i on this file, giving the command
+
+     % vvii _n_a_m_e
+
+replacing _n_a_m_e with the name of the copy file you  just  created.
+The  screen  should clear and the text of your file should appear
+on the screen.  If something else  happens  refer  to  the  foot‐
+note.++
+───────────
+++  If  you  gave the system an incorrect terminal type code then
+the editor may have just made a mess out of  your  screen.   This
+happens  when  it sends control codes for one kind of terminal to
+some other kind of terminal.  In this case hit the keys ::qq (colon
+and  the q key) and then hit the RETURN key.  This should get you
+back to the command level interpreter.  Figure out what  you  did
+wrong (ask someone else if necessary) and try again.
+     Another thing which can go wrong is that you typed the wrong
+file name and the editor just printed an  error  diagnostic.   In
+this  case  you should follow the above procedure for getting out
+of the editor, and try again this time  spelling  the  file  name
+correctly.
+     If  the editor doesn’t seem to respond to the commands which
+
+
+
+
+
+
+
+
+
+USD:11‐4               An Introduction to Display Editing with Vi
+
+
+11..33..  TThhee eeddiittoorr’’ss ccooppyy:: tthhee bbuuffffeerr
+
+     The editor does not directly modify the file which  you  are
+editing.   Rather,  the  editor  makes  a copy of this file, in a
+place called the _b_u_f_f_e_r_, and remembers the file’s name.   You  do
+not  affect  the  contents of the file unless and until you write
+the changes you make back into the original file.
+
+11..44..  NNoottaattiioonnaall ccoonnvveennttiioonnss
+
+     In our examples, input which must be typed  as  is  will  be
+presented in bboolldd ffaaccee. Text which should be replaced with appro‐
+priate input will be given in _i_t_a_l_i_c_s.  We will represent special
+characters in SMALL CAPITALS.
+
+11..55..  AArrrrooww kkeeyyss
+
+     The  editor  command  set is independent of the terminal you
+are using.  On most terminals with cursor positioning keys, these
+keys  will also work within the editor.  If you don’t have cursor
+positioning keys, or even if you do, you can use the hh jj kk and  ll
+keys  as  cursor positioning keys (these are labelled with arrows
+on an _a_d_m_3_a_)_._*
+
+     (Particular note for the HP2621: on this terminal the  func‐
+tion keys must be _s_h_i_f_t_e_d (ick) to send to the machine, otherwise
+they only act locally.  Unshifted use will leave the cursor posi‐
+tioned incorrectly.)
+
+11..66..  SSppeecciiaall cchhaarraacctteerrss:: EESSCC,, CCRR aanndd DDEELL
+
+     Several  of  these special characters are very important, so
+be sure to find them right now.  Look on your keyboard for a  key
+labelled  ESC or ALT.  It should be near the upper left corner of
+your terminal.  Try hitting this key a  few  times.   The  editor
+will ring the bell to indicate that it is in a quiescent state.++
+Partially  formed commands are cancelled by ESC, and when you in‐
+sert text in the file you end the text insertion with ESC.   This
+key  is  a  fairly harmless one to hit, so you can just hit it if
+you don’t know what is going on until the editor rings the bell.
+
+     The CR or RETURN key is important because it is used to ter‐
+minate  certain commands.  It is usually at the right side of the
+keyboard, and is the same command used at the end of  each  shell
+───────────
+you type here, try sending an interrupt to it by hitting the  DEL
+or  RUB  key  on  your  terminal, and then hitting the ::qq command
+again followed by a carriage return.
+
+*  As we will see later, _h moves back to the left (like control‐h
+which is a backspace), _j moves down (in the same column), _k moves
+up (in the same column), and _l moves to the right.
+++  On smart terminals where it is possible, the editor will qui‐
+etly flash the screen rather than ringing the bell.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi               USD:11‐5
+
+
+command.
+
+     Another  very useful key is the DEL or RUB key, which gener‐
+ates an interrupt, telling the editor to stop what it  is  doing.
+It  is  a  forceful way of making the editor listen to you, or to
+return it to the quiescent state if you don’t know or don’t  like
+what  is  going  on.   Try  hitting the ‘/’ key on your terminal.
+This key is used when you want to specify a string to be searched
+for.   The  cursor should now be positioned at the bottom line of
+the terminal after a ‘/’ printed as a prompt.  You  can  get  the
+cursor  back  to  the  current position by hitting the DEL or RUB
+key; try this now.*  From now on we will simply refer to  hitting
+the DEL or RUB key as ‘‘sending an interrupt.’’**
+
+     The  editor  often  echoes your commands on the last line of
+the terminal.  If the cursor is on the  first  position  of  this
+last  line,  then the editor is performing a computation, such as
+computing a new position in the file after a search or running  a
+command  to  reformat part of the buffer.  When this is happening
+you can stop the editor by sending an interrupt.
+
+11..77..  GGeettttiinngg oouutt ooff tthhee eeddiittoorr
+
+     After you have worked with this introduction  for  a  while,
+and you wish to do something else, you can give the command ZZZZ to
+the editor.  This will write the contents of the editor’s  buffer
+back  into the file you are editing, if you made any changes, and
+then quit from the editor.  You can also end an editor session by
+giving the command ::qq!!CR;+ this is a dangerous  but  occasionally
+essential  command which ends the editor session and discards all
+your changes.  You need to know about this command  in  case  you
+change  the editor’s copy of a file you wish only to look at.  Be
+very careful not to give this command when  you  really  want  to
+save the changes you have made.
+
+22..  MMoovviinngg aarroouunndd iinn tthhee ffiillee
+
+22..11..  SSccrroolllliinngg aanndd ppaaggiinngg
+
+     The editor has a number of commands for moving around in the
+file.  The most useful of these is generated by hitting the  con‐
+trol  and  D keys at the same time, a control‐D or ‘^D’.  We will
+use this two character notation for referring  to  these  control
+keys from now on.  You may have a key labelled ‘^’ on your termi‐
+nal.  This key will be represented as ‘↑’ in this  document;  ‘^’
+is  exclusively  used  as  part  of the ‘^x’ notation for control
+
+───────────
+* Backspacing over the ‘/’ will also cancel the search.
+**  On  some systems, this interruptibility comes at a price: you
+cannot type ahead when the editor is computing with the cursor on
+the bottom line.
++  All commands which read from the last display line can also be
+terminated with a ESC as well as an CR.
+
+
+
+
+
+
+
+
+
+USD:11‐6               An Introduction to Display Editing with Vi
+
+
+characters.++
+
+     As you know now  if  you  tried  hitting  ^^DD,  this  command
+scrolls down in the file.  The DD thus stands for down.  Many edi‐
+tor commands are mnemonic and this makes them much easier to  re‐
+member.   For instance the command to scroll up is ^^UU.  Many dumb
+terminals can’t scroll up at all, in which case hitting ^^UU clears
+the  screen and refreshes it with a line which is farther back in
+the file at the top.
+
+     If you want to see more of the file below where you are, you
+can  hit  ^^EE to expose one more line at the bottom of the screen,
+leaving the cursor where it is.  The command ^^YY (which  is  hope‐
+lessly  non‐mnemonic, but next to ^^UU on the keyboard) exposes one
+more line at the top of the screen.
+
+     There are other ways to move around in the file; the keys ^^FF
+and  ^^BB  move  forward  and  backward a page, keeping a couple of
+lines of continuity between screens so that  it  is  possible  to
+read  through  a  file  using  these rather than ^^DD and ^^UU if you
+wish.
+
+     Notice the difference between scrolling and paging.  If  you
+are trying to read the text in a file, hitting ^^FF to move forward
+a page will leave you only a little  context  to  look  back  at.
+Scrolling on the other hand leaves more context, and happens more
+smoothly.  You can continue to read the text as scrolling is tak‐
+ing place.
+
+22..22..  SSeeaarrcchhiinngg,, ggoottoo,, aanndd pprreevviioouuss ccoonntteexxtt
+
+     Another  way  to  position yourself in the file is by giving
+the editor a string to search for.  Type the character // followed
+by  a string of characters terminated by CR.  The editor will po‐
+sition the cursor at the next occurrence  of  this  string.   Try
+hitting  nn to then go to the next occurrence of this string.  The
+character ?? will search backwards from where you are, and is oth‐
+erwise like //.+
+
+     If  the  search string you give the editor is not present in
+the file the editor will print a diagnostic on the last  line  of
+the  screen, and the cursor will be returned to its initial posi‐
+tion.
+
+
+───────────
+++ If you don’t have a ‘^’ key on your  terminal  then  there  is
+probably a key labelled ‘↑’; in any case these characters are one
+and the same.
++  These  searches will normally wrap around the end of the file,
+and thus find the string even if it is not on a line in  the  di‐
+rection you search provided it is anywhere else in the file.  You
+can disable this wraparound in scans by giving  the  command  ::ssee
+nnoowwrraappssccaannCR, or more briefly ::ssee nnoowwssCR.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi               USD:11‐7
+
+
+     If you wish the search to match only at the beginning  of  a
+line,  begin  the  search string with an ↑↑.  To match only at the
+end of a line, end the search string with a $$.   Thus  //↑↑sseeaarrcchhCR
+will search for the word ‘search’ at the beginning of a line, and
+//llaasstt$$CR searches for the word ‘last’ at the end of a line.*
+
+     The  command  GG, when preceded by a number will position the
+cursor at that line in the file.  Thus 11GG will move the cursor to
+the  first  line  of  the  file.  If you give GG no count, then it
+moves to the end of the file.
+
+     If you are near the end of the file, and the  last  line  is
+not  at  the bottom of the screen, the editor will place only the
+character ‘~’ on each remaining line.  This  indicates  that  the
+last  line  in  the file is on the screen; that is, the ‘~’ lines
+are past the end of the file.
+
+     You can find out the state of the file you  are  editing  by
+typing  a  ^^GG.  The editor will show you the name of the file you
+are editing, the number of the current line, the number of  lines
+in  the  buffer, and the percentage of the way through the buffer
+which you are.  Try doing this now, and remember  the  number  of
+the line you are on.  Give a GG command to get to the end and then
+another GG command to get back where you were.
+
+     You can also get back to a previous position  by  using  the
+command ```` (two back quotes).  This is often more convenient than
+GG because it requires no advance preparation.  Try giving a GG  or
+a search with // or ?? and then a ```` to get back to where you were.
+If you accidentally hit nn or any command which moves you far away
+from  a  context of interest, you can quickly get back by hitting
+````.
+
+22..33..  MMoovviinngg aarroouunndd oonn tthhee ssccrreeeenn
+
+     Now try just moving the cursor around  on  the  screen.   If
+your  terminal  has  arrow keys (4 or 5 keys with arrows going in
+each direction) try them and convince yourself  that  they  work.
+If you don’t have working arrow keys, you can always use hh, jj, kk,
+and ll.  Experienced users of _v_i prefer these keys to arrow  keys,
+because they are usually right underneath their fingers.
+
+     Hit the ++ key.  Each time you do, notice that the cursor ad‐
+vances to the next line in the file, at the first non‐white posi‐
+tion on the line.  The −− key is like ++ but goes the other way.
+
+
+───────────
+*Actually, the string you give to search for here can be a  _r_e_g_u_‐
+_l_a_r  _e_x_p_r_e_s_s_i_o_n  in the sense of the editors _e_x(1) and _e_d(1).  If
+you don’t wish to learn about this yet, you can disable this more
+general  facility by doing ::ssee nnoommaaggiiccCR; by putting this command
+in EXINIT in your environment, you can have this always be in ef‐
+fect (more about _E_X_I_N_I_T later.)
+
+
+
+
+
+
+
+
+
+USD:11‐8               An Introduction to Display Editing with Vi
+
+
+     These  are  very common keys for moving up and down lines in
+the file.  Notice that if you go off the bottom or top with these
+keys  then  the  screen  will scroll down (and up if possible) to
+bring a line at a time into view.  The RETURN key  has  the  same
+effect as the ++ key.
+
+     _V_i also has commands to take you to the top, middle and bot‐
+tom of the screen.  HH will take you to the top (home) line on the
+screen.  Try preceding it with a number as in 33HH.  This will take
+you to the third line on the screen.  Many _v_i commands take  pre‐
+ceding numbers and do interesting things with them.  Try MM, which
+takes you to the middle line on the screen, and  LL,  which  takes
+you to the last line on the screen.  LL also takes counts, thus 55LL
+will take you to the fifth line from the bottom.
+
+22..44..  MMoovviinngg wwiitthhiinn aa lliinnee
+
+     Now try picking a word on some line on the screen,  not  the
+first word on the line.  move the cursor using RETURN and −− to be
+on the line where the word is.  Try hitting the ww key.  This will
+advance the cursor to the next word on the line.  Try hitting the
+bb key to back up words in the line.  Also try the ee key which ad‐
+vances  you to the end of the current word rather than to the be‐
+ginning of the next word.  Also try SPACE (the space  bar)  which
+moves  right one character and the BS (backspace or ^^HH) key which
+moves left one character.  The key hh works as ^^HH does and is use‐
+ful  if  you  don’t have a BS key.  (Also, as noted just above, ll
+will move to the right.)
+
+     If the line had punctuation in it you may have noticed  that
+that  the ww and bb keys stopped at each group of punctuation.  You
+can also go back and forwards words without stopping at  punctua‐
+tion  by  using  WW  and BB rather than the lower case equivalents.
+Think of these as bigger words.  Try these on a  few  lines  with
+punctuation to see how they differ from the lower case ww and bb.
+
+     The word keys wrap around the end of line, rather than stop‐
+ping at the end.  Try moving to a word on a line below where  you
+are by repeatedly hitting ww.
+
+22..55..  SSuummmmaarryy
+
+
+     SPACE    advance the cursor one position
+     ^^BB       backwards to previous page
+     ^^DD       scrolls down in the file
+     ^^EE       exposes another line at the bottom
+     ^^FF       forward to next page
+     ^^GG       tell what is going on
+     ^^HH       backspace the cursor
+     ^^NN       next line, same column
+     ^^PP       previous line, same column
+     ^^UU       scrolls up in the file
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi               USD:11‐9
+
+
+     ^^YY       exposes another line at the top
+     ++        next line, at the beginning
+     −−        previous line, at the beginning
+     //        scan for a following string forwards
+     ??        scan backwards
+     BB        back a word, ignoring punctuation
+     GG        go to specified line, last default
+     HH        home screen line
+     MM        middle screen line
+     LL        last screen line
+     WW        forward a word, ignoring punctuation
+     bb        back a word
+     ee        end of current word
+     nn        scan for next instance of // or ?? pattern
+     ww        word after this word
+
+
+22..66..  VViieeww
+
+     If you want to use the editor to look at a file, rather than
+to make changes, invoke it as _v_i_e_w instead of _v_i.  This will  set
+the  _r_e_a_d_o_n_l_y option which will prevent you from accidently over‐
+writing the file.
+
+
+33..  MMaakkiinngg ssiimmppllee cchhaannggeess
+
+33..11..  IInnsseerrttiinngg
+
+     One of the most useful commands is the ii  (insert)  command.
+After  you  type  ii, everything you type until you hit ESC is in‐
+serted into the file.  Try this now; position  yourself  to  some
+word in the file and try inserting text before this word.  If you
+are on an dumb terminal it will seem, for a minute, that some  of
+the  characters in your line have been overwritten, but they will
+reappear when you hit ESC.
+
+     Now try finding a word which can, but does not,  end  in  an
+‘s’.   Position  yourself at this word and type ee (move to end of
+word), then aa for append and then ‘sESC’ to terminate the textual
+insert.   This sequence of commands can be used to easily plural‐
+ize a word.
+
+     Try inserting and appending a few times to make sure you un‐
+derstand  how  this works; ii placing text to the left of the cur‐
+sor, aa to the right.
+
+     It is often the case that you want to add new lines  to  the
+file  you  are editing, before or after some specific line in the
+file.  Find a line where this makes sense and then give the  com‐
+mand  oo  to  create  a new line after the line you are on, or the
+command OO to create a new line before the line you are on.  After
+you  create a new line in this way, text you type up to an ESC is
+inserted on the new line.
+
+
+
+
+
+
+
+
+
+USD:11‐10              An Introduction to Display Editing with Vi
+
+
+     Many related editor commands are invoked by the same  letter
+key  and differ only in that one is given by a lower case key and
+the other is given by an upper case key.  In these cases, the up‐
+per  case  key often differs from the lower case key in its sense
+of direction, with the upper case key working backward and/or up,
+while the lower case key moves forward and/or down.
+
+     Whenever  you are typing in text, you can give many lines of
+input or just a few characters.  To type in more than one line of
+text,  hit a RETURN at the middle of your input.  A new line will
+be created for text, and you can continue to type.  If you are on
+a  slow and dumb terminal the editor may choose to wait to redraw
+the tail of the screen, and will let you type over  the  existing
+screen lines.  This avoids the lengthy delay which would occur if
+the editor attempted to keep the tail of the screen always up  to
+date.   The  tail of the screen will be fixed up, and the missing
+lines will reappear, when you hit ESC.
+
+     While you are inserting new text, you can use the characters
+you normally use at the system command level (usually ^^HH or ##) to
+backspace over the last character which you typed, and the  char‐
+acter which you use to kill input lines (usually @@, ^^XX, or ^^UU) to
+erase the input you have typed on the current line.+ The  charac‐
+ter  ^^WW will erase a whole word and leave you after the space af‐
+ter the previous word; it is useful for quickly backing up in  an
+insert.
+
+     Notice that when you backspace during an insertion the char‐
+acters you backspace over are not erased; the cursor moves  back‐
+wards,  and  the characters remain on the display.  This is often
+useful if you are planning to type in something similar.  In  any
+case  the characters disappear when when you hit ESC; if you want
+to get rid of them immediately, hit an ESC and then aa again.
+
+     Notice also that you can’t erase characters which you didn’t
+insert,  and  that  you can’t backspace around the end of a line.
+If you need to back up to the previous line to make a correction,
+just  hit ESC and move the cursor back to the previous line.  Af‐
+ter making the correction you can return to where  you  were  and
+use the insert or append command again.
+
+33..22..  MMaakkiinngg ssmmaallll ccoorrrreeccttiioonnss
+
+     You  can  make small corrections in existing text quite eas‐
+ily.  Find a single character which is wrong  or  just  pick  any
+character.  Use the arrow keys to find the character, or get near
+the character with the word motion keys and then either backspace
+(hit  the  BS key or ^^HH or even just hh) or SPACE (using the space
+bar) until the cursor is on the character which is wrong.  If the
+character  is  not  needed  then  hit the xx key; this deletes the
+───────────
++ In fact, the character ^^HH (backspace) always works to erase the
+last  input character here, regardless of what your erase charac‐
+ter is.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐11
+
+
+character from the file.  It is analogous to the way  you  xx  out
+characters  when  you  make mistakes on a typewriter (except it’s
+not as messy).
+
+     If the character is incorrect, you can replace it  with  the
+correct  character  by giving the command rr_c, where _c is replaced
+by the correct character.  Finally if the character which is  in‐
+correct  should  be replaced by more than one character, give the
+command ss which substitutes a string of characters,  ending  with
+ESC, for it.  If there are a small number of characters which are
+wrong you can precede ss with a count of the number of  characters
+to  be  replaced.   Counts  are also useful with xx to specify the
+number of characters to be deleted.
+
+33..33..  MMoorree ccoorrrreeccttiioonnss:: ooppeerraattoorrss
+
+     You already know almost enough to make changes at  a  higher
+level.   All  you  need  to  know now is that the dd key acts as a
+delete operator.  Try the command ddww to delete a word.  Try  hit‐
+ting  ..  a few times.  Notice that this repeats the effect of the
+ddww.  The command .. repeats the last command which made a  change.
+You can remember it by analogy with an ellipsis ‘......’.
+
+     Now  try ddbb.  This deletes a word backwards, namely the pre‐
+ceding word.  Try ddSPACE.  This deletes a single  character,  and
+is equivalent to the xx command.
+
+     Another very useful operator is cc or change.  The command ccww
+thus changes the text of a single word.  You follow it by the re‐
+placement  text  ending  with  an ESC.  Find a word which you can
+change to another, and try this now.  Notice that the end of  the
+text  to be changed was marked with the character ‘$’ so that you
+can see this as you are typing in the new material.
+
+33..44..  OOppeerraattiinngg oonn lliinneess
+
+     It is often the case that you  want  to  operate  on  lines.
+Find a line which you want to delete, and type dddd, the dd operator
+twice.  This will delete the line.  If you are on a  dumb  termi‐
+nal,  the editor may just erase the line on the screen, replacing
+it with a line with only an @ on it.  This line does  not  corre‐
+spond  to any line in your file, but only acts as a place holder.
+It helps to avoid a lengthy redraw of  the  rest  of  the  screen
+which  would  be  necessary  to  close up the hole created by the
+deletion on a terminal without a delete line capability.
+
+     Try repeating the cc operator twice; this will change a whole
+line,  erasing its previous contents and replacing them with text
+you type up to an ESC.+
+
+───────────
++ The command SS is a convenient synonym for for  cccc,  by  analogy
+with  ss.   Think of SS as a substitute on lines, while ss is a sub‐
+stitute on characters.
+
+
+
+
+
+
+
+
+
+USD:11‐12              An Introduction to Display Editing with Vi
+
+
+     You can delete or change more than one line by preceding the
+dddd  or  cccc  with a count, i.e. 55dddd deletes 5 lines.  You can also
+give a command like ddLL to delete all the lines up to and  includ‐
+ing  the  last  line  on the screen, or dd33LL to delete through the
+third from the bottom line.  Try some commands  like  this  now.*
+Notice that the editor lets you know when you change a large num‐
+ber of lines so that you can see the extent of the  change.   The
+editor  will  also always tell you when a change you make affects
+text which you cannot see.
+
+33..55..  UUnnddooiinngg
+
+     Now suppose that the last change which you made  was  incor‐
+rect; you could use the insert, delete and append commands to put
+the correct material back.  However, since it is often  the  case
+that  we regret a change or make a change incorrectly, the editor
+provides a uu (undo) command to reverse the last change which  you
+made.  Try this a few times, and give it twice in a row to notice
+that an uu also undoes a uu..
+
+     The undo command lets you reverse only a single change.  Af‐
+ter  you  make a number of changes to a line, you may decide that
+you would rather have the original state of the line back.  The UU
+command restores the current line to the state before you started
+changing it.
+
+     You can recover text which you delete, even if undo will not
+bring it back; see the section on recovering lost text below.
+
+33..66..  SSuummmmaarryy
+
+
+     SPACE    advance the cursor one position
+     ^^HH       backspace the cursor
+     ^^WW       erase a word during an insert
+     erase    your erase (usually ^H or #), erases a character during an insert
+     kill     your kill (usually @, ^X, or ^U), kills the insert on this line
+     ..        repeats the changing command
+     OO        opens and inputs new lines, above the current
+     UU        undoes the changes you made to the current line
+     aa        appends text after the cursor
+     cc        changes the object you specify to the following text
+     dd        deletes the object you specify
+     ii        inserts text before the cursor
+     oo        opens and inputs new lines, below the current
+     uu        undoes the last change
+
+
+───────────
+* One subtle point here involves using the // search  after  a  dd.
+This will normally delete characters from the current position to
+the point of the match.  If what is desired is  to  delete  whole
+lines  including  the  two points, give the pattern as //ppaatt//++00, a
+line address.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐13
+
+
+44..  MMoovviinngg aabboouutt;; rreeaarrrraannggiinngg aanndd dduupplliiccaattiinngg tteexxtt
+
+44..11..  LLooww lleevveell cchhaarraacctteerr mmoottiioonnss
+
+     Now  move  the cursor to a line where there is a punctuation
+or a bracketing character such as a parenthesis or a comma or pe‐
+riod.   Try  the command ff_x where _x is this character.  This com‐
+mand finds the next _x character to the right of the cursor in the
+current  line.   Try  then  hitting a ;;, which finds the next in‐
+stance of the same character.  By using the ff command and then  a
+sequence of ;;’s you can often get to a particular place in a line
+much faster than with a  sequence  of  word  motions  or  SPACEs.
+There  is  also  a FF command, which is like ff, but searches back‐
+ward.  The ;; command repeats FF also.
+
+     When you are operating on the text in a line it is often de‐
+sirable to deal with the characters up to, but not including, the
+first instance of a character.  Try ddff_x for some _x now and notice
+that  the  _x character is deleted.  Undo this with uu and then try
+ddtt_x;  the tt here stands for to, i.e.  delete up to  the  next  _x,
+but not the _x.  The command TT is the reverse of tt.
+
+     When  working with the text of a single line, an ↑↑ moves the
+cursor to the first non‐white position on the line, and a $$ moves
+it  to  the end of the line.  Thus $$aa will append new text at the
+end of the current line.
+
+     Your file may have tab (^^II) characters in it.  These charac‐
+ters  are  represented  as  a number of spaces expanding to a tab
+stop, where tab stops are every 8 positions.*  When the cursor is
+at  a tab, it sits on the last of the several spaces which repre‐
+sent that tab.  Try moving the cursor back and forth over tabs so
+you understand how this works.
+
+     On rare occasions, your file may have nonprinting characters
+in it.  These characters are displayed in the same way  they  are
+represented  in this document, that is with a two character code,
+the first character of which is ‘^’.  On the screen  non‐printing
+characters  resemble  a  ‘^’  character  adjacent to another, but
+spacing or backspacing over the character will  reveal  that  the
+two characters are, like the spaces representing a tab character,
+a single character.
+
+     The editor sometimes discards control characters,  depending
+on  the  character and the setting of the _b_e_a_u_t_i_f_y option, if you
+attempt to insert them in your file.  You can get a control char‐
+acter in the file by beginning an insert and then typing a ^^VV be‐
+fore the control character.  The ^^VV quotes the following  charac‐
+ter, causing it to be inserted directly into the file.
+
+───────────
+* This is settable by a command of the form ::ssee ttss==_xCR,  where  _x
+is  4 to set tabstops every four columns.  This has effect on the
+screen representation within the editor.
+
+
+
+
+
+
+
+
+
+USD:11‐14              An Introduction to Display Editing with Vi
+
+
+44..22..  HHiigghheerr lleevveell tteexxtt oobbjjeeccttss
+
+     In  working with a document it is often advantageous to work
+in terms of sentences, paragraphs, and sections.  The  operations
+((  and )) move to the beginning of the previous and next sentences
+respectively.  Thus the command dd)) will delete the  rest  of  the
+current  sentence;  likewise dd(( will delete the previous sentence
+if you are at the beginning of the current sentence, or the  cur‐
+rent sentence up to where you are if you are not at the beginning
+of the current sentence.
+
+     A sentence is defined to end at a ‘.’, ‘!’ or ‘?’  which  is
+followed by either the end of a line, or by two spaces.  Any num‐
+ber of closing ‘)’, ‘]’, ‘"’ and ‘´’ characters may appear  after
+the ‘.’, ‘!’ or ‘?’ before the spaces or end of line.
+
+     The  operations  {{ and }} move over paragraphs and the opera‐
+tions [[[[ and ]]]] move over sections.+
+
+     A paragraph begins after each empty line, and also  at  each
+of  a  set of paragraph macros, specified by the pairs of charac‐
+ters in the definition of the string  valued  option  _p_a_r_a_g_r_a_p_h_s.
+The  default setting for this option defines the paragraph macros
+of the _−_m_s and _−_m_m macro packages, i.e. the ‘.IP’,  ‘.LP’,  ‘.PP’
+and ‘.QP’, ‘.P’ and ‘.LI’ macros.++ Each  paragraph  boundary  is
+also  a  sentence  boundary.  The sentence and paragraph commands
+can be given counts to operate over groups of sentences and para‐
+graphs.
+
+     Sections  in  the  editor begin after each macro in the _s_e_c_‐
+_t_i_o_n_s option, normally ‘.NH’, ‘.SH’, ‘.H’  and  ‘.HU’,  and  each
+line  with a formfeed ^^LL in the first column.  Section boundaries
+are always line and paragraph boundaries also.
+
+     Try experimenting with the sentence and  paragraph  commands
+until  you are sure how they work.  If you have a large document,
+try looking through it using the section commands.   The  section
+commands  interpret  a preceding count as a different window size
+in which to redraw the screen at the new location, and this  win‐
+dow  size  is the base size for newly drawn windows until another
+size is specified.  This is very useful if you are on a slow ter‐
+minal and are looking for a particular section.  You can give the
+first section command a small count to then see  each  successive
+section heading in a small window.
+───────────
++ The [[[[ and ]]]] operations require the operation character to  be
+doubled  because  they can move the cursor far from where it cur‐
+rently is.  While it is easy to get back  with  the  command  ````,
+these  commands  would  still be frustrating if they were easy to
+hit accidentally.
+++  You can easily change or extend this set of macros by assign‐
+ing a different string to the _p_a_r_a_g_r_a_p_h_s option in  your  EXINIT.
+See section 6.2 for details.  The ‘.bp’ directive is also consid‐
+ered to start a paragraph.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐15
+
+
+44..33..  RReeaarrrraannggiinngg aanndd dduupplliiccaattiinngg tteexxtt
+
+     The  editor  has  a  single  unnamed  buffer  where the last
+deleted or changed away text is saved, and a set of named buffers
+aa−zz  which  you  can  use to save copies of text and to move text
+around in your file and between files.
+
+     The operator yy yanks a copy of the object which follows into
+the  unnamed  buffer.  If preceded by a buffer name, ""_xyy, where _x
+here is replaced by a letter aa−−zz, it places the text in the named
+buffer.   The text can then be put back in the file with the com‐
+mands pp and PP;; pp puts the text after or below the cursor, while PP
+puts the text before or above the cursor.
+
+     If  the text which you yank forms a part of a line, or is an
+object such as a sentence which partially  spans  more  than  one
+line,  then  when  you put the text back, it will be placed after
+the cursor (or before if you use PP).  If the  yanked  text  forms
+whole lines, they will be put back as whole lines, without chang‐
+ing the current line.  In this case, the put acts much like  a  oo
+or OO command.
+
+     Try  the  command YYPP.  This makes a copy of the current line
+and leaves you on this copy, which is placed before  the  current
+line.   The  command  YY is a convenient abbreviation for yyyy.  The
+command YYpp will also make a copy of the current line,  and  place
+it  after  the  current line.  You can give YY a count of lines to
+yank, and thus duplicate several lines; try 33YYPP.
+
+     To move text within the buffer, you need to delete it in one
+place,  and put it back in another.  You can precede a delete op‐
+eration by the name of a buffer in which the text is to be stored
+as  in  ""aa55dddd  deleting 5 lines into the named buffer _a.  You can
+then move the cursor to the eventual resting place of  the  these
+lines  and  do  a  ""aapp or ""aaPP to put them back.  In fact, you can
+switch and edit another file before you put the  lines  back,  by
+giving  a command of the form ::ee _n_a_m_eCR where _n_a_m_e is the name of
+the other file you want to edit.  You will have to write back the
+contents  of  the  current editor buffer (or discard them) if you
+have made changes before the editor will let you  switch  to  the
+other file.  An ordinary delete command saves the text in the un‐
+named buffer, so that an ordinary  put  can  move  it  elsewhere.
+However,  the unnamed buffer is lost when you change files, so to
+move text from one file to another you should use an unnamed buf‐
+fer.
+
+44..44..  SSuummmmaarryy..
+
+
+     ↑↑        first non‐white on line
+     $$        end of line
+     ))        forward sentence
+     }}        forward paragraph
+
+
+
+
+
+
+
+
+
+
+USD:11‐16              An Introduction to Display Editing with Vi
+
+
+     ]]]]       forward section
+     ((        backward sentence
+     {{        backward paragraph
+     [[[[       backward section
+     ff_x       find _x forward in line
+     pp        put text back, after cursor or below current line
+     yy        yank operator, for copies and moves
+     tt_x       up to _x forward, for operators
+     FF_x       f backward in line
+     PP        put text back, before cursor or above current line
+     TT_x       t backward in line
+
+
+55..  HHiigghh lleevveell ccoommmmaannddss
+
+55..11..  WWrriittiinngg,, qquuiittttiinngg,, eeddiittiinngg nneeww ffiilleess
+
+     So  far  we  have  seen how to enter _v_i and to write out our
+file using either ZZZZ or ::wwCR. The first exits  from  the  editor,
+(writing  if  changes  were made), the second writes and stays in
+the editor.
+
+     If you have changed the editor’s copy of the file but do not
+wish  to save your changes, either because you messed up the file
+or decided that the changes are not an improvement to  the  file,
+then you can give the command ::qq!!CR to quit from the editor with‐
+out writing the changes.  You  can  also  reedit  the  same  file
+(starting  over)  by  giving  the  command ::ee!!CR.  These commands
+should be used only rarely, and with caution, as it is not possi‐
+ble  to  recover the changes you have made after you discard them
+in this manner.
+
+     You can edit a different file without leaving the editor  by
+giving  the  command ::ee _n_a_m_eCR.  If you have not written out your
+file before you try to do this, then the  editor  will  tell  you
+this,  and  delay  editing the other file.  You can then give the
+command ::wwCR to save your work and  then  the  ::ee _n_a_m_eCR  command
+again,  or carefully give the command ::ee!! _n_a_m_eCR, which edits the
+other file discarding the changes you have made  to  the  current
+file.  To have the editor automatically save changes, include _s_e_t
+_a_u_t_o_w_r_i_t_e in your EXINIT, and use ::nn instead of ::ee.
+
+55..22..  EEssccaappiinngg ttoo aa sshheellll
+
+     You can get to a shell to execute a single command by giving
+a _v_i command of the form ::!!_c_m_dCR.  The system will run the single
+command _c_m_d and when the command finishes, the  editor  will  ask
+you  to hit a RETURN to continue.  When you have finished looking
+at the output on the screen, you should hit RETURN and the editor
+will clear the screen and redraw it.  You can then continue edit‐
+ing.  You can also give another :: command when it asks you for  a
+RETURN; in this case the screen will not be redrawn.
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐17
+
+
+     If  you  wish to execute more than one command in the shell,
+then you can give the command ::sshhCR.  This will give  you  a  new
+shell,  and when you finish with the shell, ending it by typing a
+^^DD, the editor will clear the screen and continue.
+
+     On systems which support it, ^^ZZ will suspend the editor  and
+return to the (top level) shell.  When the editor is resumed, the
+screen will be redrawn.
+
+55..33..  MMaarrkkiinngg aanndd rreettuurrnniinngg
+
+     The command ```` returned to the previous place after a motion
+of  the cursor by a command such as //, ?? or GG.  You can also mark
+lines in the file with single letter tags  and  return  to  these
+marks  later  by  naming  the tags.  Try marking the current line
+with the command mm_x, where you should pick some letter for _x, say
+‘a’.  Then move the cursor to a different line (any way you like)
+and hit ``aa.  The cursor  will  return  to  the  place  which  you
+marked.  Marks last only until you edit another file.
+
+     When  using  operators  such  as  dd  and referring to marked
+lines, it is often desirable to delete whole  lines  rather  than
+deleting  to the exact position in the line marked by mm.  In this
+case you can use the form ´´_x rather than ``_x.  Used without an op‐
+erator,  ´´_x  will  move  to  the first non‐white character of the
+marked line; similarly ´´´´ moves to the first non‐white  character
+of the line containing the previous context mark ````.
+
+55..44..  AAddjjuussttiinngg tthhee ssccrreeeenn
+
+     If  the  screen image is messed up because of a transmission
+error to your terminal, or because some program  other  than  the
+editor wrote output to your terminal, you can hit a ^^LL, the ASCII
+form‐feed character, to cause the screen to be refreshed.
+
+     On a dumb terminal, if there are @ lines in  the  middle  of
+the screen as a result of line deletion, you may get rid of these
+lines by typing ^^RR to cause the  editor  to  retype  the  screen,
+closing up these holes.
+
+     Finally,  if  you wish to place a certain line on the screen
+at the top middle or bottom of the screen, you can  position  the
+cursor  to that line, and then give a zz command.  You should fol‐
+low the zz command with a RETURN if you want the line to appear at
+the  top  of the window, a .. if you want it at the center, or a −−
+if you want it at the bottom.
+
+66..  SSppeecciiaall ttooppiiccss
+
+66..11..  EEddiittiinngg oonn ssllooww tteerrmmiinnaallss
+
+     When you are on a slow terminal, it is  important  to  limit
+the  amount  of  output which is generated to your screen so that
+you will not suffer long delays, waiting for  the  screen  to  be
+
+
+
+
+
+
+
+
+
+USD:11‐18              An Introduction to Display Editing with Vi
+
+
+refreshed.   We have already pointed out how the editor optimizes
+the updating of the screen during insertions on dumb terminals to
+limit  the delays, and how the editor erases lines to @ when they
+are deleted on dumb terminals.
+
+     The use of the slow terminal insertion mode is controlled by
+the  _s_l_o_w_o_p_e_n  option.  You can force the editor to use this mode
+even on faster terminals by giving the command  ::ssee  sslloowwCR.   If
+your  system  is  sluggish this helps lessen the amount of output
+coming to your terminal.  You can  disable  this  option  by  ::ssee
+nnoosslloowwCR.
+
+     The  editor  can  simulate an intelligent terminal on a dumb
+one.  Try giving the command ::ssee rreeddrraawwCR.  This simulation  gen‐
+erates  a great deal of output and is generally tolerable only on
+lightly loaded systems and fast terminals.  You can disable  this
+by giving the command
+ ::ssee nnoorreeddrraawwCR.
+
+     The  editor also makes editing more pleasant at low speed by
+starting editing in a small window, and letting the window expand
+as  you edit.  This works particularly well on intelligent termi‐
+nals.  The editor can expand the window easily when you insert in
+the  middle  of  the screen on these terminals.  If possible, try
+the editor on an intelligent terminal to see how this works.
+
+     You can control the size of the window which is redrawn each
+time  the screen is cleared by giving window sizes as argument to
+the commands which cause large screen motions:
+
+     ::  //  ??  [[[[  ]]]]  ``  ´´
+
+Thus if you are searching for a particular instance of  a  common
+string  in  a  file you can precede the first search command by a
+small number, say 3, and the editor will draw three line  windows
+around each instance of the string which it locates.
+
+     You  can  easily  expand or contract the window, placing the
+current line as you choose, by giving a number on  a  zz  command,
+after  the  zz  and before the following RETURN, .. or −−.  Thus the
+command zz55.. redraws the screen with the current line in the  cen‐
+ter of a five line window.+
+
+     If the editor is redrawing or otherwise updating large  por‐
+tions  of the display, you can interrupt this updating by hitting
+a DEL or RUB as usual.  If you do this you may partially  confuse
+the  editor about what is displayed on the screen.  You can still
+edit the text on the screen if you wish; clear up  the  confusion
+by  hitting  a  ^^LL; or move or search again, ignoring the current
+state of the display.
+
+───────────
++  Note  that  the  command 55zz.. has an entirely different effect,
+placing line 5 in the center of a new window.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐19
+
+
+     See section 7.8 on _o_p_e_n mode for another way to use  the  _v_i
+command set on slow terminals.
+
+66..22..  OOppttiioonnss,, sseett,, aanndd eeddiittoorr ssttaarrttuupp ffiilleess
+
+     The  editor  has  a  set of options, some of which have been
+mentioned above.  The most useful options are given in  the  fol‐
+lowing table.
+
+     The options are of three kinds:  numeric options, string op‐
+tions, and toggle options.  You can set numeric  and  string  op‐
+tions by a statement of the form
+
+     sseett _o_p_t==_v_a_l
+
+and  toggle  options  can be set or unset by statements of one of
+the forms
+
+     sseett _o_p_t
+     sseett nnoo_o_p_t
+
+
+NNaammee         DDeeffaauulltt               DDeessccrriippttiioonn
+──────────────────────────────────────────────────────────────────────────────────────
+autoindent   noai                  Supply indentation automatically
+autowrite    noaw                  Automatic write before ::nn, ::ttaa, ^^↑↑, !!
+ignorecase   noic                  Ignore case in searching
+lisp         nolisp                (( {{ )) }} commands deal with S‐expressions
+list         nolist                Tabs print as ^I; end of lines marked with $
+magic        nomagic               The characters . [ and * are special in scans
+number       nonu                  Lines are displayed prefixed with line numbers
+paragraphs   para=IPLPPPQPbpP LI   Macro names which start paragraphs
+redraw       nore                  Simulate a smart terminal on a dumb one
+sections     sect=NHSHH HU         Macro names which start new sections
+shiftwidth   sw=8                  Shift distance for <, > and input ^^DD and ^^TT
+showmatch    nosm                  Show matching (( or {{ as )) or }} is typed
+slowopen     slow                  Postpone display updates during inserts
+term         dumb                  The kind of terminal you are using.
+
+These statements can be placed in your EXINIT  in  your  environ‐
+ment,  or given while you are running _v_i by preceding them with a
+:: and following them with a CR.
+
+     You can get a list of all options which you have changed  by
+the  command  ::sseettCR, or the value of a single option by the com‐
+mand ::sseett _o_p_t??CR.  A list of all possible options and their  val‐
+ues is generated by ::sseett aallllCR.  Set can be abbreviated ssee.  Mul‐
+tiple options can be placed on one line, e.g.  ::ssee aaii aaww nnuuCR.
+
+     Options set by the sseett command only last while you  stay  in
+the  editor.   It  is  common to want to have certain options set
+whenever you use the editor.  This can be accomplished by  creat‐
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐20              An Introduction to Display Editing with Vi
+
+
+ing  a  list  of  _e_x commands+ which are to be run every time you
+start up _e_x, _e_d_i_t, or _v_i.  A typical list includes a sseett command,
+and  possibly  a  few mmaapp commands.  Since it is advisable to get
+these commands on one line, they can  be  separated  with  the  |
+character, for example:
+
+     sseett ai aw terse|mmaapp @ dd|mmaapp # x
+
+which  sets  the  options  _a_u_t_o_i_n_d_e_n_t, _a_u_t_o_w_r_i_t_e, _t_e_r_s_e, (the sseett
+command), makes @ delete a line, (the first  mmaapp),  and  makes  #
+delete a character, (the second mmaapp).  (See section 6.9 for a de‐
+scription of the mmaapp command) This string should be placed in the
+variable  EXINIT  in your environment.  If you use the shell _c_s_h,
+put this line in the file _._l_o_g_i_n in your home directory:
+
+     setenv EXINIT ´sseett ai aw terse|mmaapp @ dd|mmaapp # x´
+
+If you use the standard shell _s_h, put these  lines  in  the  file
+_._p_r_o_f_i_l_e in your home directory:
+
+     EXINIT=´sseett ai aw terse|mmaapp @ dd|mmaapp # x´
+     export EXINIT
+
+Of  course, the particulars of the line would depend on which op‐
+tions you wanted to set.
+
+66..33..  RReeccoovveerriinngg lloosstt lliinneess
+
+     You might have a serious problem if you delete a  number  of
+lines  and  then regret that they were deleted.  Despair not, the
+editor saves the last 9 deleted blocks of text in a set  of  num‐
+bered  registers 1−9.  You can get the _n’th previous deleted text
+back in your file by the command "_npp.  The "  here  says  that  a
+buffer  name is to follow, _n is the number of the buffer you wish
+to try (use the number 1 for now), and  pp  is  the  put  command,
+which  puts text in the buffer after the cursor.  If this doesn’t
+bring back the text you wanted, hit uu to undo  this  and  then  ..
+(period)  to  repeat  the put command.  In general the ..  command
+will repeat the last change you made.  As a  special  case,  when
+the  last command refers to a numbered text buffer, the .. command
+increments the number of the buffer before repeating the command.
+Thus a sequence of the form
+
+     ""11ppuu..uu..uu..
+
+will,  if  repeated  long  enough,  show you all the deleted text
+which has been saved for you.  You can omit the uu  commands  here
+to  gather  up  all  this text in the buffer, or stop after any ..
+command to keep just the then recovered text.  The command PP  can
+also  be  used  rather  than  pp  to put the recovered text before
+rather than after the cursor.
+
+───────────
++ All commands which start with :: are _e_x commands.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐21
+
+
+66..44..  RReeccoovveerriinngg lloosstt ffiilleess
+
+     If the system crashes, you can recover the work you were do‐
+ing to within a few changes.  You will normally receive mail when
+you next login giving you the name of the  file  which  has  been
+saved for you.  You should then change to the directory where you
+were when the system crashed and give a command of the form:
+
+     % vvii −−rr _n_a_m_e
+
+replacing _n_a_m_e with the name of the file which you were  editing.
+This will recover your work to a point near where you left off.+
+
+     You can get a listing of the files which are saved  for  you
+by giving the command:
+
+     % vvii −−rr
+
+If  there  is  more than one instance of a particular file saved,
+the editor gives you the newest instance each  time  you  recover
+it.   You can thus get an older saved copy back by first recover‐
+ing the newer copies.
+
+     For this feature to work, _v_i must be correctly installed  by
+a  super  user on your system, and the _m_a_i_l program must exist to
+receive mail.  The invocation ‘‘_v_i _‐_r’’ will not always list  all
+saved  files,  but  they  can  be  recovered even if they are not
+listed.
+
+66..55..  CCoonnttiinnuuoouuss tteexxtt iinnppuutt
+
+     When you are typing in large amounts of text  it  is  conve‐
+nient  to  have lines broken near the right margin automatically.
+You can cause this to happen by giving the command  ::ssee  wwmm==1100CR.
+This causes all lines to be broken at a space at least 10 columns
+from the right hand edge of the screen.
+
+     If the editor breaks an input line and you wish  to  put  it
+back  together you can tell it to join the lines with JJ.  You can
+give JJ a count of the number of lines to be joined as  in  33JJ  to
+join  3  lines.  The editor supplies white space, if appropriate,
+at the juncture of the joined lines, and  leaves  the  cursor  at
+this  white  space.   You  can kill the white space with xx if you
+don’t want it.
+
+
+
+───────────
++  In rare cases, some of the lines of the file may be lost.  The
+editor will give you the numbers of these lines and the  text  of
+the  lines  will  be  replaced by the string ‘LOST’.  These lines
+will almost always be among the last few which you changed.   You
+can  either choose to discard the changes which you made (if they
+are easy to remake) or to replace the few lost lines by hand.
+
+
+
+
+
+
+
+
+
+USD:11‐22              An Introduction to Display Editing with Vi
+
+
+66..66..  FFeeaattuurreess ffoorr eeddiittiinngg pprrooggrraammss
+
+     The editor has a number of commands  for  editing  programs.
+The  thing that most distinguishes editing of programs from edit‐
+ing of text is the desirability of maintaining an indented struc‐
+ture to the body of the program.  The editor has a _a_u_t_o_i_n_d_e_n_t fa‐
+cility for helping you generate correctly indented programs.
+
+     To enable this facility you can give the command  ::ssee  aaiiCR.
+Now try opening a new line with oo and type some characters on the
+line after a few tabs.  If you now  start  another  line,  notice
+that the editor supplies white space at the beginning of the line
+to line it up with the previous line.  You cannot backspace  over
+this indentation, but you can use ^^DD key to backtab over the sup‐
+plied indentation.
+
+     Each time you type ^^DD you back up one position, normally  to
+an 8 column boundary.  This amount is settable; the editor has an
+option called _s_h_i_f_t_w_i_d_t_h which you can set to change this  value.
+Try giving the command ::ssee ssww==44CR and then experimenting with au‐
+toindent again.
+
+     For shifting lines in the program left and right, there  are
+operators  <<  and  >>..  These shift the lines you specify right or
+left by one _s_h_i_f_t_w_i_d_t_h_.  Try <<<< and >>>> which shift one line  left
+or right, and <<LL and >>LL shifting the rest of the display left and
+right.
+
+     If you have a complicated expression and wish to see how the
+parentheses  match, put the cursor at a left or right parenthesis
+and hit %%.  This will show you the  matching  parenthesis.   This
+works also for braces { and }, and brackets [ and ].
+
+     If  you  are  editing  C programs, you can use the [[[[ and ]]]]
+keys to advance or retreat to a line starting with a  {{,  i.e.  a
+function declaration at a time.  When ]]]] is used with an operator
+it stops after a line which starts with }}; this is sometimes use‐
+ful with yy]]]].
+
+66..77..  FFiilltteerriinngg ppoorrttiioonnss ooff tthhee bbuuffffeerr
+
+     You  can run system commands over portions of the buffer us‐
+ing the operator !!.  You can use this to sort lines in  the  buf‐
+fer, or to reformat portions of the buffer with a pretty‐printer.
+Try typing in a list of random words, one  per  line  and  ending
+them  with  a  blank line.  Back up to the beginning of the list,
+and then give the command !!}}ssoorrttCR.  This says to sort  the  next
+paragraph of material, and the blank line ends a paragraph.
+
+66..88..  CCoommmmaannddss ffoorr eeddiittiinngg LLIISSPP
+
+     If  you are editing a LISP program you should set the option
+_l_i_s_p by doing ::ssee lliissppCR.  This changes the (( and ))  commands  to
+move  backward  and  forward  over  s‐expressions.   The  {{ and }}
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐23
+
+
+commands are like (( and )) but don’t stop at atoms.  These can  be
+used to skip to the next list, or through a comment quickly.
+
+     The  _a_u_t_o_i_n_d_e_n_t option works differently for LISP, supplying
+indent to align at the first argument to the last open list.   If
+there is no such argument then the indent is two spaces more than
+the last level.
+
+     There is another option which is useful for typing in  LISP,
+the  _s_h_o_w_m_a_t_c_h option.  Try setting it with ::ssee ssmmCR and then try
+typing a ‘(’ some words and then a ‘)’.  Notice that  the  cursor
+shows  the  position  of  the  ‘(’ which matches the ‘)’ briefly.
+This happens only if the matching ‘(’ is on the screen,  and  the
+cursor stays there for at most one second.
+
+     The editor also has an operator to realign existing lines as
+though they had been typed in with _l_i_s_p and _a_u_t_o_i_n_d_e_n_t set.  This
+is  the  ==  operator.   Try  the command ==%% at the beginning of a
+function.  This will realign all the lines of the function decla‐
+ration.
+
+     When  you  are  editing LISP,, the [[[[ and ]] advance and re‐
+treat to lines beginning with a ((, and  are  useful  for  dealing
+with entire function definitions.
+
+66..99..  MMaaccrrooss
+
+     _V_i has a parameterless macro facility, which lets you set it
+up so that when you hit a single keystroke, the editor  will  act
+as  though you had hit some longer sequence of keys.  You can set
+this up if you find yourself typing the same sequence of commands
+repeatedly.
+
+     Briefly, there are two flavors of macros:
+
+a)   Ones  where you put the macro body in a buffer register, say
+     _x.  You can then type @@xx to invoke the macro.  The @@ may  be
+     followed by another @@ to repeat the last macro.
+
+b)   You  can  use the _m_a_p command from _v_i (typically in your _E_X_‐
+     _I_N_I_T) with a command of the form:
+
+          :map _l_h_s _r_h_sCR
+
+     mapping _l_h_s into _r_h_s_.  There are restrictions: _l_h_s should be
+     one keystroke (either 1 character or one function key) since
+     it must be entered within one second  (unless  _n_o_t_i_m_e_o_u_t  is
+     set,  in  which  case you can type it as slowly as you wish,
+     and _v_i will wait for you to finish it before it echoes  any‐
+     thing).   The  _l_h_s  can be no longer than 10 characters, the
+     _r_h_s no longer than 100.  To get a space, tab or newline into
+     _l_h_s  or  _r_h_s  you  should escape them with a ^^VV.  (It may be
+     necessary to double the ^^VV if the map command is  given  in‐
+     side _v_i_, rather than in _e_x_._)  Spaces and tabs inside the _r_h_s
+
+
+
+
+
+
+
+
+
+USD:11‐24              An Introduction to Display Editing with Vi
+
+
+     need not be escaped.
+
+     Thus to make the qq key write and exit the  editor,  you  can
+give the command
+
+     :map q :wq^^VV^^VVCR CR
+
+which  means  that  whenever you type qq, it will be as though you
+had typed the four characters ::wwqqCR.  A ^^VV’s  is  needed  because
+without  it  the CR would end the :: command, rather than becoming
+part of the _m_a_p definition.  There  are  two  ^^VV’s  because  from
+within  _v_i,  two  ^^VV’s must be typed to get one.  The first CR is
+part of the _r_h_s, the second terminates the : command.
+
+     Macros can be deleted with
+
+     unmap lhs
+
+
+     If the _l_h_s of a macro is ‘‘#0’’ through  ‘‘#9’’,  this  maps
+the  particular function key instead of the 2 character ‘‘#’’ se‐
+quence.  So that terminals without function keys can access  such
+definitions, the form ‘‘#x’’ will mean function key _x on all ter‐
+minals (and need not be typed within one second.)  The  character
+‘‘#’’ can be changed by using a macro in the usual way:
+
+     :map ^^VV^^VV^^II #
+
+to  use  tab,  for  example.  (This won’t affect the _m_a_p command,
+which still uses ##,, but just the invocation from visual mode.
+
+     The undo command reverses an entire macro call as a unit, if
+it made any changes.
+
+     Placing a ‘!’ after the word mmaapp causes the mapping to apply
+to input mode, rather than command mode.  Thus, to arrange for ^^TT
+to be the same as 4 spaces in input mode, you can type:
+
+     :map ^^TT ^^VVb/b/b/b/
+
+where  bb//  is  a blank.  The ^^VV is necessary to prevent the blanks
+from being taken as white space between the _l_h_s and _r_h_s.
+
+77..  WWoorrdd AAbbbbrreevviiaattiioonnss
+
+     A feature similar to macros in input mode is word  abbrevia‐
+tion.   This allows you to type a short word and have it expanded
+into a longer word or words.  The commands  are  ::aabbbbrreevviiaattee  and
+::uunnaabbbbrreevviiaattee  (::aabb  and  ::uunnaa) and have the same syntax as ::mmaapp.
+For example:
+
+     :ab eecs Electrical Engineering and Computer Sciences
+
+causes the word ‘eecs’ to  always  be  changed  into  the  phrase
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐25
+
+
+‘Electrical  Engineering  and Computer Sciences’.  Word abbrevia‐
+tion is different from macros in that only whole  words  are  af‐
+fected.   If ‘eecs’ were typed as part of a larger word, it would
+be left alone.  Also, the partial word is echoed as it is  typed.
+There is no need for an abbreviation to be a single keystroke, as
+it should be with a macro.
+
+77..11..  AAbbbbrreevviiaattiioonnss
+
+     The editor has a number of short commands  which  abbreviate
+longer  commands  which  we  have  introduced here.  You can find
+these commands easily on the quick reference  card.   They  often
+save a bit of typing and you can learn them as convenient.
+
+88..  NNiittttyy‐‐ggrriittttyy ddeettaaiillss
+
+88..11..  LLiinnee rreepprreesseennttaattiioonn iinn tthhee ddiissppllaayy
+
+     The editor folds long logical lines onto many physical lines
+in the display.  Commands which  advance  lines  advance  logical
+lines  and  will  skip over all the segments of a line in one mo‐
+tion.  The command || moves the cursor to a specific  column,  and
+may be useful for getting near the middle of a long line to split
+it in half.  Try 8800|| on a line which  is  more  than  80  columns
+long.+
+
+     The editor only puts full lines on the display; if there  is
+not  enough room on the display to fit a logical line, the editor
+leaves the physical line empty, placing only an @ on the line  as
+a  place  holder.   When you delete lines on a dumb terminal, the
+editor will often just clear the lines to @ to save time  (rather
+than  rewriting the rest of the screen.)  You can always maximize
+the information on the screen by giving the ^^RR command.
+
+     If you wish, you can have the editor place line numbers  be‐
+fore  each line on the display.  Give the command ::ssee nnuuCR to en‐
+able this, and the command ::ssee nnoonnuuCR to turn it  off.   You  can
+have  tabs represented as ^^II and the ends of lines indicated with
+‘$’ by giving the command ::ssee lliissttCR;  ::ssee  nnoolliissttCR  turns  this
+off.
+
+     Finally, lines consisting of only the character ‘~’ are dis‐
+played when the last line in the file is in  the  middle  of  the
+screen.   These represent physical lines which are past the logi‐
+cal end of file.
+
+88..22..  CCoouunnttss
+
+     Most _v_i commands will use a preceding count to affect  their
+behavior  in some way.  The following table gives the common ways
+in which the counts are used:
+───────────
++ You can make long lines very easily by using JJ to join together
+short lines.
+
+
+
+
+
+
+
+
+
+USD:11‐26              An Introduction to Display Editing with Vi
+
+
+     new window size      ::  //  ??  [[[[  ]]]]  ``  ´´
+     scroll amount        ^^DD  ^^UU
+     line/column number   zz  GG  ||
+     repeat effect        most of the rest
+
+
+
+     The editor maintains a notion of the current default  window
+size.   On  terminals  which run at speeds greater than 1200 baud
+the editor uses the full terminal screen.  On terminals which are
+slower  than  1200 baud (most dialup lines are in this group) the
+editor uses 8 lines as the default window size.  At 1200 baud the
+default is 16 lines.
+
+     This  size  is  the size used when the editor clears and re‐
+fills the screen after a search or other motion  moves  far  from
+the  edge  of  the current window.  The commands which take a new
+window size as count all often cause the screen  to  be  redrawn.
+If  you anticipate this, but do not need as large a window as you
+are currently using, you may wish to change the  screen  size  by
+specifying  the new size before these commands.  In any case, the
+number of lines used on the screen will expand if  you  move  off
+the top with a −− or similar command or off the bottom with a com‐
+mand such as RETURN or ^^DD.  The window will revert  to  the  last
+specified size the next time it is cleared and refilled.+
+
+     The  scroll  commands ^^DD and ^^UU likewise remember the amount
+of scroll last specified, using half the basic window  size  ini‐
+tially.  The simple insert commands use a count to specify a rep‐
+etition of the inserted text.  Thus  1100aa++−−−−−−−−ESC  will  insert  a
+grid‐like  string  of  text.  A few commands also use a preceding
+count as a line or column number.
+
+     Except for a few commands which ignore any counts  (such  as
+^^RR),  the  rest  of the editor commands use a count to indicate a
+simple repetition of their effect.  Thus 55ww advances  five  words
+on  the  current line, while 55RETURN advances five lines.  A very
+useful instance of a count as a repetition is a  count  given  to
+the  ..  command, which repeats the last changing command.  If you
+do ddww and then 33.., you will  delete  first  one  and  then  three
+words.  You can then delete two more words with 22...
+
+88..33..  MMoorree ffiillee mmaanniippuullaattiioonn ccoommmmaannddss
+
+     The  following  table  lists  the file manipulation commands
+which you can use when you are in _v_i_.  All of these commands  are
+followed  by a CR or ESC.  The most basic commands are ::ww and ::ee.
+A normal editing session on a single file will end with a ZZZZ com‐
+mand.   If you are editing for a long period of time you can give
+::ww commands occasionally after major amounts of editing, and then
+finish  with  a  ZZZZ.    When you edit more than one file, you can
+finish with one with a ::ww and start editing a new file by  giving
+───────────
++ But not by a ^^LL which just redraws the screen as it is.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐27
+
+
+
+
+     ::ww           write back changes
+     ::wwqq          write and quit
+     ::xx           write (if necessary) and quit (same as ZZ).
+     ::ee _n_a_m_e      edit file _n_a_m_e
+     ::ee!!          reedit, discarding changes
+     ::ee ++ _n_a_m_e    edit, starting at end
+     ::ee ++_n        edit, starting at line _n
+     ::ee ##         edit alternate file
+     ::ww _n_a_m_e      write file _n_a_m_e
+     ::ww!! _n_a_m_e     overwrite file _n_a_m_e
+     ::_x_,_yww _n_a_m_e   write lines _x through _y to _n_a_m_e
+     ::rr _n_a_m_e      read file _n_a_m_e into buffer
+     ::rr !!_c_m_d      read output of _c_m_d into buffer
+     ::nn           edit next file in argument list
+     ::nn!!          edit next file, discarding changes to current
+     ::nn _a_r_g_s      specify new argument list
+     ::ttaa _t_a_g      edit file containing tag _t_a_g, at _t_a_g
+
+
+a ::ee command, or set _a_u_t_o_w_r_i_t_e and use ::nn <file>.
+
+     If  you  make changes to the editor’s copy of a file, but do
+not wish to write them back, then you must give an  !!  after  the
+command  you  would otherwise use; this forces the editor to dis‐
+card any changes you have made.  Use this carefully.
+
+     The ::ee command can be given a ++ argument to start at the end
+of  the file, or a ++_n argument to start at line _n.  In actuality,
+_n may be any editor command not containing a  space,  usefully  a
+scan like ++//_p_a_t or ++??_p_a_t.  In forming new names to the ee command,
+you can use the character %% which is replaced by the current file
+name,  or the character ## which is replaced by the alternate file
+name.  The alternate file name is generally  the  last  name  you
+typed  other  than  the current file.  Thus if you try to do a ::ee
+and get a diagnostic that you haven’t written the file,  you  can
+give  a  ::ww  command and then a ::ee ## command to redo the previous
+::ee.
+
+     You can write part of the buffer to a file  by  finding  out
+the lines that bound the range to be written using ^^GG, and giving
+these numbers after the :: and before the  ww,  separated  by  ,,’s.
+You  can  also mark these lines with mm and then use an address of
+the form ´´_x,,´´_y on the ww command here.
+
+     You can read another file into the buffer after the  current
+line by using the ::rr command.  You can similarly read in the out‐
+put from a command, just use !!_c_m_d instead of a file name.
+
+     If you wish to edit a set of files in  succession,  you  can
+give all the names on the command line, and then edit each one in
+turn using the command ::nn.  It is also possible to respecify  the
+list  of  files  to  be edited by giving the ::nn command a list of
+
+
+
+
+
+
+
+
+
+USD:11‐28              An Introduction to Display Editing with Vi
+
+
+file names, or a pattern to be expanded as you would  have  given
+it on the initial _v_i command.
+
+     If  you  are  editing  large programs, you will find the ::ttaa
+command very useful.  It utilizes a data base of  function  names
+and  their  locations,  which  can be created by programs such as
+_c_t_a_g_s_, to quickly find a function whose name you  give.   If  the
+::ttaa  command  will  require  the editor to switch files, then you
+must ::ww or abandon any changes before switching.  You can  repeat
+the  ::ttaa  command  without any arguments to look for the same tag
+again.
+
+88..44..  MMoorree aabboouutt sseeaarrcchhiinngg ffoorr ssttrriinnggss
+
+     When you are searching for strings in the file with // and ??,
+the editor normally places you at the next or previous occurrence
+of the string.  If you are using an operator such as dd, cc  or  yy,
+then  you may well wish to affect lines up to the line before the
+line containing the pattern.  You can give a search of  the  form
+//_p_a_t//−−_n to refer to the _n’th line before the next line containing
+_p_a_t, or you can use ++ instead of −− to refer to  the  lines  after
+the  one  containing  _p_a_t.  If you don’t give a line offset, then
+the editor will affect characters up to the match  place,  rather
+than  whole  lines;  thus  use ‘‘+0’’ to affect to the line which
+matches.
+
+     You can have the editor ignore the  case  of  words  in  the
+searches it does by giving the command ::ssee iiccCR.  The command ::ssee
+nnooiiccCR turns this off.
+
+     Strings given to searches may actually  be  regular  expres‐
+sions.  If you do not want or need this facility, you should
+
+     set nomagic
+
+in  your  EXINIT.   In this case, only the characters ↑↑ and $$ are
+special in patterns.  The character \\ is also then special (as it
+is  most everywhere in the system), and may be used to get at the
+an extended pattern matching facility.  It is also  necessary  to
+use  a  \ before a // in a forward scan or a ?? in a backward scan,
+in any case.  The following table gives the extended  forms  when
+mmaaggiicc is set.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐29
+
+
+     ↑↑        at beginning of pattern, matches beginning of line
+     $$        at end of pattern, matches end of line
+     ..        matches any character
+     \\<<       matches the beginning of a word
+     \\>>       matches the end of a word
+     [[_s_t_r]]    matches any single character in _s_t_r
+     [[↑↑_s_t_r]]   matches any single character not in _s_t_r
+     [[_x−−_y]]    matches any character between _x and _y
+     **        matches any number of the preceding pattern
+
+
+If  you use nnoommaaggiicc mode, then the .. [[ and ** primitives are given
+with a preceding \.
+
+88..55..  MMoorree aabboouutt iinnppuutt mmooddee
+
+     There are a number of characters which you can use  to  make
+corrections  during input mode.  These are summarized in the fol‐
+lowing table.
+
+
+     ^^HH      deletes the last input character
+     ^^WW      deletes the last input word, defined as by bb
+     eerraassee   your erase character, same as ^^HH
+     kkiillll    your kill character, deletes the input on this line
+     \\       escapes a following ^^HH and your erase and kill
+     EESSCC     ends an insertion
+     DDEELL     interrupts an insertion, terminating it abnormally
+     CCRR      starts a new line
+     ^^DD      backtabs over _a_u_t_o_i_n_d_e_n_t
+     00^^DD     kills all the _a_u_t_o_i_n_d_e_n_t
+     ↑↑^^DD     same as 00^^DD, but restores indent next line
+     ^^VV      quotes the next non‐printing character into the file
+
+
+
+     The most usual way of making corrections to input is by typ‐
+ing  ^^HH  to  correct a single character, or by typing one or more
+^^WW’s to back over incorrect words.  If you use ##  as  your  erase
+character in the normal system, it will work like ^^HH.
+
+     Your system kill character, normally @@, ^^XX or ^^UU, will erase
+all the input you have given on the current  line.   In  general,
+you  can  neither erase input back around a line boundary nor can
+you erase characters which you did not insert with this insertion
+command.   To  make  corrections on the previous line after a new
+line has been started you can hit ESC to end the insertion,  move
+over  and  make the correction, and then return to where you were
+to continue.  The command AA which appends at the end of the  cur‐
+rent line is often useful for continuing.
+
+     If  you  wish to type in your erase or kill character (say #
+or @) then you must precede it with a \\, just as you would do  at
+the  normal  system  command level.  A more general way of typing
+
+
+
+
+
+
+
+
+
+USD:11‐30              An Introduction to Display Editing with Vi
+
+
+non‐printing characters into the file is to precede them  with  a
+^^VV.   The  ^^VV  echoes as a ↑↑ character on which the cursor rests.
+This indicates that the editor expects  you  to  type  a  control
+character.  In fact you may type any character and it will be in‐
+serted into the file at that point.*
+
+     If  you are using _a_u_t_o_i_n_d_e_n_t you can backtab over the indent
+which it supplies by typing a ^^DD.  This backs up to a  _s_h_i_f_t_w_i_d_t_h
+boundary.  This only works immediately after the supplied _a_u_t_o_i_n_‐
+_d_e_n_t.
+
+     When you are using _a_u_t_o_i_n_d_e_n_t you may wish to place a  label
+at  the  left  margin of a line.  The way to do this easily is to
+type ↑↑ and then ^^DD.  The editor will move the cursor to the  left
+margin for one line, and restore the previous indent on the next.
+You can also type a 00 followed immediately by a ^^DD if you wish to
+kill all the indent and not have it come back on the next line.
+
+88..66..  UUppppeerr ccaassee oonnllyy tteerrmmiinnaallss
+
+     If  your  terminal has only upper case, you can still use _v_i
+by using the normal system convention for typing on such a termi‐
+nal.   Characters  which you normally type are converted to lower
+case, and you can type upper case letters by preceding them  with
+a  \.   The characters { ~ } | ` are not available on such termi‐
+nals, but you can escape them as \( \↑ \) \! \´.   These  charac‐
+ters  are  represented  on  the  display in the same way they are
+typed.++
+
+88..77..  VVii aanndd eexx
+
+     _V_i  is  actually  one  mode of editing within the editor _e_x_.
+When you are running _v_i you can escape to the line oriented  edi‐
+tor  of  _e_x by giving the command QQ.  All of the :: commands which
+were introduced above are available in  _e_x_.   Likewise,  most  _e_x
+commands  can be invoked from _v_i using :.  Just give them without
+the :: and follow them with a CR.
+
+     In rare instances, an internal error may occur  in  _v_i_.   In
+this  case  you  will get a diagnostic and be left in the command
+mode of _e_x_.  You can then save your work and quit if you wish  by
+───────────
+* This is not quite true.  The implementation of the editor  does
+not  allow  the NULL (^^@@) character to appear in files.  Also the
+LF (linefeed or ^^JJ) character is used by the editor  to  separate
+lines  in  the file, so it cannot appear in the middle of a line.
+You can insert any other character, however, if you wait for  the
+editor to echo the ↑↑ before you type the character.  In fact, the
+editor will treat a following letter as a request for the  corre‐
+sponding  control  character.  This is the only way to type ^^SS or
+^^QQ, since the system normally uses them  to  suspend  and  resume
+output and never gives them to the editor to process.
+++ The \ character you give will not echo until you type  another
+key.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐31
+
+
+giving  a command xx after the :: which _e_x prompts you with, or you
+can reenter _v_i by giving _e_x a _v_i command.
+
+     There are a number of things which you can do more easily in
+_e_x  than in _v_i_.  Systematic changes in line oriented material are
+particularly easy.  You can read the advanced  editing  documents
+for  the  editor  _e_d  to  find out a lot more about this style of
+editing.  Experienced users often mix their  use  of  _e_x  command
+mode and _v_i command mode to speed the work they are doing.
+
+88..88..  OOppeenn mmooddee:: vvii oonn hhaarrddccooppyy tteerrmmiinnaallss aanndd ‘‘‘‘ggllaassss ttttyy’’ss’’’’ ‡‡
+
+     If  you  are on a hardcopy terminal or a terminal which does
+not have a cursor which can move off the  bottom  line,  you  can
+still  use  the command set of _v_i_, but in a different mode.  When
+you give a _v_i command, the editor will tell you that it is  using
+_o_p_e_n mode.  This name comes from the _o_p_e_n command in _e_x_, which is
+used to get into the same mode.
+
+     The only difference between _v_i_s_u_a_l mode and _o_p_e_n mode is the
+way in which the text is displayed.
+
+     In  _o_p_e_n  mode the editor uses a single line window into the
+file, and moving backward and forward  in  the  file  causes  new
+lines  to  be displayed, always below the current line.  Two com‐
+mands of _v_i work differently in _o_p_e_n_: zz and ^^RR.   The  zz  command
+does  not  take  parameters, but rather draws a window of context
+around the current line and then returns you to the current line.
+
+     If you are on a hardcopy terminal, the ^^RR command  will  re‐
+type  the  current  line.  On such terminals, the editor normally
+uses two lines to represent the current line.  The first line  is
+a copy of the line as you started to edit it, and you work on the
+line below this line.  When you  delete  characters,  the  editor
+types  a  number  of  \’s  to  show  you the characters which are
+deleted.  The editor also reprints the current  line  soon  after
+such changes so that you can see what the line looks like again.
+
+     It  is sometimes useful to use this mode on very slow termi‐
+nals which can support _v_i in the full screen mode.   You  can  do
+this by entering _e_x and using an _o_p_e_n command.
+
+
+AAcckknnoowwlleeddggeemmeennttss
+
+     Bruce  Englar  encouraged the early development of this dis‐
+play editor.  Peter Kessler helped bring sanity  to  version  2’s
+command  layout.   Bill Joy wrote versions 1 and 2.0 through 2.7,
+and created the framework that users see in the  present  editor.
+Mark  Horton  added macros and other features and made the editor
+work on a large number of terminals and Unix systems.
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐21
+
+
+AAppppeennddiixx:: cchhaarraacctteerr ffuunnccttiioonnss
+
+     This appendix gives the uses the editor makes of each  char‐
+acter.   The characters are presented in their order in the ASCII
+character set:  Control characters come first, then most  special
+characters,  then  the  digits, upper and then lower case charac‐
+ters.
+
+     For each character we tell a meaning it has as a command and
+any meaning it has during an insert.  If it has only meaning as a
+command, then only this is discussed.  Section numbers in  paren‐
+theses indicate where the character is discussed; a ‘f’ after the
+section number means that the character is mentioned in  a  foot‐
+note.
+
+^^@@             Not  a  command  character.  If typed as the first
+               character of an insertion it is replaced with  the
+               last  text  inserted,  and  the insert terminates.
+               Only 128 characters are saved from  the  last  in‐
+               sert;  if more characters were inserted the mecha‐
+               nism is not available.  A ^^@@ cannot be part of the
+               file due to the editor implementation (7.5f).
+
+^^AA             Unused.
+
+^^BB             Backward  window.   A  count specifies repetition.
+               Two lines of continuity are kept if possible (2.1,
+               6.1, 7.2).
+
+^^CC             Unused.
+
+^^DD             As  a command, scrolls down a half‐window of text.
+               A count gives the number  of  (logical)  lines  to
+               scroll,  and  is  remembered  for future ^^DD and ^^UU
+               commands (2.1, 7.2).  During an  insert,  backtabs
+               over  _a_u_t_o_i_n_d_e_n_t white space at the beginning of a
+               line  (6.6,  7.5);  this  white  space  cannot  be
+               backspaced over.
+
+^^EE             Exposes  one more line below the current screen in
+               the file, leaving the cursor where it is if possi‐
+               ble.  (Version 3 only.)
+
+^^FF             Forward  window.   A  count  specifies repetition.
+               Two lines of continuity are kept if possible (2.1,
+               6.1, 7.2).
+
+^^GG             Equivalent  to  ::ffCR,  printing  the current file,
+               whether it has been  modified,  the  current  line
+               number  and  the  number of lines in the file, and
+               the percentage of the way through  the  file  that
+               you are.
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐22              An Introduction to Display Editing with Vi
+
+
+^^HH ((BS))        Same  as  lleefftt aarrrrooww.  (See hh).  During an insert,
+               eliminates the last input character, backing  over
+               it  but  not erasing it; it remains so you can see
+               what you typed if you wish to type something  only
+               slightly different (3.1, 7.5).
+
+^^II ((TAB))       Not  a command character.  When inserted it prints
+               as some number of spaces.  When the cursor is at a
+               tab  character  it rests at the last of the spaces
+               which represent the tab.  The spacing of  tabstops
+               is controlled by the _t_a_b_s_t_o_p option (4.1, 6.6).
+
+^^JJ ((LF))        Same as ddoowwnn aarrrrooww (see jj).
+
+^^KK             Unused.
+
+^^LL             The  ASCII  formfeed  character,  this  causes the
+               screen to be cleared and redrawn.  This is  useful
+               after a transmission error, if characters typed by
+               a program  other  than  the  editor  scramble  the
+               screen, or after output is stopped by an interrupt
+               (5.4, 7.2f).
+
+^^MM ((CR))        A carriage return advances to the  next  line,  at
+               the first non‐white position in the line.  Given a
+               count, it advances that many lines (2.3).   During
+               an insert, a CR causes the insert to continue onto
+               another line (3.1).
+
+^^NN             Same as ddoowwnn aarrrrooww (see jj).
+
+^^OO             Unused.
+
+^^PP             Same as uupp aarrrrooww (see kk).
+
+^^QQ             Not a command character.  In input mode, ^^QQ quotes
+               the  next  character,  the same as ^^VV, except that
+               some teletype drivers will eat the ^^QQ so that  the
+               editor never sees it.
+
+^^RR             Redraws  the  current  screen, eliminating logical
+               lines not corresponding to physical  lines  (lines
+               with only a single @ character on them).  On hard‐
+               copy terminals in _o_p_e_n mode, retypes  the  current
+               line (5.4, 7.2, 7.8).
+
+^^SS             Unused.   Some  teletype drivers use ^^SS to suspend
+               output until pressed.^^QQis
+
+^^TT             Not a command character.  During an  insert,  with
+               _a_u_t_o_i_n_d_e_n_t  set  and at the beginning of the line,
+               inserts _s_h_i_f_t_w_i_d_t_h white space.
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐23
+
+
+^^UU             Scrolls the screen up, inverting ^^DD which  scrolls
+               down.  Counts work as they do for ^^DD, and the pre‐
+               vious scroll amount is common to both.  On a  dumb
+               terminal,  ^^UU  will often necessitate clearing and
+               redrawing the screen  further  back  in  the  file
+               (2.1, 7.2).
+
+^^VV             Not  a  command  character.  In input mode, quotes
+               the next character so that it is possible  to  in‐
+               sert  non‐printing and special characters into the
+               file (4.2, 7.5).
+
+^^WW             Not a command character.  During an insert,  backs
+               up as bb would in command mode; the deleted charac‐
+               ters remain on the display (see ^^HH) (7.5).
+
+^^XX             Unused.
+
+^^YY             Exposes one more line above  the  current  screen,
+               leaving  the  cursor where it is if possible.  (No
+               mnemonic value for this key; however, it  is  next
+               to  ^^UU  which  scrolls  up  a  bunch.)  (Version 3
+               only.)
+
+^^ZZ             If supported by the Unix system, stops the editor,
+               exiting  to the top level shell.  Same as ::ssttooppCR.
+               Otherwise, unused.
+
+^^[[ ((ESC))       Cancels a partially formed command, such  as  a  zz
+               when  no  following  character has yet been given;
+               terminates inputs on the last line (read  by  com‐
+               mands  such  as :: // and ??); ends insertions of new
+               text into the buffer.  If an  ESC  is  given  when
+               quiescent  in  command state, the editor rings the
+               bell or flashes the screen.  You can thus hit  ESC
+               if  you don’t know what is happening till the edi‐
+               tor rings the bell.  If you don’t know if you  are
+               in  insert  mode you can type ESCaa, and then mate‐
+               rial to be input; the material  will  be  inserted
+               correctly  whether  or not you were in insert mode
+               when you started (1.5, 3.1, 7.5).
+
+^^\\             Unused.
+
+^^]]             Searches for the word which is after the cursor as
+               a  tag.   Equivalent to typing ::ttaa, this word, and
+               then a CR.  Mnemonically,  this  command  is  ‘‘go
+               right to’’ (7.3).
+
+^^↑↑             Equivalent  to  ::ee  ##CR, returning to the previous
+               position in the last edited  file,  or  editing  a
+               file  which  you  specified if you got a ‘No write
+               since last change diagnostic’ and do not  want  to
+               have to type the file name again (7.3).  (You have
+
+
+
+
+
+
+
+
+
+USD:11‐24              An Introduction to Display Editing with Vi
+
+
+               to do a ::ww before ^^↑↑ will work in this  case.   If
+               you  do  not  wish to write the file you should do
+               ::ee!! ##CR instead.)
+
+^^__             Unused.  Reserved as the command character for the
+               Tektronix 4025 and 4027 terminal.
+
+SPACE          Same as rriigghhtt aarrrrooww (see ll).
+
+!!              An operator, which processes lines from the buffer
+               with reformatting commands.  Follow !! with the ob‐
+               ject  to  be  processed, and then the command name
+               terminated by CR.  Doubling !! and preceding it  by
+               a  count causes count lines to be filtered; other‐
+               wise the count is passed on to  the  object  after
+               the !!.  Thus 22!!}}_f_m_tCR reformats the next two para‐
+               graphs by running them through  the  program  _f_m_t.
+               If   you   are   working   on  LISP,  the  command
+               !!%%_g_r_i_n_dCR,*  given at the beginning of a function,
+               will run the text of the function through the LISP
+               grinder  (6.7, 7.3).  To read a file or the output
+               of a command into the buffer  use  ::rr  (7.3).   To
+               simply execute a command use ::!! (7.3).
+
+""              Precedes  a named buffer specification.  There are
+               named buffers 11−−99 used for saving deleted text and
+               named  buffers  aa−−zz  into which you can place text
+               (4.3, 6.3)
+
+##              The macro character which, when followed by a num‐
+               ber,  will substitute for a function key on termi‐
+               nals without function keys (6.9).  In input  mode,
+               if  this  is  your erase character, it will delete
+               the last character you typed in  input  mode,  and
+               must  be  preceded with a \\ to insert it, since it
+               normally backs over the last input  character  you
+               gave.
+
+$$              Moves  to the end of the current line.  If you ::ssee
+               lliissttCR, then the end of each line will be shown by
+               printing  a  $$ after the end of the displayed text
+               in the line.   Given  a  count,  advances  to  the
+               count’th  following  end of line; thus 22$$ advances
+               to the end of the following line.
+
+%%              Moves to the parenthesis or brace {{ }}  which  bal‐
+               ances the parenthesis or brace at the current cur‐
+               sor position.
+
+&&              A synonym for ::&&CR, by analogy with the _e_x &&  com‐
+               mand.
+───────────
+*Both _f_m_t and _g_r_i_n_d are Berkeley programs and may not be  present
+at all installations.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐25
+
+
+´´              When  followed by a ´´ returns to the previous con‐
+               text at the beginning of  a  line.   The  previous
+               context  is set whenever the current line is moved
+               in a non‐relative way.  When followed by a  letter
+               aa−zz,  returns  to  the  line which was marked with
+               this letter with a mm command, at  the  first  non‐
+               white  character  in  the  line. (2.2, 5.3).  When
+               used with an operator such  as  dd,  the  operation
+               takes place over complete lines; if you use ``, the
+               operation takes place from the exact marked  place
+               to the current cursor position within the line.
+
+((              Retreats to the beginning of a sentence, or to the
+               beginning of a LISP s‐expression if the  _l_i_s_p  op‐
+               tion  is set.  A sentence ends at a .. !! or ?? which
+               is followed by either the end of a line or by  two
+               spaces.  Any number of closing )) ]] "" and ´´ charac‐
+               ters may appear after the .. !! or ??, and before the
+               spaces  or  end  of line.  Sentences also begin at
+               paragraph and section boundaries (see {{ and [[[[ be‐
+               low).   A count advances that many sentences (4.2,
+               6.8).
+
+))              Advances to the beginning of a sentence.  A  count
+               repeats  the  effect.  See (( above for the defini‐
+               tion of a sentence (4.2, 6.8).
+
+**              Unused.
+
+++              Same as CR when used as a command.
+
+,,              Reverse of the last ff FF tt or  TT  command,  looking
+               the  other  way  in  the current line.  Especially
+               useful after hitting too  many  ;;  characters.   A
+               count repeats the search.
+
+−−              Retreats  to  the  previous line at the first non‐
+               white character.  This is the inverse of ++ and RE‐
+               TURN.   If the line moved to is not on the screen,
+               the screen is scrolled, or cleared and redrawn  if
+               this  is  not  possible.   If  a  large  amount of
+               scrolling would be required  the  screen  is  also
+               cleared  and redrawn, with the current line at the
+               center (2.3).
+
+..              Repeats the last command which changed the buffer.
+               Especially  useful  when  deleting words or lines;
+               you can delete some words/lines and then hit ..  to
+               delete  more and more words/lines.  Given a count,
+               it passes it on to  the  command  being  repeated.
+               Thus  after  a  22ddww,  33.. deletes three words (3.3,
+               6.3, 7.2, 7.4).
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐26              An Introduction to Display Editing with Vi
+
+
+//              Reads a string from the last line on  the  screen,
+               and  scans forward for the next occurrence of this
+               string.  The normal input editing sequences may be
+               used  during  the input on the bottom line; an re‐
+               turns to command  state  without  ever  searching.
+               The search begins when you hit CR to terminate the
+               pattern; the cursor moves to the beginning of  the
+               last  line  to  indicate  that  the  search  is in
+               progress; the search may then be terminated with a
+               DEL  or  RUB, or by backspacing when at the begin‐
+               ning of the bottom line, returning the  cursor  to
+               its initial position.  Searches normally wrap end‐
+               around to find a string anywhere in the buffer.
+
+               When used with an operator the enclosed region  is
+               normally  affected.   By mentioning an offset from
+               the line matched by  the  pattern  you  can  force
+               whole  lines  to  be  affected.  To do this give a
+               pattern with a closing a closing  //  and  then  an
+               offset ++_n or −−_n.
+
+               To  include  the character // in the search string,
+               you must escape it with a preceding \\.  A ↑↑ at the
+               beginning of the pattern forces the match to occur
+               at the beginning of a line only; this  speeds  the
+               search.   A $$ at the end of the pattern forces the
+               match to occur at the end of a  line  only.   More
+               extended  pattern  matching is available, see sec‐
+               tion 7.4; unless you set  nnoommaaggiicc  in  your  _._e_x_r_c
+               file you will have to preceed the characters .. [[ **
+               and ~~ in the search pattern with a \\ to  get  them
+               to  work  as  you  would naively expect (1.5, 2,2,
+               6.1, 7.2, 7.4).
+
+00              Moves to the first character on the current  line.
+               Also  used,  in  forming numbers, after an initial
+               11−99.
+
+11−−99            Used to form numeric arguments to  commands  (2.3,
+               7.2).
+
+::              A  prefix to a set of commands for file and option
+               manipulation and escapes to the system.  Input  is
+               given  on  the  bottom line and terminated with an
+               CR, and the command then executed.  You can return
+               to where you were by hitting DEL or RUB if you hit
+               :: accidentally (see primarily 6.2 and 7.3).
+
+;;              Repeats the last single character find which  used
+               ff  FF  tt  or  TT.   A  count iterates the basic scan
+               (4.1).
+
+<<              An  operator   which   shifts   lines   left   one
+               _s_h_i_f_t_w_i_d_t_h,   normally   8   spaces.    Like   all
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐27
+
+
+               operators, affects lines when repeated, as in  <<<<.
+               Counts  are  passed  through  to the basic object,
+               thus 33<<<< shifts three lines (6.6, 7.2).
+
+==              Reindents line for LISP, as though they were typed
+               in with _l_i_s_p and _a_u_t_o_i_n_d_e_n_t set (6.8).
+
+>>              An   operator   which   shifts   lines  right  one
+               _s_h_i_f_t_w_i_d_t_h, normally 8 spaces.  Affects lines when
+               repeated as in >>>>.  Counts repeat the basic object
+               (6.6, 7.2).
+
+??              Scans backwards, the opposite of //.  See the // de‐
+               scription above for details on scanning (2.2, 6.1,
+               7.4).
+
+@@              A macro character (6.9).  If  this  is  your  kill
+               character,  you must escape it with a \ to type it
+               in during input mode, as it  normally  backs  over
+               the input you have given on the current line (3.1,
+               3.4, 7.5).
+
+AA              Appends at the end  of  line,  a  synonym  for  $$aa
+               (7.2).
+
+BB              Backs  up a word, where words are composed of non‐
+               blank sequences, placing the cursor at the  begin‐
+               ning  of  the  word.   A  count repeats the effect
+               (2.4).
+
+CC              Changes the rest of the text on the current  line;
+               a synonym for cc$$.
+
+DD              Deletes  the rest of the text on the current line;
+               a synonym for dd$$.
+
+EE              Moves forward to the end of  a  word,  defined  as
+               blanks  and non‐blanks, like BB and WW.  A count re‐
+               peats the effect.
+
+FF              Finds a single following character,  backwards  in
+               the  current  line.   A  count repeats this search
+               that many times (4.1).
+
+GG              Goes to the line number given as  preceding  argu‐
+               ment, or the end of the file if no preceding count
+               is given.  The screen is redrawn with the new cur‐
+               rent line in the center if necessary (7.2).
+
+HH              HHoommee  aarrrrooww.   Homes the cursor to the top line on
+               the screen.  If a count is given, then the  cursor
+               is  moved  to the count’th line on the screen.  In
+               any case the cursor is moved  to  the  first  non‐
+               white  character  on  the  line.   If  used as the
+
+
+
+
+
+
+
+
+
+USD:11‐28              An Introduction to Display Editing with Vi
+
+
+               target of an operator,  full  lines  are  affected
+               (2.3, 3.2).
+
+II              Inserts  at the beginning of a line; a synonym for
+               ↑↑ii.
+
+JJ              Joins together lines, supplying appropriate  white
+               space: one space between words, two spaces after a
+               .., and no spaces at all if the first character  of
+               the joined on line is )).  A count causes that many
+               lines to be joined rather  than  the  default  two
+               (6.5, 7.1f).
+
+KK              Unused.
+
+LL              Moves  the cursor to the first non‐white character
+               of the last line on the screen.  With a count,  to
+               the  first non‐white of the count’th line from the
+               bottom.  Operators affect whole  lines  when  used
+               with LL (2.3).
+
+MM              Moves the cursor to the middle line on the screen,
+               at the first non‐white position on the line (2.3).
+
+NN              Scans for the next match of the last pattern given
+               to  //  or ??, but in the reverse direction; this is
+               the reverse of nn.
+
+OO              Opens a new line above the current line and inputs
+               text  there  up to an ESC.  A count can be used on
+               dumb terminals to specify a number of lines to  be
+               opened;   this   is  generally  obsolete,  as  the
+               _s_l_o_w_o_p_e_n option works better (3.1).
+
+PP              Puts the last deleted text back  before/above  the
+               cursor.   The  text goes back as whole lines above
+               the cursor if it was deleted as whole lines.  Oth‐
+               erwise the text is inserted between the characters
+               before and at the cursor.  May be  preceded  by  a
+               named buffer specification ""_x to retrieve the con‐
+               tents of the buffer; buffers 11−99  contain  deleted
+               material,  buffers  aa−zz  are available for general
+               use (6.3).
+
+QQ              Quits from _v_i to _e_x command mode.  In  this  mode,
+               whole  lines  form commands, ending with a RETURN.
+               You can give all the :: commands; the  editor  sup‐
+               plies the :: as a prompt (7.7).
+
+RR              Replaces  characters on the screen with characters
+               you type (overlay fashion).   Terminates  with  an
+               ESC.
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐29
+
+
+SS              Changes  whole  lines,  a synonym for cccc.  A count
+               substitutes for that many lines.   The  lines  are
+               saved  in  the  numeric buffers, and erased on the
+               screen before the substitution begins.
+
+TT              Takes a single following  character,  locates  the
+               character  before  the cursor in the current line,
+               and places the cursor just after  that  character.
+               A  count repeats the effect.  Most useful with op‐
+               erators such as dd (4.1).
+
+UU              Restores the current line to its state before  you
+               started changing it (3.5).
+
+VV              Unused.
+
+WW              Moves  forward  to  the beginning of a word in the
+               current line, where words are defined as sequences
+               of  blank/non‐blank  characters.   A count repeats
+               the effect (2.4).
+
+XX              Deletes the character before the cursor.  A  count
+               repeats  the  effect,  but  only characters on the
+               current line are deleted.
+
+YY              Yanks a copy of the current line into the  unnamed
+               buffer,  to  be put back by a later pp or PP; a very
+               useful synonym for yyyy.  A count  yanks  that  many
+               lines.   May  be  preceded by a buffer name to put
+               lines in that buffer (7.4).
+
+ZZZZ             Exits the editor.  (Same as ::xxCR.)  If any changes
+               have  been  made, the buffer is written out to the
+               current file.  Then the editor quits.
+
+[[[[             Backs up to the previous section boundary.  A sec‐
+               tion  begins at each macro in the _s_e_c_t_i_o_n_s option,
+               normally a ‘.NH’ or ‘.SH’ and also at lines  which
+               which  start  with a formfeed ^^LL.  Lines beginning
+               with {{ also stop [[[[;  this  makes  it  useful  for
+               looking backwards, a function at a time, in C pro‐
+               grams.  If the option _l_i_s_p is set, stops at each ((
+               at the beginning of a line, and is thus useful for
+               moving backwards at the top  level  LISP  objects.
+               (4.2, 6.1, 6.6, 7.2).
+
+\\              Unused.
+
+]]]]             Forward  to a section boundary, see [[[[ for a defi‐
+               nition (4.2, 6.1, 6.6, 7.2).
+
+↑↑              Moves to the first non‐white position on the  cur‐
+               rent line (4.4).
+
+
+
+
+
+
+
+
+
+
+USD:11‐30              An Introduction to Display Editing with Vi
+
+
+__              Unused.
+
+``              When  followed by a `` returns to the previous con‐
+               text.  The previous context is  set  whenever  the
+               current line is moved in a non‐relative way.  When
+               followed by a letter aa−zz, returns to the  position
+               which  was  marked  with this letter with a mm com‐
+               mand.  When used with an operator such as  dd,  the
+               operation  takes place from the exact marked place
+               to the current position within the  line;  if  you
+               use  ´´,  the  operation  takes place over complete
+               lines (2.2, 5.3).
+
+aa              Appends arbitrary text after  the  current  cursor
+               position;  the  insert  can continue onto multiple
+               lines by using RETURN within the insert.  A  count
+               causes  the  inserted  text  to be replicated, but
+               only if the inserted text is all on one line.  The
+               insertion terminates with an ESC (3.1, 7.2).
+
+bb              Backs up to the beginning of a word in the current
+               line.  A word is a sequence of alphanumerics, or a
+               sequence  of  special characters.  A count repeats
+               the effect (2.4).
+
+cc              An operator which changes  the  following  object,
+               replacing  it  with the following input text up to
+               an ESC.  If more than part of a single line is af‐
+               fected, the text which is changed away is saved in
+               the numeric named buffers.  If only  part  of  the
+               current  line is affected, then the last character
+               to be changed away is marked with a  $$.   A  count
+               causes that many objects to be affected, thus both
+               33cc)) and cc33)) change the following  three  sentences
+               (7.4).
+
+dd              An  operator  which  deletes the following object.
+               If more than part of a line is affected, the  text
+               is  saved  in the numeric buffers.  A count causes
+               that many objects to be affected; thus 33ddww is  the
+               same as dd33ww (3.3, 3.4, 4.1, 7.4).
+
+ee              Advances  to  the end of the next word, defined as
+               for bb and ww.  A count  repeats  the  effect  (2.4,
+               3.1).
+
+ff              Finds  the  first  instance  of the next character
+               following the cursor on the current line.  A count
+               repeats the find (4.1).
+
+gg              Unused.
+
+               Arrow keys hh, jj, kk, ll, and HH.
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐31
+
+
+hh              LLeefftt aarrrrooww.  Moves the cursor one character to the
+               left.  Like the other arrow keys,  either  hh,  the
+               lleefftt  aarrrrooww  key,  or one of the synonyms (^^HH) has
+               the same effect.  On v2  editors,  arrow  keys  on
+               certain  kinds  of terminals (those which send es‐
+               cape sequences, such as vt52, c100, or hp)  cannot
+               be used.  A count repeats the effect (3.1, 7.5).
+
+ii              Inserts  text  before the cursor, otherwise like aa
+               (7.2).
+
+jj              DDoowwnn aarrrrooww.  Moves the cursor one line down in the
+               same  column.   If the position does not exist, _v_i
+               comes as close as possible  to  the  same  column.
+               Synonyms include ^^JJ (linefeed) and ^^NN.
+
+kk              UUpp  aarrrrooww.  Moves the cursor one line up.  ^^PP is a
+               synonym.
+
+ll              RRiigghhtt aarrrrooww.  Moves the cursor  one  character  to
+               the right.  SPACE is a synonym.
+
+mm              Marks  the  current  position of the cursor in the
+               mark register which is specified by the next char‐
+               acter aa−zz.  Return to this position or use with an
+               operator using `` or ´´ (5.3).
+
+nn              Repeats the last // or ?? scanning commands (2.2).
+
+oo              Opens new lines below the current line;  otherwise
+               like OO (3.1).
+
+pp              Puts text after/below the cursor; otherwise like PP
+               (6.3).
+
+qq              Unused.
+
+rr              Replaces the single character at the cursor with a
+               single  character you type.  The new character may
+               be a RETURN; this is  the  easiest  way  to  split
+               lines.   A  count  replaces  each of the following
+               count characters with the single character  given;
+               see RR above which is the more usually useful iter‐
+               ation of rr (3.2).
+
+ss              Changes the single character under the  cursor  to
+               the  text  which  follows  up  to  an ESC; given a
+               count, that many characters from the current  line
+               are  changed.  The last character to be changed is
+               marked with $$ as in cc (3.2).
+
+tt              Advances the cursor upto the character before  the
+               next  character typed.  Most useful with operators
+               such as dd and cc to delete the characters up  to  a
+
+
+
+
+
+
+
+
+
+USD:11‐32              An Introduction to Display Editing with Vi
+
+
+               following character.  You can use .. to delete more
+               if this  doesn’t  delete  enough  the  first  time
+               (4.1).
+
+uu              Undoes the last change made to the current buffer.
+               If repeated,  will  alternate  between  these  two
+               states,  thus  is its own inverse. When used after
+               an insert which inserted text  on  more  than  one
+               line,  the  lines  are  saved in the numeric named
+               buffers (3.5).
+
+vv              Unused.
+
+ww              Advances to the beginning of the next word, as de‐
+               fined by bb (2.4).
+
+xx              Deletes  the  single  character  under the cursor.
+               With a count deletes deletes that many  characters
+               forward  from the cursor position, but only on the
+               current line (6.5).
+
+yy              An operator, yanks the following object  into  the
+               unnamed  temporary buffer.  If preceded by a named
+               buffer specification, ""_x, the text  is  placed  in
+               that  buffer  also.   Text  can  be recovered by a
+               later pp or PP (7.4).
+
+zz              Redraws the screen with the current line placed as
+               specified by the following character: RETURN spec‐
+               ifies the top of the screen, .. the center  of  the
+               screen,  and  −−  at  the  bottom of the screen.  A
+               count may be given after the zz and before the fol‐
+               lowing  character  to  specify the new screen size
+               for the redraw.  A count before the  zz  gives  the
+               number  of  the line to place in the center of the
+               screen instead of the default current line. (5.4)
+
+{{              Retreats to the beginning of the beginning of  the
+               preceding  paragraph.   A paragraph begins at each
+               macro in the _p_a_r_a_g_r_a_p_h_s  option,  normally  ‘.IP’,
+               ‘.LP’,  ‘.PP’,  ‘.QP’ and ‘.bp’.  A paragraph also
+               begins after a completely empty line, and at  each
+               section boundary (see [[[[ above) (4.2, 6.8, 7.6).
+
+||              Places  the  cursor on the character in the column
+               specified by the count (7.1, 7.2).
+
+}}              Advances to the beginning of the  next  paragraph.
+               See  {{  for the definition of paragraph (4.2, 6.8,
+               7.6).
+
+~~              Unused.
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐33
+
+
+^^?? ((DEL))       Interrupts the editor, returning it to command ac‐
+               cepting state (1.5, 7.5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐34              An Introduction to Display Editing with Vi
+
+
+               .
+
+                 VVii CCoommmmaanndd && FFuunnccttiioonn RReeffeerreennccee
+
+
+                        _A_l_a_n _P_._W_. _H_e_w_e_t_t
+
+             _R_e_v_i_s_e_d _f_o_r _v_e_r_s_i_o_n _2_._1_2 _b_y _M_a_r_k _H_o_r_t_o_n
+
+99..  AAuutthhoorr’’ss DDiissccllaaiimmeerr
+
+This  document  does  not claim to be 100% complete.  There are a
+few commands listed in the original document that I was unable to
+test  either  because  I do not speak lliisspp, because they required
+programs we don’t have, or because I wasn’t  able  to  make  them
+work.   In  these  cases  I  left  the command out.  The commands
+listed in this document have been tried and are  known  to  work.
+It  is expected that prospective users of this document will read
+it once to get the flavor of everything that vvii can do  and  then
+use  it as a reference document.  Experimentation is recommended.
+If you don’t understand a command, try it and see what happens.
+
+[Note: In revising this document, I have  attempted  to  make  it
+completely  reflect  version  2.12 of vvii.  It does not attempt to
+document the VAX version (version 3), but with one or two  excep‐
+tions  (wrapmargin, arrow keys) everything said about 2.12 should
+apply to 3.1.  _M_a_r_k _H_o_r_t_o_n]
+
+1100..  NNoottaattiioonn
+
+[[ooppttiioonn]] is used to denote optional parts of a command.  Many  vvii
+commands  have  an  optional count.  [[ccnntt]] means that an optional
+number may precede the command to multiply or  iterate  the  com‐
+mand.   {{vvaarriiaabbllee  iitteemm}}  is  used to denote parts of the command
+which must appear, but can take a  number  of  different  values.
+<<cchhaarraacctteerr  [[‐‐cchhaarraacctteerr]]>>  means that the character or one of the
+characters in the range described between the two angle  brackets
+is  to be typed.  For example <<eesscc>> means the eessccaappee key is to be
+typed.  <<aa‐‐zz>> means that a lower case  letter  is  to  be  typed.
+^^<<cchhaarraacctteerr>> means that the character is to be typed as a ccoonnttrrooll
+character, that is, with the <<ccnnttll>> key held down while  simulta‐
+neously typing the specified character.  In this document control
+characters will be denoted using the _u_p_p_e_r  _c_a_s_e  character,  but
+^<uppercase  chr>  and ^<lowercase chr> are equivalent.  That is,
+for example, <<^^DD>> is equal to <<^^dd>>.  The  most  common  character
+abbreviations used in this list are as follows:
+
+<esc>   escape, octal 033
+
+<cr>    carriage return, ^M, octal 015
+
+<lf>    linefeed ^J, octal 012
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐35
+
+
+<nl>    newline, ^J, octal 012 (same as linefeed)
+
+<bs>    backspace, ^H, octal 010
+
+<tab>   tab, ^I, octal 011
+
+<bell>  bell, ^G, octal 07
+
+<ff>    formfeed, ^L, octal 014
+
+<sp>    space, octal 040
+
+<del>   delete, octal 0177
+
+
+1111..  BBaassiiccss
+
+To run vvii the shell variable TTEERRMM must be defined and exported to
+your environment.  How you do this depends on which shell you are
+using.   You  can  tell  which shell you have by the character it
+prompts you for commands with.  The  Bourne  shell  prompts  with
+‘$’,  and  the  C shell prompts with ‘%’.  For these examples, we
+will suppose that you are using an HP 2621 terminal, whose  term‐
+cap name is ‘‘2621’’.
+
+1111..11..  BBoouurrnnee SShheellll
+
+To manually set your terminal type to 2621 you would type:
+
+     TERM=2621
+     export TERM
+
+
+     There are various ways of having this automatically or semi‐
+automatically done when you log in.  Suppose you usually dial  in
+on  a 2621.  You want to tell this to the machine, but still have
+it work when you use a hardwired terminal.  The recommended  way,
+if you have the ttsseett program, is to use the sequence
+
+     tset −s −d 2621 > tset$$
+     . tset$$
+     rm tset$$
+
+in  your  .login (for csh) or the same thing using ‘.’ instead of
+‘source’ in your .profile (for sh).  The above line says that  if
+you  are  dialing in you are on a 2621, but if you are on a hard‐
+wired terminal it figures out your terminal type from an  on‐line
+list.
+
+1111..22..  TThhee CC SShheellll
+
+To manually set your terminal type to 2621 you would type:
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐36              An Introduction to Display Editing with Vi
+
+
+     setenv TERM 2621
+
+
+     There are various ways of having this automatically or semi‐
+automatically done when you log in.  Suppose you usually dial  in
+on  a 2621.  You want to tell this to the machine, but still have
+it work when you use a hardwired terminal.  The recommended  way,
+if you have the ttsseett program, is to use the sequence
+
+     tset −s −d 2621 > tset$$
+     source tset$$
+     rm tset$$
+
+in  your .login.*  The above line says that if you are dialing in
+you are on a 2621, but if you are on a hardwired terminal it fig‐
+ures out your terminal type from an on‐line list.
+
+1122..  NNoorrmmaall CCoommmmaannddss
+
+VVii is a visual editor with a window on the file.  What you see on
+the screen is vvii’s current notion of what your file will contain,
+(at  this  point in the file), when it is written out.  Most com‐
+mands do not cause any change in the screen  until  the  complete
+command  is  typed.   Should you get confused while typing a com‐
+mand, you can abort the command by  typing  an  <del>  character.
+You  will  know  you  are  back  to command level when you hear a
+<bell>.  Usually typing an <esc> will produce  the  same  result.
+When vvii gets an improperly formatted command it rings the <bell>.
+Following are the vvii commands broken down by function.
+
+1122..11..  EEnnttrryy aanndd EExxiitt
+
+To enter vvii on a particular _f_i_l_e, type
+
+     vvii _f_i_l_e
+
+The file will be read in and the cursor will be placed at the be‐
+ginning of the first line.  The first screenfull of the file will
+be displayed on the terminal.
+
+     To get out of the editor, type
+
+     ZZ
+
+If you are in some special mode, such as input mode or the middle
+of  a  multi‐keystroke command, it may be necessary to type <esc>
+first.
+
+
+
+───────────
+*  On  a version 6 system without environments, the invocation of
+tset is simpler, just add the line ‘‘tset −d 2621’’ to your  .lo‐
+gin or .profile.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐37
+
+
+1122..22..  CCuurrssoorr aanndd PPaaggee MMoottiioonn
+
+NNOOTTEE:: The arrow keys (see the  next  four  commands)  on  certain
+kinds  of  terminals will not work with the PDP‐11 version of vi.
+The control versions or the hjkl versions will work on any termi‐
+nal.  Experienced users prefer the hjkl keys because they are al‐
+ways right under their fingers.  Beginners often prefer the arrow
+keys, since they do not require memorization of which hjkl key is
+which.  The mnemonic value of hjkl is clear from looking  at  the
+keyboard of an adm3a.
+
+
+[cnt]<bs> or [cnt]h or [cnt]←
+                Move  the cursor to the left one character.  Cur‐
+                sor stops at the left margin of the page.  If cnt
+                is given, these commands move that many spaces.
+
+[cnt]^N or [cnt]j or [cnt]↓ or [cnt]<lf>
+                Move  down  one  line.   Moving  off  the  screen
+                scrolls the window to force a new line  onto  the
+                screen.  Mnemonic: NNext
+
+[cnt]^P or [cnt]k or [cnt]↑
+                Move  up  one  line.   Moving  off the top of the
+                screen forces new text  onto  the  screen.   Mne‐
+                monic: PPrevious
+
+[cnt]<sp> or [cnt]l or [cnt]→
+                Move to the right one character.  Cursor will not
+                go beyond the end of the line.
+
+[cnt]‐          Move the cursor up the screen to the beginning of
+                the next line.  Scroll if necessary.
+
+[cnt]+ or [cnt]<cr>
+
+                Move  the cursor down the screen to the beginning
+                of the next line.  Scroll up if necessary.
+
+[cnt]$          Move the cursor to the end of the line.  If there
+                is  a  count,  move  to the end of the line "cnt"
+                lines forward in the file.
+
+^               Move the cursor to the  beginning  of  the  first
+                word on the line.
+
+0               Move the cursor to the left margin of the current
+                line.
+
+[cnt]|          Move the cursor to the column  specified  by  the
+                count.  The default is column zero.
+
+[cnt]w          Move  the  cursor  to  the  beginning of the next
+                word. If there is a count, then move forward that
+
+
+
+
+
+
+
+
+
+USD:11‐38              An Introduction to Display Editing with Vi
+
+
+                many  words and position the cursor at the begin‐
+                ning of the word.  Mnemonic: next‐wword
+
+[cnt]W          Move the cursor to the beginning of the next word
+                which  follows  a  "white  space" (<sp>,<tab>, or
+                <nl>).  Ignore other punctuation.
+
+[cnt]b          Move the cursor to the preceding word.  Mnemonic:
+                bbackup‐word
+
+[cnt]B          Move  the  cursor  to  the preceding word that is
+                separated from  the  current  word  by  a  "white
+                space" (<sp>,<tab>, or <nl>).
+
+[cnt]e          Move the cursor to the end of the current word or
+                the end of the "cnt"’th  word  hence.   Mnemonic:
+                eend‐of‐word
+
+[cnt]E          Move  the  cursor  to the end of the current word
+                which is delimited by "white space"  (<sp>,<tab>,
+                or <nl>).
+
+[line number]G
+                Move  the  cursor to the line specified.  Of par‐
+                ticular use are the sequences "1G" and "G", which
+                move  the  cursor to the beginning and the end of
+                the file respectively.  Mnemonic: GGo‐to
+
+NNOOTTEE:: The next four commands (^D, ^U, ^F, ^B) are not true motion
+commands,  in  that they cannot be used as the object of commands
+such as delete or change.
+
+[cnt]^D         Move the cursor down in the file by  "cnt"  lines
+                (or  the  last  "cnt" if a new count isn’t given.
+                The initial default is half a page.)  The  screen
+                is simultaneously scrolled up.  Mnemonic: DDown
+
+[cnt]^U         Move  the  cursor  up in the file by "cnt" lines.
+                The screen is simultaneously scrolled down.  Mne‐
+                monic: UUp
+
+[cnt]^F         Move  the cursor to the next page.  A count moves
+                that many pages.  Two lines of the previous  page
+                are  kept  on the screen for continuity if possi‐
+                ble.  Mnemonic: FForward‐a‐page
+
+[cnt]^B         Move the cursor to the previous page.  Two  lines
+                of  the  current page are kept if possible.  Mne‐
+                monic: BBackup‐a‐page
+
+[cnt](          Move the cursor to the beginning of the next sen‐
+                tence.   A  sentence  is defined as ending with a
+                ".", "!", or "?"  followed by  two  spaces  or  a
+                <nl>.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐39
+
+
+[cnt])          Move  the  cursor backwards to the beginning of a
+                sentence.
+
+[cnt]}          Move the cursor to  the  beginning  of  the  next
+                paragraph.   This command works best inside nnrrooffff
+                documents.  It  understands  two  sets  of  nnrrooffff
+                macros,  −−mmss  and  −−mmmm,  for  which  the commands
+                ".IP", ".LP", ".PP", ".QP", "P", as well  as  the
+                nroff  command  ".bp"  are considered to be para‐
+                graph delimiters.  A blank line also  delimits  a
+                paragraph.   The  nnrrooffff macros that it accepts as
+                paragraph delimiters is  adjustable.   See  ppaarraa‐‐
+                ggrraapphhss under the SSeett CCoommmmaannddss section.
+
+[cnt]{          Move  the  cursor backwards to the beginning of a
+                paragraph.
+
+]]              Move the cursor to the next  "section",  where  a
+                section  is  defined by two sets of nnrrooffff macros,
+                −−mmss and −−mmmm, in which ".NH", ".SH", and ".H"  de‐
+                limit   a  section.   A  line  beginning  with  a
+                <ff><nl> sequence, or a line beginning with a "{"
+                are  also  considered  to  be section delimiters.
+                The last option makes it useful for  finding  the
+                beginnings of C functions.  The nnrrooffff macros that
+                are used for section delimiters can be  adjusted.
+                See sseeccttiioonnss under the SSeett CCoommmmaannddss section.
+
+[[              Move  the  cursor backwards to the beginning of a
+                section.
+
+%               Move the cursor to the  matching  parenthesis  or
+                brace.   This  is  very useful in C or lisp code.
+                If the cursor is sitting on a (( )) {{ or }} the cur‐
+                sor  is  moved  to  the matching character at the
+                other end of the section.  If the cursor  is  not
+                sitting  on a brace or a parenthesis, vvii searches
+                forward until it finds one and then jumps to  the
+                match mate.
+
+[cnt]H          If  there  is no count move the cursor to the top
+                left position on  the  screen.   If  there  is  a
+                count,  then  move the cursor to the beginning of
+                the line "cnt" lines from the top of the  screen.
+                Mnemonic:  HHome
+
+[cnt]L          If  there  is no count move the cursor to the be‐
+                ginning of the last line on the screen.  If there
+                is a count, then move the cursor to the beginning
+                of the line "cnt" lines from the  bottom  of  the
+                screen.  Mnemonic: LLast
+
+M               Move  the  cursor  to the beginning of the middle
+                line on the screen.  Mnemonic: MMiddle
+
+
+
+
+
+
+
+
+
+USD:11‐40              An Introduction to Display Editing with Vi
+
+
+m<a‐z>          This command does not move  the  cursor,  but  it
+                mmaarrkkss  the  place  in  the file and the character
+                "<a‐z>" becomes the label for referring  to  this
+                location in the file.  See the next two commands.
+                Mnemonic: mmark NNOOTTEE:: The mark command  is  not  a
+                motion,  and cannot be used as the target of com‐
+                mands such as delete.
+
+´<a‐z>          Move the cursor to the beginning of the line that
+                is marked with the label "<a‐z>".
+
+`<a‐z>          Move the cursor to the exact position on the line
+                that was marked with with the label "<a‐z>".
+
+´´              Move the cursor back to the beginning of the line
+                where it was before the last "non‐relative" move.
+                A "non‐relative" move  is  something  such  as  a
+                search  or a jump to a specific line in the file,
+                rather than moving the cursor  or  scrolling  the
+                screen.
+
+``              Move  the  cursor  back  to the exact spot on the
+                line where it was located before the  last  "non‐
+                relative" move.
+
+1122..33..  SSeeaarrcchheess
+
+The following commands allow you to search for items in a file.
+
+[cnt]f{chr}
+
+                Search  forward  on  the  line  for  the  next or
+                "cnt"’th occurrence of the character "chr".   The
+                cursor  is  placed  aatt the character of interest.
+                Mnemonic: ffind character
+
+[cnt]F{chr}
+
+                Search backwards on the  line  for  the  next  or
+                "cnt"’th  occurrence of the character "chr".  The
+                cursor is placed aatt the character of interest.
+
+[cnt]t{chr}
+
+                Search forward  on  the  line  for  the  next  or
+                "cnt"’th  occurrence of the character "chr".  The
+                cursor is placed jjuusstt pprreecceeddiinngg the character  of
+                interest.  Mnemonic: move cursor up tto character
+
+[cnt]T{chr}
+
+                Search  backwards  on  the  line  for the next or
+                "cnt"’th occurrence of the character "chr".   The
+                cursor  is placed jjuusstt pprreecceeddiinngg the character of
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐41
+
+
+                interest.
+
+[cnt];          Repeat the last "f", "F", "t" or "T" command.
+
+[cnt],          Repeat the last "f", "F", "t" or "T" command, but
+                in the opposite search direction.  This is useful
+                if you overshoot.
+
+[cnt]/[string]/<nl>
+                Search  forward  for  the  next   occurrence   of
+                "string".   Wrap  around  at  the end of the file
+                does occur.  The final <<//>> is not required.
+
+[cnt]?[string]?<nl>
+                Search  backwards  for  the  next  occurrence  of
+                "string".  If a count is specified, the count be‐
+                comes the new window size.  Wrap  around  at  the
+                beginning  of the file does occur.  The final <<??>>
+                is not required.
+
+n               Repeat the last /[string]/ or ?[string]?  search.
+                Mnemonic: nnext occurrence.
+
+N               Repeat  the last /[string]/ or ?[string]? search,
+                but in the reverse direction.
+
+:g/[string]/[editor command]<nl>
+
+                Using the :: syntax it is possible  to  do  global
+                searches ala the standard UNIX "ed" editor.
+
+1122..44..  TTeexxtt IInnsseerrttiioonn
+
+The following commands allow for the insertion of text.  All mul‐
+ticharacter text insertions are terminated with an <esc>  charac‐
+ter.   The  last  change can always be uunnddoonnee by typing a uu.  The
+text insert in insertion mode can contain newlines.
+
+a{text}<esc>    Insert text immediately following the cursor  po‐
+                sition.  Mnemonic: aappend
+
+A{text}<esc>    Insert text at the end of the current line.  Mne‐
+                monic: AAppend
+
+i{text}<esc>    Insert text immediately preceding the cursor  po‐
+                sition.  Mnemonic: iinsert
+
+I{text}<esc>    Insert text at the beginning of the current line.
+
+o{text}<esc>    Insert  a  new  line  after the line on which the
+                cursor appears and insert text there.   Mnemonic:
+                oopen new line
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐42              An Introduction to Display Editing with Vi
+
+
+O{text}<esc>    Insert a new line preceding the line on which the
+                cursor appears and insert text there.
+
+1122..55..  TTeexxtt DDeelleettiioonn
+
+The following commands allow the user to delete text  in  various
+ways.  All changes can always be uunnddoonnee by typing the uu command.
+
+[cnt]x          Delete  the  character  or characters starting at
+                the cursor position.
+
+[cnt]X          Delete the character or  characters  starting  at
+                the character preceding the cursor position.
+
+D               Deletes the remainder of the line starting at the
+                cursor.  Mnemonic: DDelete the rest of line
+
+[cnt]d{motion}
+                Deletes one or more occurrences of the  specified
+                motion.  Any motion from sections 4.1 and 4.2 can
+                be used here.   The  d  can  be  stuttered  (e.g.
+                [cnt]dd) to delete cnt lines.
+
+1122..66..  TTeexxtt RReeppllaacceemmeenntt
+
+The  following  commands  allow the user to simultaneously delete
+and insert new text.  All such actions can be uunnddoonnee by typing  uu
+following the command.
+
+r<chr>          Replaces  the character at the current cursor po‐
+                sition with <chr>.  This is a one  character  re‐
+                placement.  No <esc> is required for termination.
+                Mnemonic:  rreplace character
+
+R{text}<esc>    Starts overlaying the characters  on  the  screen
+                with  whatever  you type.  It does not stop until
+                an <esc> is typed.
+
+[cnt]s{text}<esc>
+                Substitute for "cnt" characters beginning at  the
+                current  cursor  position.   A "$" will appear at
+                the position in the text where the "cnt"’th char‐
+                acter  appears  so you will know how much you are
+                erasing.  Mnemonic: ssubstitute
+
+[cnt]S{text}<esc>
+                Substitute  for  the  entire  current  line   (or
+                lines).   If  no count is given, a "$" appears at
+                the end of the current line.  If a count of  more
+                than 1 is given, all the lines to be replaced are
+                deleted before the insertion begins.
+
+[cnt]c{motion}{text}<esc>
+                Change the specified  "motion"  by  replacing  it
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐43
+
+
+                with  the  insertion  text.  A "$" will appear at
+                the end of the last item that  is  being  deleted
+                unless  the  deletion  involves whole lines.  Mo‐
+                tion’s can be any motion  from  sections  4.1  or
+                4.2.  Stuttering the c (e.g. [cnt]cc) changes cnt
+                lines.
+
+1122..77..  MMoovviinngg TTeexxtt
+
+VVii provides a number of ways of moving  chunks  of  text  around.
+There  are  nine  buffers  into which each piece of text which is
+deleted or "yanked" is put in addition to the "undo" buffer.  The
+most  recent  deletion  or  yank is in the "undo" buffer and also
+usually in buffer 1, the next most recent in  buffer  2,  and  so
+forth.   Each  new  deletion pushes down all the older deletions.
+Deletions older than 9 disappear.  There is also a set  of  named
+registers, a‐z, into which text can optionally be placed.  If any
+delete or replacement type command is preceded  by  ""<<aa‐‐zz>>,  that
+named  buffer  will contain the text deleted after the command is
+executed.  For example, ""aa33dddd will delete three lines starting at
+the current line and put them in buffer ""aa.*  There are two  more
+basic  commands and some variations useful in getting and putting
+text into a file.
+
+["<a‐z>][cnt]y{motion}
+
+                Yank the specified item or "cnt" items and put in
+                the  "undo"  buffer or the specified buffer.  The
+                variety of "items" that can be yanked is the same
+                as those that can be deleted with the "d" command
+                or changed with the "c" command.  In the same way
+                that  "dd" means delete the current line and "cc"
+                means replace the current line, "yy"  means  yank
+                the current line.
+
+["<a‐z>][cnt]Y  Yank the current line or the "cnt" lines starting
+                from the current line.  If no  buffer  is  speci‐
+                fied,  they  will go into the "undo" buffer, like
+                any delete would.   It  is  equivalent  to  "yy".
+                Mnemonic:  YYank
+
+["<a‐z>]p       Put  "undo"  buffer  or the specified buffer down
+                aafftteerr the cursor.  If whole lines were yanked  or
+                deleted  into  the  buffer, then they will be put
+                down on the line following the line the cursor is
+                on.   If  something else was deleted, like a word
+                or sentence, then it will be inserted immediately
+                following the cursor.  Mnemonic:  pput buffer
+
+───────────
+* Referring to an upper case letter as a buffer name (A‐Z) is the
+same as referring to the lower  case  letter,  except  that  text
+placed  in  such  a buffer is appended to it instead of replacing
+it.
+
+
+
+
+
+
+
+
+
+USD:11‐44              An Introduction to Display Editing with Vi
+
+
+                It should be noted that text in the named buffers
+                remains there when you start editing a  new  file
+                with the ::ee ffiillee<<eesscc>> command.  Since this is so,
+                it is possible to copy or delete  text  from  one
+                file  and  carry  it  over to another file in the
+                buffers.  However, the undo buffer and the  abil‐
+                ity to undo are lost when changing files.
+
+["<a‐z>]P       Put  "undo"  buffer  or the specified buffer down
+                bbeeffoorree the cursor.  If whole lines  where  yanked
+                or deleted into the buffer, then they will be put
+                down on the line preceding the line the cursor is
+                on.   If  something else was deleted, like a word
+                or sentence, then it will be inserted immediately
+                preceding the cursor.
+
+[cnt]>{motion}  The  shift operator will right shift all the text
+                from the line on which the cursor is  located  to
+                the  line  where the mmoottiioonn is located.  The text
+                is shifted by one sshhiiffttwwiiddtthh.  (See  section  6.)
+                >>>> means right shift the current line or lines.
+
+[cnt]<{motion}  The  shift  operator will left shift all the text
+                from the line on which the cursor is  located  to
+                the  line where the iitteemm is located.  The text is
+                shifted by one sshhiiffttwwiiddtthh.  (See section 6.)   <<<<
+                means left shift the current line or lines.  Once
+                the line has reached the left margin  it  is  not
+                further affected.
+
+[cnt]={motion}  Prettyprints the indicated area according to lliisspp
+                conventions.  The area should be a lisp s‐expres‐
+                sion.
+
+1122..88..  MMiisscceellllaanneeoouuss CCoommmmaannddss
+
+VVii  has  a number of miscellaneous commands that are very useful.
+They are:
+
+ZZ              This is the normal way to exit from vi.   If  any
+                changes  have been made, the file is written out.
+                Then you are returned to the shell.
+
+^L              Redraw the current screen.   This  is  useful  if
+                someone  "write"s you while you are in "vi" or if
+                for any reason garbage gets onto the screen.
+
+^R              On dumb terminals, those not having  the  "delete
+                line" function (the vt100 is such a terminal), vvii
+                saves redrawing the screen when you delete a line
+                by  just  marking the line with an "@" at the be‐
+                ginning and blanking the line.  If  you  want  to
+                actually get rid of the lines marked with "@" and
+                see what the page looks like, typing a ^R will do
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐45
+
+
+                this.
+
+.               "Dot"  is  a particularly useful command.  It re‐
+                peats the last text modifying command.  Therefore
+                you  can  type a command once and then to another
+                place and repeat it by just typing ".".
+
+u               Perhaps the most important command in the editor,
+                u  undoes  the last command that changed the buf‐
+                fer.  Mnemonic:  uundo
+
+U               Undo all the text modifying commands performed on
+                the  current  line  since the last time you moved
+                onto it.
+
+[cnt]J          Join the current line  and  the  following  line.
+                The  <nl>  is  deleted  and the two lines joined,
+                usually with a space between the end of the first
+                line  and  the  beginning  of what was the second
+                line.  If the first line ended with  a  "period",
+                then  two spaces are inserted.  A count joins the
+                next cnt lines.  Mnemonic: JJoin lines
+
+Q               Switch to eexx editing mode.  In this mode vvii  will
+                behave  very  much  like  eedd.  The editor in this
+                mode will operate on single  lines  normally  and
+                will not attempt to keep the "window" up to date.
+                Once in this mode it is also possible  to  switch
+                to  the  ooppeenn  mode  of editing.  By entering the
+                command  [[lliinnee  nnuummbbeerr]]ooppeenn<<nnll>>  you  enter  this
+                mode.   It  is  similar to the normal visual mode
+                except the window is only oonnee  line  long.   Mne‐
+                monic: QQuit visual mode
+
+^]              An  abbreviation  for  a tag command.  The cursor
+                should be positioned at the beginning of a  word.
+                That  word  is  taken  as a tag name, and the tag
+                with that name is found as if it had  been  typed
+                in a :tag command.
+
+[cnt]!{motion}{UNIX cmd}<nl>
+                Any  UNIX  filter  (e.g.  command  that reads the
+                standard input and outputs something to the stan‐
+                dard output) can be sent a section of the current
+                file and have the output of the  command  replace
+                the  original text.  Useful examples are programs
+                like ccbb, ssoorrtt, and nnrrooffff.   For  instance,  using
+                ssoorrtt  it  would  be possible to sort a section of
+                the current file into a new list.  Using !!!! means
+                take  a  line  or  lines starting at the line the
+                cursor is currently on and pass them to the  UNIX
+                command.   NNOOTTEE::  To just escape to the shell for
+                one command, use :!{cmd}<nl>, see section 5.
+
+
+
+
+
+
+
+
+
+
+USD:11‐46              An Introduction to Display Editing with Vi
+
+
+z{cnt}<nl>      This resets the  current  window  size  to  "cnt"
+                lines and redraws the screen.
+
+1122..99..  SSppeecciiaall IInnsseerrtt CChhaarraacctteerrss
+
+There  are  some characters that have special meanings during in‐
+sert modes.  They are:
+
+^V              During inserts, typing a ^V allows you  to  quote
+                control  characters into the file.  Any character
+                typed after the ^V  will  be  inserted  into  the
+                file.
+
+[^]^D or [0]^D  <^D>   without   any   argument   backs   up  one
+                sshhiiffttwwiiddtthh.  This is necessary to remove indenta‐
+                tion that was inserted by the aauuttooiinnddeenntt feature.
+                ^<^D> temporarily removes  all  the  autoindenta‐
+                tion, thus placing the cursor at the left margin.
+                On the next line, the previous indent level  will
+                be restored.  This is useful for putting "labels"
+                at the left margin.  0<^D> says  remove  all  au‐
+                toindents  and  stay  that  way.  Thus the cursor
+                moves to the left margin and stays there on  suc‐
+                cessive  lines  until <tab>’s are typed.  As with
+                the <tab>, the <^D> is only effective before  any
+                other "non‐autoindent" controlling characters are
+                typed.  Mnemonic: DDelete a shiftwidth
+
+^W              If the cursor is sitting on a  word,  <^W>  moves
+                the  cursor  back  to  the beginning of the word,
+                thus erasing the word from the insert.  Mnemonic:
+                erase WWord
+
+<bs>            The  backspace  always  serves as an erase during
+                insert modes in addition to your  normal  "erase"
+                character.   To insert a <bs> into your file, use
+                the <^V> to quote it.
+
+1133..  :: Commands
+
+Typing a ":" during command mode causes vvii to put the  cursor  at
+the  bottom  on  the screen in preparation for a command.  In the
+":" mode, vvii can be given most eedd commands.  It is also from this
+mode  that  you  exit  from vvii or switch to different files.  All
+commands of this variety are  terminated  by  a  <nl>,  <cr>,  or
+<esc>.
+
+:w[!] [file]    Causes  vvii  to  write out the current text to the
+                disk.  It is written to the file you are  editing
+                unless  "file"  is  supplied.   If "file" is sup‐
+                plied, the write is directed  to  that  file  in‐
+                stead.   If that file already exists, vvii will not
+                perform the write unless the "!" is supplied  in‐
+                dicating  you  _r_e_a_l_l_y  want  to destroy the older
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐47
+
+
+                copy of the file.
+
+:q[!]           Causes vvii to exit.  If you have modified the file
+                you  are looking at currently and haven’t written
+                it out, vvii will refuse to exit unless the "!"  is
+                supplied.
+
+:e[!] [+[cmd]] [file]
+
+                Start  editing  a new file called "file" or start
+                editing the current file over again.  The command
+                ":e!"  says "ignore the changes I’ve made to this
+                file and start over from the beginning".   It  is
+                useful  if  you really mess up the file.  The op‐
+                tional "+" says instead of starting at the begin‐
+                ning,  start  at  the "end", or, if "cmd" is sup‐
+                plied, execute "cmd" first.  Useful cases of this
+                are  where  cmd is "n" (any integer) which starts
+                at line number n, and "/text", which searches for
+                "text" and starts at the line where it is found.
+
+^^              Switch  back  to  the  place you were before your
+                last tag  command.   If  your  last  tag  command
+                stayed  within  the file, ^^ returns to that tag.
+                If you have no recent tag command, it will return
+                to  the  same  place in the previous file that it
+                was showing when  you  switched  to  the  current
+                file.
+
+:n[!]           Start editing the next file in the argument list.
+                Since vvii can be called with multiple file  names,
+                the  ":n"  command  tells  it to stop work on the
+                current file and switch to the next file.  If the
+                current  file  was modifies, it has to be written
+                out before the ":n" will work  or  else  the  "!"
+                must  be supplied, which says discard the changes
+                I made to the current file.
+
+:n[!] file [file file ...]
+
+                Replace the current argument list with a new list
+                of files and start editing the first file in this
+                new list.
+
+:r file         Read in a copy of "file" on the  line  after  the
+                cursor.
+
+:r !cmd         Execute  the "cmd" and take its output and put it
+                into the file after the current line.
+
+:!cmd           Execute any UNIX shell command.
+
+:ta[!] tag      VVii looks in the file named ttaaggss  in  the  current
+                directory.   TTaaggss  is  a  file  of  lines  in the
+
+
+
+
+
+
+
+
+
+USD:11‐48              An Introduction to Display Editing with Vi
+
+
+                format:
+
+                        tag filename vvii‐search‐command
+
+                If vvii finds the tag you specified in the ::ttaa com‐
+                mand, it stops editing the current file if neces‐
+                sary and if the current file is up to date on the
+                disk  and switches to the file specified and uses
+                the search pattern specified to find the "tagged"
+                item  of  interest.   This is particularly useful
+                when editing multi‐file C programs  such  as  the
+                operating  system.   There  is  a  program called
+                ccttaaggss which will  generate  an  appropriate  ttaaggss
+                file for C and f77 programs so that by saying ::ttaa
+                ffuunnccttiioonn<<nnll>> you will be switched to  that  func‐
+                tion.   It  could  also  be  useful  when editing
+                multi‐file documents, though the ttaaggss file  would
+                have to be generated manually.
+
+1144..  SSppeecciiaall AArrrraannggeemmeennttss ffoorr SSttaarrttuupp
+
+     VVii takes the value of $$TTEERRMM and looks up the characteristics
+of that terminal in the file //eettcc//tteerrmmccaapp.   If  you  don’t  know
+vvii’s name for the terminal you are working on, look in //eettcc//tteerrmm‐‐
+ccaapp.
+
+     When vvii starts, it attempts to read the variable EXINIT from
+your  environment.*  If that exists, it takes the values in it as
+the default values for certain of its  internal  constants.   See
+the  section  on  "Set  Values"  for  further details.  If EXINIT
+doesn’t exist you will get all the normal defaults.
+
+     Should  you inadvertently hang up the phone while inside vvii,
+or should the computer crash, all may not be lost.  Upon  return‐
+ing to the system, type:
+
+     vi −r file
+
+This  will  normally recover the file.  If there is more than one
+temporary file for a specific file name, vvii recovers  the  newest
+one.   You  can  get an older version by recovering the file more
+than once.  The command "vi ‐r" without a file name gives you the
+list  of  files that were saved in the last system crash (but _n_o_t
+the file just saved when the phone was hung up).
+
+1155..  SSeett CCoommmmaannddss
+
+VVii has a number of internal variables and switches which  can  be
+set  to  achieve  special  affects.   These options come in three
+forms, those that are switches, which toggle from off to  on  and
+back,  those that require a numeric value, and those that require
+───────────
+* On version 6 systems Instead of EXINIT, put  the  startup  com‐
+mands in the file .exrc in your home directory.
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐49
+
+
+an alphanumeric string value.  The toggle options are  set  by  a
+command of the form:
+
+     :set option<nl>
+
+and turned off with the command:
+
+     :set nooption<nl>
+
+Commands requiring a value are set with a command of the form:
+
+     :set option=value<nl>
+
+To display the value of a specific option type:
+
+     :set option?<nl>
+
+To display only those that you have changed type:
+
+     :set<nl>
+
+and  to display the long table of all the settable parameters and
+their current values type:
+
+     :set all<nl>
+
+
+     Most of the options have a long form  and  an  abbreviation.
+Both  are listed in the following table as well as the normal de‐
+fault value.
+
+     To arrange to have values other than the default used  every
+time you enter vvii, place the appropriate sseett command in EXINIT in
+your environment, e.g.
+
+     EXINIT=’set ai aw terse sh=/bin/csh’
+     export EXINIT
+
+or
+
+     setenv EXINIT ’set ai aw terse sh=/bin/csh’
+
+for sshh and ccsshh, respectively.  These are usually placed  in  your
+.profile or .login.  If you are running a system without environ‐
+ments (such as version 6) you can place the set  command  in  the
+file .exrc in your home directory.
+
+autoindent ai   Default: noai Type: toggle
+                When in autoindent mode, vi helps you indent code
+                by starting each line in the same column  as  the
+                preceding  line.  Tabbing to the right with <tab>
+                or <^T> will move this boundary to the right, and
+                it can be moved to the left with <^D>.
+
+
+
+
+
+
+
+
+
+
+USD:11‐50              An Introduction to Display Editing with Vi
+
+
+autoprint ap    Default: ap Type: toggle
+                Causes  the current line to be printed after each
+                ex text modifying command.  This is not  of  much
+                interest in the normal vvii visual mode.
+
+autowrite aw    Default: noaw type: toggle
+                Autowrite causes an automatic write to be done if
+                there are unsaved changes before certain commands
+                which change files or otherwise interact with the
+                outside world.   These  commands  are  :!,  :tag,
+                :next, :rewind, ^^, and ^].
+
+beautify bf     Default: nobf Type: toggle
+                Causes all control characters except <tab>, <nl>,
+                and <ff> to be discarded.
+
+directory dir   Default: dir=/tmp Type: string
+                This is the directory in which vvii puts its tempo‐
+                rary file.
+
+errorbells eb   Default: noeb Type: toggle
+                Error messages are preceded by a <bell>.
+
+hardtabs ht     Default: hardtabs=8 Type: numeric
+                This  option  contains the value of hardware tabs
+                in your terminal, or of software tabs expanded by
+                the Unix system.
+
+ignorecase ic   Default: noic Type: toggle
+                All  upper  case  characters  are mapped to lower
+                case in regular expression matching.
+
+lisp            Default: nolisp Type: toggle
+                Autoindent for lliisspp code.  The commands  ((  ))  [[[[
+                and ]]]] are modified appropriately to affect s‐ex‐
+                pressions and functions.
+
+list            Default: nolist Type: toggle
+                All printed lines have the <tab> and <nl> charac‐
+                ters displayed visually.
+
+magic           Default: magic Type: toggle
+                Enable  the  metacharacters  for matching.  These
+                include  ..  **  <<   >>   [[ssttrriinngg]]   [[^^ssttrriinngg]]   and
+                [[<<cchhrr>>‐‐<<cchhrr>>]].
+
+number nu       Default: nonu Type: toggle
+                Each line is displayed with its line number.
+
+open            Default: open Type: toggle
+                When  set, prevents entering open or visual modes
+                from ex or edit.  Not of interest from vi.
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐51
+
+
+optimize opt    Default: opt Type: toggle
+                Basically of use only when using the eexx capabili‐
+                ties.   This option prevents automatic <cr>s from
+                taking place, and speeds up  output  of  indented
+                lines, at the expense of losing typeahead on some
+                versions of UNIX.
+
+paragraphs para Default: para=IPLPPPQPP bp Type: string
+                Each pair of characters in  the  string  indicate
+                nnrrooffff  macros  which are to be treated as the be‐
+                ginning of a paragraph for the {{ and }}  commands.
+                The default string is for the ‐‐mmss and ‐‐mmmm macros.
+                To indicate one letter nnrrooffff macros, such  as  ..PP
+                or  ..HH, quote a space in for the second character
+                position.  For example:
+
+                        :set paragraphs=P\ bp<nl>
+
+                would cause vvii to consider ..PP and  ..bbpp  as  para‐
+                graph delimiters.
+
+prompt          Default: prompt Type: toggle
+                In eexx command mode the prompt character :: will be
+                printed when eexx is waiting for a  command.   This
+                is not of interest from vi.
+
+redraw          Default: noredraw Type: toggle
+                On  dumb terminals, force the screen to always be
+                up to date, by sending great amounts  of  output.
+                Useful only at high speeds.
+
+report          Default: report=5 Type: numeric
+                This  sets  the threshold for the number of lines
+                modified.  When more than this  number  of  lines
+                are  modified, removed, or yanked, vvii will report
+                the number of lines changed at the bottom of  the
+                screen.
+
+scroll          Default: scroll={1/2 window} Type: numeric
+                This  is  the  number  of  lines  that the screen
+                scrolls up or down when using the <^U>  and  <^D>
+                commands.
+
+sections        Default: sections=SHNHH HU Type: string
+                Each  two  character  pair of this string specify
+                nnrrooffff macro names which are to be treated as  the
+                beginning of a section by the ]]]] and [[[[ commands.
+                The default string is for the ‐‐mmss and ‐‐mmmm macros.
+                To  enter  one  letter nnrrooffff macros, use a quoted
+                space as the second  character.   See  ppaarraaggrraapphhss
+                for a fuller explanation.
+
+shell sh        Default:  sh=from  environment  SHELL  or /bin/sh
+                Type: string
+
+
+
+
+
+
+
+
+
+USD:11‐52              An Introduction to Display Editing with Vi
+
+
+                This is the name of the sshh to be  used  for  "es‐
+                caped" commands.
+
+shiftwidth sw   Default: sw=8 Type: numeric
+                This  is the number of spaces that a <^T> or <^D>
+                will move over for indenting, and  the  amount  <
+                and > shift by.
+
+showmatch sm    Default: nosm Type: toggle
+                When  a )) or }} is typed, show the matching (( or {{
+                by moving the cursor to it for one second  if  it
+                is on the current screen.
+
+slowopen slow   Default: terminal dependent Type: toggle
+                On  terminals  that  are  slow and unintelligent,
+                this option prevents the updating of  the  screen
+                some of the time to improve speed.
+
+tabstop ts      Default: ts=8 Type: numeric
+                <tab>s are expanded to boundaries that are multi‐
+                ples of this value.
+
+taglength tl    Default: tl=0 Type: numeric
+                If nonzero, tag names  are  only  significant  to
+                this many characters.
+
+term            Default: (from environment TTEERRMM, else dumb) Type:
+                string
+                This is the terminal and controls the visual dis‐
+                plays.   It  cannot  be  changed when in "visual"
+                mode, you have to Q to command mode, type  a  set
+                term  command,  and  do  ‘‘vi.’’ to get back into
+                visual.  Or exit vi, fix $TERM, and reenter.  The
+                definitions that drive a particular terminal type
+                are found in the file //eettcc//tteerrmmccaapp.
+
+terse           Default: terse Type: toggle
+                When set, the error diagnostics are short.
+
+warn            Default: warn Type: toggle
+                The user is warned if she/he tries to  escape  to
+                the   shell   without  writing  out  the  current
+                changes.
+
+window          Default: window={8 at 600 baud  or  less,  16  at
+                1200  baud,  and  screen size − 1 at 2400 baud or
+                more} Type: numeric
+                This is the number of lines in the  window  when‐
+                ever vvii must redraw an entire screen.  It is use‐
+                ful to make this size smaller if  you  are  on  a
+                slow line.
+
+w300, w1200, w9600
+                These   set   window,   but   only   within   the
+
+
+
+
+
+
+
+
+
+An Introduction to Display Editing with Vi              USD:11‐53
+
+
+                corresponding speed ranges.  They are  useful  in
+                an  EXINIT  to fine tune window sizes.  For exam‐
+                ple,
+
+                     set w300=4 w1200=12
+
+                causes a 4 lines window at speed up to 600  baud,
+                a  12 line window at 1200 baud, and a full screen
+                (the default) at over 1200 baud.
+
+wrapscan ws     Default: ws Type: toggle
+                Searches will wrap around the  end  of  the  file
+                when  is  option  is  set.   When  it is off, the
+                search will terminate when it reaches the end  or
+                the beginning of the file.
+
+wrapmargin wm   Default: wm=0 Type: numeric
+                VVii will automatically insert a <nl> when it finds
+                a natural break point  (usually  a  <sp>  between
+                words)  that  occurs  within  "wm"  spaces of the
+                right margin.  Therefore with "wm=0"  the  option
+                is  off.   Setting  it  to 10 would mean that any
+                time you are within 10 spaces of the right margin
+                vvii  would be looking for a <sp> or <tab> which it
+                could replace with a <nl>.   This  is  convenient
+                for people who forget to look at the screen while
+                they type.  (In  version  3,  wrapmargin  behaves
+                more  like  nroff, in that the boundary specified
+                by the distance from the right edge of the screen
+                is  taken as the rightmost edge of the area where
+                a break  is  allowed,  instead  of  the  leftmost
+                edge.)
+
+writeany wa     Default: nowa Type: toggle
+                VVii  normally  makes  a number of checks before it
+                writes out a file.  This prevents the  user  from
+                inadvertently   destroying   a  file.   When  the
+                "writeany" option is enabled, vvii no longer  makes
+                          these checks.
+                               EExx QQuuiicckk RReeffeerreennccee
+
+
+          EEnntteerriinngg//lleeaavviinngg eexx
+
+           %% eexx _n_a_m_e         edit _n_a_m_e, start at end
+           %% eexx ++_n _n_a_m_e      ... at line _n
+           %% eexx −−tt _t_a_g       start at _t_a_g
+           %% eexx −−rr           list saved files
+           %% eexx −−rr _n_a_m_e      recover file _n_a_m_e
+           %% eexx _n_a_m_e ......     edit first; rest via ::nn
+           %% eexx −−RR _n_a_m_e      read only mode
+           :: xx               exit, saving changes
+           :: qq!!              exit, discarding changes
+
+
+
+
+
+
+
+
+          USD:11‐54              An Introduction to Display Editing with Vi
+
+          EExx ssttaatteess
+
+          Command       Normal  and  initial
+                        state.         Input
+                        prompted  for  by ::.
+                        Your kill  character
+                        cancels partial com‐
+                        mand.
+          Insert        Entered by aa  ii  and
+                        cc.   Arbitrary  text
+                        then terminates with
+                        line  having  only ..
+                        character on  it  or
+                        abnormally  with in‐
+                        terrupt.
+          Open/visual   Entered by  ooppeenn  or
+                        vvii,  terminates with
+                        QQ or ^\.
+
+          EExx ccoommmmaannddss
+
+          abbrev   aabb   next         nn     unabbrev     uunnaa
+          append   aa    number       nnuu    undo         uu
+          args     aarr   open         oo     unmap        uunnmm
+          change   cc    preserve     pprree   version      vvee
+          copy     ccoo   print        pp     visual       vvii
+          delete   dd    put          ppuu    write        ww
+          edit     ee    quit         qq     xit          xx
+          file     ff    read         rree    yank         yyaa
+          global   gg    recover      rreecc   _w_i_n_d_o_w       zz
+          insert   ii    rewind       rreeww   _e_s_c_a_p_e       !!
+          join     jj    set          ssee    _l_s_h_i_f_t       <<
+          list     ll    shell        sshh    _p_r_i_n_t _n_e_x_t   CR
+          map           source       ssoo    _r_e_s_u_b_s_t      &&
+          mark     mmaa   stop         sstt    _r_s_h_i_f_t       >>
+          move     mm    substitute   ss     _s_c_r_o_l_l       ^^DD
+
+          EExx ccoommmmaanndd aaddddrreesssseess
+
+          _n     line _n      //_p_a_t   next with _p_a_t
+          ..     current     ??_p_a_t   previous with _p_a_t
+          $$     last        _x‐‐_n    _n before _x
+          ++     next        _x,,_y    _x through _y
+          −−     previous    ´´_x     marked with _x
+          ++_n    _n forward   ´´´´     previous context
+          %%     1,$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          An Introduction to Display Editing with Vi              USD:11‐55
+
+          SSppeecciiffyyiinngg tteerrmmiinnaall ttyyppee
+
+           %% sseetteennvv TTEERRMM _t_y_p_e           _c_s_h and all version 6
+           $$ TTEERRMM==_t_y_p_e;; eexxppoorrtt TTEERRMM     _s_h in Version 7
+           SSeeee aallssoo _t_s_e_t(1)
+
+          SSoommee tteerrmmiinnaall ttyyppeess
+
+          2621   43     adm31    dw1     h19
+          2645   733    adm3a    dw2     i100
+          300s   745    c100     gt40    mime
+          33     act4   dm1520   gt42    owl
+          37     act5   dm2500   h1500   t1061
+          4014   adm3   dm3025   h1510   vt52
+
+          IInniittiiaalliizziinngg ooppttiioonnss
+
+          EEXXIINNIITT       place sseett’s here in environment var.
+          sseett _x        enable option
+          sseett nnoo_x      disable option
+          sseett _x==_v_a_l    give value _v_a_l
+          sseett          show changed options
+          sseett aallll      show all options
+          sseett _x??       show value of option _x
+
+          UUsseeffuull ooppttiioonnss
+
+          aauuttooiinnddeenntt   ai     supply indent
+          aauuttoowwrriittee    aw     write before changing files
+          iiggnnoorreeccaassee   ic     in scanning
+          lliisspp                (( )) {{ }} are s‐exp’s
+          lliisstt                print ^I for tab, $ at end
+          mmaaggiicc               .. [[ ** special in patterns
+          nnuummbbeerr       nu     number lines
+          ppaarraaggrraapphhss   para   macro names which start ...
+          rreeddrraaww              simulate smart terminal
+          ssccrroollll              command mode lines
+          sseeccttiioonnss     sect   macro names ...
+          sshhiiffttwwiiddtthh   sw     for << >>, and input ^^DD
+          sshhoowwmmaattcchh    sm     to )) and }} as typed
+          sslloowwooppeenn     slow   choke updates during insert
+          wwiinnddooww              visual mode lines
+          wwrraappssccaann     ws     around end of buffer?
+          wwrraappmmaarrggiinn   wm     automatic line splitting
+
+
+          SSccaannnniinngg ppaatttteerrnn ffoorrmmaattiioonn
+
+           ↑↑           beginning of line
+           $$           end of line
+           ..           any character
+           \\<<          beginning of word
+           \\>>          end of word
+           [[_s_t_r]]       any char in _s_t_r
+           [[↑↑_s_t_r]]      ... not in _s_t_r
+           [[_x_−_y]]       ... between _x and _y
+           **           any number of preceding
+
+
+
+
+
+
+
+          USD:11‐56              An Introduction to Display Editing with Vi
+
+                       VVii QQuuiicckk RReeffeerreennccee
+
+
+          EEnntteerriinngg//lleeaavviinngg vvii
+
+           %% vvii _n_a_m_e           edit _n_a_m_e at top
+           %% vvii ++_n _n_a_m_e        ... at line _n
+           %% vvii ++ _n_a_m_e         ... at end
+           %% vvii −−rr             list saved files
+           %% vvii −−rr _n_a_m_e        recover file _n_a_m_e
+           %% vvii _n_a_m_e ......       edit first; rest via ::nn
+           %% vvii −−tt _t_a_g         start at _t_a_g
+           %% vvii ++//_p_a_t _n_a_m_e     search for _p_a_t
+           %% vviieeww _n_a_m_e         read only mode
+           ZZZZ                  exit from vi, saving changes
+           ^^ZZ                  stop vi for later resumption
+
+          TThhee ddiissppllaayy
+
+          Last line   Error messages, echoing input  to
+                      ::  //  ?? and !!, feedback about i/o
+                      and large changes.
+          @ lines     On screen only, not in file.
+          ~ lines     Lines past end of file.
+          ^_x          Control characters, ^? is delete.
+          tabs        Expand to spaces, cursor at last.
+
+
+          VVii ssttaatteess
+
+          Command     Normal   and   initial
+                      state.   Others return
+                      here.   ESC   (escape)
+                      cancels  partial  com‐
+                      mand.
+          Insert      Entered by aa ii AA II oo OO
+                      cc  CC ss SS RR.  Arbitrary
+                      text  then  terminates
+                      with ESC character, or
+                      abnormally with inter‐
+                      rupt.
+          Last line   Reading  input for :: //
+                      ?? or !!; terminate with
+                      ESC  or CR to execute,
+                      interrupt to cancel.
+
+          CCoouunnttss bbeeffoorree vvii ccoommmmaannddss
+
+          line/column number   zz  GG  ||
+          scroll amount        ^^DD  ^^UU
+          replicate insert     aa  ii  AA  II
+          repeat effect        most rest
+
+          SSiimmppllee ccoommmmaannddss
+
+          ddww                delete a word
+          ddee                ... leaving punctuation
+          dddd                delete a line
+          33dddd               ... 3 lines
+          ii_t_e_x_tESC          insert text _a_b_c
+          ccww_n_e_wESC          change word to _n_e_w
+
+
+
+          An Introduction to Display Editing with Vi              USD:11‐57
+
+          eeaa_sESC            pluralize word
+          xxpp                transpose characters
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:11‐58              An Introduction to Display Editing with Vi
+
+          IInntteerrrruuppttiinngg,, ccaanncceelllliinngg
+
+            EESSCC      end insert or incomplete cmd
+            ^^??       (delete or rubout) interrupts
+            ^^LL       reprint screen if ^^?? scrambles it
+
+          FFiillee mmaanniippuullaattiioonn
+
+           ::ww            write back changes
+           ::wwqq           write and quit
+           ::qq            quit
+           ::qq!!           quit, discard changes
+           ::ee _n_a_m_e       edit file _n_a_m_e
+           ::ee!!           reedit, discard changes
+           ::ee ++ _n_a_m_e     edit, starting at end
+           ::ee ++_n         edit starting at line _n
+           ::ee ##          edit alternate file
+           ^^↑↑            synonym for ::ee ##
+           ::ww _n_a_m_e       write file _n_a_m_e
+           ::ww!! _n_a_m_e      overwrite file _n_a_m_e
+           ::sshh           run shell, then return
+           ::!!_c_m_d         run _c_m_d, then return
+           ::nn            edit next file in arglist
+           ::nn _a_r_g_s       specify new arglist
+           ::ff            show current file and line
+           ^^GG            synonym for ::ff
+           ::ttaa _t_a_g       to tag file entry _t_a_g
+           ^^]]            ::ttaa, following word is _t_a_g
+
+          PPoossiittiioonniinngg wwiitthhiinn ffiillee
+
+           ^^FF          forward screenfull
+           ^^BB          backward screenfull
+           ^^DD          scroll down half screen
+           ^^UU          scroll up half screen
+           GG           goto line (end default)
+           //_p_a_t        next line matching _p_a_t
+           ??_p_a_t        prev line matching _p_a_t
+           nn           repeat last // or ??
+           NN           reverse last // or ??
+           //_p_a_t//++_n     n’th line after _p_a_t
+           ??_p_a_t??−−_n     n’th line before _p_a_t
+           ]]]]          next section/function
+           [[[[          previous section/function
+           %%           find matching (( )) {{ or }}
+
+          AAddjjuussttiinngg tthhee ssccrreeeenn
+
+           ^^LL          clear and redraw
+           ^^RR          retype, eliminate @ lines
+           zzCR         redraw, current at window top
+           zz−−          ... at bottom
+           zz..          ... at center
+           //_p_a_t//zz−−     _p_a_t line at bottom
+           zz_n..         use _n line window
+           ^^EE          scroll window down 1 line
+           ^^YY          scroll window up 1 line
+
+
+
+
+
+
+
+          An Introduction to Display Editing with Vi              USD:11‐59
+
+          MMaarrkkiinngg aanndd rreettuurrnniinngg
+
+           ````      previous context
+           ´´´´      ... at first non‐white in line
+           mm_x      mark position with letter _x
+           ``_x      to mark _x
+           ´´_x      ... at first non‐white in line
+
+          LLiinnee ppoossiittiioonniinngg
+
+           HH          home window line
+           LL          last window line
+           MM          middle window line
+           ++          next line, at first non‐white
+           −−          previous line, at first non‐white
+           CR         return, same as +
+           ↓↓ or jj     next line, same column
+           ↑↑ or kk     previous line, same column
+
+          CChhaarraacctteerr ppoossiittiioonniinngg
+
+           ↑↑          first non white
+           00          beginning of line
+           $$          end of line
+           hh or →→     forward
+           ll or ←←     backwards
+           ^^HH         same as ←←
+           space      same as →→
+           ff_x         find _x forward
+           FF_x         ff backward
+           tt_x         upto _x forward
+           TT_x         back upto _x
+           ;;          repeat last ff FF tt or TT
+           ,,          inverse of ;;
+           ||          to specified column
+           %%          find matching (( {{ )) or }}
+
+          WWoorrddss,, sseenntteenncceess,, ppaarraaggrraapphhss
+
+            ww      word forward
+            bb      back word
+            ee      end of word
+            ))      to next sentence
+            }}      to next paragraph
+            ((      back sentence
+            {{      back paragraph
+            WW      blank delimited word
+            BB      back WW
+            EE      to end of WW
+
+          CCoommmmaannddss ffoorr LLIISSPP
+
+            ))      Forward s‐expression
+            }}      ... but don’t stop at atoms
+            ((      Back s‐expression
+            {{      ... but don’t stop at atoms
+
+
+
+
+
+
+
+
+          USD:11‐60              An Introduction to Display Editing with Vi
+
+          CCoorrrreeccttiioonnss dduurriinngg iinnsseerrtt
+
+           ^^HH        erase last character
+           ^^WW        erases last word
+           erase     your erase, same as ^^HH
+           kill      your kill, erase input this line
+           \\         escapes ^^HH, your erase and kill
+           ESC       ends insertion, back to command
+           ^^??        interrupt, terminates insert
+           ^^DD        backtab over _a_u_t_o_i_n_d_e_n_t
+           ↑↑^^DD       kill _a_u_t_o_i_n_d_e_n_t, save for next
+           00^^DD       ... but at margin next also
+           ^^VV        quote non‐printing character
+
+          IInnsseerrtt aanndd rreeppllaaccee
+
+           aa       append after cursor
+           ii       insert before
+           AA       append at end of line
+           II       insert before first non‐blank
+           oo       open line below
+           OO       open above
+           rr_x      replace single char with _x
+           RR       replace characters
+
+          OOppeerraattoorrss ((ddoouubbllee ttoo aaffffeecctt lliinneess))
+
+            dd      delete
+            cc      change
+            <<      left shift
+            >>      right shift
+            !!      filter through command
+            ==      indent for LISP
+            yy      yank lines to buffer
+
+          MMiisscceellllaanneeoouuss ooppeerraattiioonnss
+
+            CC      change rest of line
+            DD      delete rest of line
+            ss      substitute chars
+            SS      substitute lines
+            JJ      join lines
+            xx      delete characters
+            XX      ... before cursor
+            YY      yank lines
+
+          YYaannkk aanndd ppuutt
+
+           pp       put back lines
+           PP       put before
+           ""_xpp     put from buffer _x
+           ""_xyy     yank to buffer _x
+           ""_xdd     delete into buffer _x
+
+          UUnnddoo,, rreeddoo,, rreettrriieevvee
+
+           uu       undo last change
+           UU       restore current line
+           ..       repeat last change
+           ""_dpp     retrieve _d’th last delete
+
+
+

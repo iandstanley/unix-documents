@@ -1,0 +1,1782 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+               WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+                         _E_r_i_c _P_. _A_l_l_m_a_n_*
+
+                         Project INGRES
+                 Electronics Research Laboratory
+               University of California, Berkeley
+                   Berkeley, California  94720
+
+
+
+
+
+
+     This  document  describes  the  text  processing  facilities
+available  on  the  UNIX† operating system via NROFF† and the −me
+macro package.  It is assumed that the reader already  is  gener‐
+ally  familiar  with  the UNIX operating system and a text editor
+such as eexx.  This is intended to be a casual introduction, and as
+such not all material is covered.  In particular, many variations
+and additional features of the −me  macro  package  are  not  ex‐
+plained.  For a complete discussion of this and other issues, see
+_T_h_e _−_m_e _R_e_f_e_r_e_n_c_e _M_a_n_u_a_l and _T_h_e _N_R_O_F_F_/_T_R_O_F_F _R_e_f_e_r_e_n_c_e _M_a_n_u_a_l_.
+
+     NROFF, a computer program that runs on  the  UNIX  operating
+system,  reads  an  input file prepared by the user and outputs a
+formatted paper suitable for publication or framing.   The  input
+consists  of  _t_e_x_t,  or  words to be printed, and _r_e_q_u_e_s_t_s, which
+give instructions to the NROFF program telling how to format  the
+printed copy.
+
+     Section  1 describes the basics of text processing.  Section
+2 describes the basic requests.  Section 3  introduces  displays.
+Annotations,  such  as  footnotes, are handled in section 4.  The
+more complex requests which are not discussed in  section  2  are
+covered  in  section  5.  Finally, section 6 discusses things you
+will need to know if you want to typeset documents.  If you are a
+novice,  you  probably  won’t want to read beyond section 4 until
+you have tried some of the basic features out.
+
+     When you have your raw text ready, call the NROFF  formatter
+by typing as a request to the UNIX shell:
+____________________
+   *Author’s  current  address:  Computer Science Division, EECS,
+University of California, Berkeley, California 94720.
+   †UNIX is a trademark of AT&T Bell Laboratories
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                      UUSSDD::1199‐‐11
+
+
+
+
+
+
+
+UUSSDD::1199‐‐22                      WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+    nroff −me −T_t_y_p_e _f_i_l_e_s
+
+where  _t_y_p_e describes the type of terminal you are outputting to.
+Common values are ddttcc for a DTC 300s (daisy‐wheel  type)  printer
+and llpprr for the line printer.  If the −−TT flag is omitted, a “low‐
+est common denominator” terminal is assumed;  this  is  good  for
+previewing  output  on most terminals.  A complete description of
+options to the NROFF command can be found in _T_h_e _N_R_O_F_F_/_T_R_O_F_F _R_e_f_‐
+_e_r_e_n_c_e _M_a_n_u_a_l_.
+
+     The  word  _a_r_g_u_m_e_n_t is used in this manual to mean a word or
+number which appears on the same line as a request which modifies
+the meaning of that request.  For example, the request
+
+    .sp
+
+spaces one line, but
+
+    .sp 4
+
+spaces  four  lines.   The number 44 is an _a_r_g_u_m_e_n_t to the ..sspp re‐
+quest which says to space four lines instead of  one.   Arguments
+are separated from the request and from each other by spaces.
+
+11..  BBaassiiccss ooff TTeexxtt PPrroocceessssiinngg
+
+        The  primary  function  of NROFF is to _c_o_l_l_e_c_t words from
+   input lines, _f_i_l_l output lines with those words,  _j_u_s_t_i_f_y  the
+   right  hand  margin by inserting extra spaces in the line, and
+   output the result.  For example, the input:
+
+       Now is the time
+       for all good men
+       to come to the aid
+       of their party.
+       Four score and seven
+       years ago,...
+
+   will be read, packed onto output lines, and justified to  pro‐
+   duce:
+
+       Now is the time for all good men to come to the aid of
+       their party.  Four score and seven years ago,...
+
+   Sometimes you may want to start a new output line even  though
+   the  line  you are on is not yet full; for example, at the end
+   of a paragraph.  To do this  you  can  cause  a  _b_r_e_a_k,  which
+   starts  a  new output line.  Some requests cause a break auto‐
+   matically, as do blank input lines and input  lines  beginning
+   with a space.
+
+        Not  all  input  lines are text to be formatted.  Some of
+   the input lines are _r_e_q_u_e_s_t_s which describe how to format  the
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                      UUSSDD::1199‐‐33
+
+
+   text.  Requests always have a period or an apostrophe (“´”) as
+   the first character of the input line.
+
+        The text formatter also does more complex things, such as
+   automatically  numbering  pages,  skipping  over  page  folds,
+   putting footnotes in the correct place, and so forth.
+
+        I can offer you a few hints for preparing text for  input
+   to  NROFF.   First,  keep  the input lines short.  Short input
+   lines are easier to edit,  and  NROFF  will  pack  words  onto
+   longer  lines  for  you  anyhow.   In keeping with this, it is
+   helpful to begin a new line  after  every  period,  comma,  or
+   phrase,  since  common  corrections  are to add or delete sen‐
+   tences or phrases.  Second, do not put spaces at  the  end  of
+   lines,  since  this can sometimes confuse the NROFF processor.
+   Third, do not hyphenate words at  the  end  of  lines  (except
+   words  that  should  have hyphens in them, such as “mother‐in‐
+   law”); NROFF is smart enough to hyphenate  words  for  you  as
+   needed, but is not smart enough to take hyphens out and join a
+   word back  together.   Also,  words  such  as  “mother‐in‐law”
+   should  not  be  broken over a line, since then you will get a
+   space where not wanted, such as “mother‐ in‐law”.
+
+22..  BBaassiicc RReeqquueessttss
+
+   22..11..  PPaarraaggrraapphhss
+
+           Paragraphs are begun by using the  ..pppp  request.   For
+      example, the input:
+
+          .pp
+          Now is the time for all good men
+          to come to the aid of their party.
+          Four score and seven years ago,...
+
+      produces  a  blank line followed by an indented first line.
+      The result is:
+
+               Now is the time for all good men  to  come  to
+          the aid of their party.  Four score and seven years
+          ago,...
+
+
+           Notice that the sentences of the paragraphs  _m_u_s_t  _n_o_t
+      begin  with  a space, since blank lines and lines beginning
+      with spaces cause a break.  For example, if I had typed:
+
+          .pp
+          Now is the time for all good men
+                to come to the aid of their party.
+          Four score and seven years ago,...
+
+      The output would be:
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐44                      WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+               Now is the time for all good men
+                to come to the  aid  of  their  party.   Four
+          score and seven years ago,...
+
+      A  new  line begins after the word “men” because the second
+      line began with a space character.
+
+           There are many fancier types of paragraphs, which will
+      be described later.
+
+   22..22..  HHeeaaddeerrss aanndd FFooootteerrss
+
+           Arbitrary  headers  and  footers can be put at the top
+      and bottom  of  every  page.   Two  requests  of  the  form
+      ..hhee _t_i_t_l_e  and  ..ffoo _t_i_t_l_e  define  the titles to put at the
+      head and the foot of every page, respectively.  The  titles
+      are called _t_h_r_e_e_‐_p_a_r_t titles, that is, there is a left‐jus‐
+      tified part, a centered part, and a  right‐justified  part.
+      To  separate these three parts the first character of _t_i_t_l_e
+      (whatever it may be) is used as a delimiter.  Any character
+      may be used, but backslash and double quote marks should be
+      avoided.  The percent sign is replaced by the current  page
+      number  whenever  found  in  the  title.   For example, the
+      input:
+
+          .he ´´%´´
+          .fo ´Jane Jones´´My Book´
+
+      results in the page number centered  at  the  top  of  each
+      page,  “Jane Jones” in the lower left corner, and “My Book”
+      in the lower right corner.
+
+   22..33..  DDoouubbllee SSppaacciinngg
+
+           NROFF will double space output text  automatically  if
+
+      you use the request ..llss 22, as is done in this section.  You
+
+      can revert to single spaced mode by typing ..llss 11.
+
+   22..44..  PPaaggee LLaayyoouutt
+
+           A number of requests allow you to change the  way  the
+      printed copy looks, sometimes called the _l_a_y_o_u_t of the out‐
+      put page.  Most of these requests  adjust  the  placing  of
+      “white  space”  (blank lines or spaces).  In these explana‐
+      tions, characters in italics should be replaced with values
+      you wish to use; bold characters represent characters which
+      should actually be typed.
+
+           The ..bbpp request starts a new page.
+
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                      UUSSDD::1199‐‐55
+
+
+           The request ..sspp _N leaves _N lines of  blank  space.   _N
+      can  be  omitted  (meaning skip a single line) or can be of
+      the form _Nii (for _N inches) or _Ncc (for _N centimeters).   For
+      example, the input:
+
+          .sp 1.5i
+          My thoughts on the subject
+          .sp
+
+      leaves one and a half inches of space, followed by the line
+      “My thoughts on the subject”, followed by  a  single  blank
+      line.
+
+           The  ..iinn _+_N  request changes the amount of white space
+      on the left of the page (the _i_n_d_e_n_t).  The argument  _N  can
+      be of the form ++_N (meaning leave _N spaces more than you are
+      already leaving), −−_N (meaning leave less than you do  now),
+      or  just  _N  (meaning leave exactly _N spaces).  _N can be of
+      the form _Nii or _Ncc also.  For example, the input:
+
+          initial text
+          .in 5
+          some text
+          .in +1i
+          more text
+          .in −2c
+          final text
+
+      produces “some text” indented exactly five spaces from  the
+      left margin, “more text” indented five spaces plus one inch
+      from the left margin (fifteen spaces on a pica typewriter),
+      and  “final  text” indented five spaces plus one inch minus
+      two centimeters from the margin.  That is, the output is:
+
+          initial text
+               some text
+                         more text
+                 final text
+
+
+           The ..ttii _+_N (temporary indent)  request  is  used  like
+      ..iinn _+_N when the indent should apply to one line only, after
+      which it should revert to the previous indent.   For  exam‐
+      ple, the input:
+
+          .in 1i
+          .ti 0
+          Ware, James R.  The Best of Confucius,
+          Halcyon House, 1950.
+          An excellent book containing translations of
+          most of Confucius´ most delightful sayings.
+          A definite must for anyone interested in the early foundations
+          of Chinese philosophy.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐66                      WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+      produces:
+      Ware, James R.  The Best of Confucius, Halcyon House, 1950.
+                An excellent book containing translations of most
+                of  Confucius’  most delightful sayings.  A defi‐
+                nite must for  anyone  interested  in  the  early
+                foundations of Chinese philosophy.
+
+           Text  lines  can be centered by using the ..ccee request.
+      The line after the ..ccee is centered  (horizontally)  on  the
+      page.   To center more than one line, use ..ccee _N (where _N is
+      the number of lines to center), followed by  the  _N  lines.
+      If  you  want  to center many lines but don’t want to count
+      them, type:
+
+          .ce 1000
+          lines to center
+          .ce 0
+
+      The ..ccee 00 request tells NROFF to center zero more lines, in
+      other words, stop centering.
+
+           All  of  these  requests  cause a break; that is, they
+      always start a new line.  If you want to start a  new  line
+      without performing any other action, use ..bbrr.
+
+   22..55..  UUnnddeerrlliinniinngg
+
+           Text can be underlined using the ..uull request.  The ..uull
+      request causes the next input line to  be  underlined  when
+      output.   You  can  underline  multiple  lines by stating a
+      count of _i_n_p_u_t lines to underline, followed by those  lines
+      (as with the ..ccee request).  For example, the input:
+
+          .ul 2
+          Notice that these two input lines
+          are underlined.
+
+      will  underline those eight words in NROFF.  (In TROFF they
+      will be set in italics.)
+
+33..  DDiissppllaayyss
+
+        Displays are sections of text to be set off from the body
+   of  the paper.  Major quotes, tables, and figures are types of
+   displays, as are all the examples used in this document.   All
+   displays except centered blocks are output single spaced.
+
+   33..11..  MMaajjoorr QQuuootteess
+
+           Major  quotes are quotes which are several lines long,
+      and hence are set in from the  rest  of  the  text  without
+      quote  marks around them.  These can be generated using the
+      commands ..((qq and ..))qq to surround the quote.   For  example,
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                      UUSSDD::1199‐‐77
+
+
+      the input:
+
+          As Weizenbaum points out:
+          .(q
+          It is said that to explain is to explain away.
+          This maxim is nowhere so well fulfilled
+          as in the areas of computer programming,...
+          .)q
+
+      generates as output:
+
+      As Weizenbaum points out:
+
+          It  is  said  that  to  explain is to explain away.
+          This maxim is nowhere so well fulfilled as  in  the
+          areas of computer programming,...
+
+
+   33..22..  LLiissttss
+
+           A  _l_i_s_t  is  an indented, single spaced, unfilled dis‐
+      play.  Lists should be used when the material to be printed
+      should  not  be filled and justified like normal text, such
+      as columns of figures or the examples used in  this  paper.
+      Lists  are  surrounded  by  the  requests ..((ll and ..))ll.  For
+      example, type:
+
+          Alternatives to avoid deadlock are:
+          .(l
+          Lock in a specified order
+          Detect deadlock and back out one process
+          Lock all resources needed before proceeding
+          .)l
+
+      will produce:
+      Alternatives to avoid deadlock are:
+
+          Lock in a specified order
+          Detect deadlock and back out one process
+          Lock all resources needed before proceeding
+
+
+   33..33..  KKeeeeppss
+
+           A _k_e_e_p is a display of lines which are kept on a  sin‐
+      gle  page if possible.  An example of where you would use a
+      keep might be a diagram.  Keeps differ from lists  in  that
+      lists may be broken over a page boundary whereas keeps will
+      not.
+
+           Blocks are the basic kind of keep.   They  begin  with
+      the  request ..((bb and end with the request ..))bb.  If there is
+      not room on the current page for everything in the block, a
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐88                      WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+      new page is begun.  This has the unpleasant effect of leav‐
+      ing blank space at the bottom of the page.   When  this  is
+      not appropriate, you can use the alternative, called _f_l_o_a_t_‐
+      _i_n_g _k_e_e_p_s.
+
+           _F_l_o_a_t_i_n_g _k_e_e_p_s move relative to the text.  Hence, they
+      are good for things which will be referred to by name, such
+      as “See figure 3”.  A floating keep will appear at the bot‐
+      tom  of the current page if it will fit; otherwise, it will
+      appear at the top of the next page.  Floating  keeps  begin
+      with  the line ..((zz and end with the line ..))zz.  For an exam‐
+      ple of a floating keep, see figure 1.  The ..hhll  request  is
+      used  to  draw  a horizontal line so that the figure stands
+      out from the text.
+
+   33..44..  FFaanncciieerr DDiissppllaayyss
+
+           Keeps and lists are normally collected in _n_o_f_i_l_l mode,
+      so  that  they are good for tables and such.  If you want a
+      display in fill mode (for  text),  type  ..((ll FF  (Throughout
+      this section, comments applied to ..((ll also apply to ..((bb and
+      ..((zz).  This kind of display will be indented from both mar‐
+      gins.  For example, the input:
+
+          .(l F
+          And now boys and girls,
+          a newer, bigger, better toy than ever before!
+          Be the first on your block to have your own computer!
+          Yes kids, you too can have one of these modern
+          data processing devices.
+          You too can produce beautifully formatted papers
+          without even batting an eye!
+          .)l
+
+      will be output as:
+
+          _____________________________________________
+
+          .(z
+          .hl
+          Text of keep to be floated.
+          .sp
+          .ce
+          Figure 1.  Example of a Floating Keep.
+          .hl
+          .)z
+
+             Figure 1.  Example of a Floating Keep.
+          _____________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                      UUSSDD::1199‐‐99
+
+
+          And now boys and girls, a newer, bigger, better toy
+          than ever before!  Be the first on  your  block  to
+          have your own computer!  Yes kids, you too can have
+          one of these modern data processing  devices.   You
+          too  can produce beautifully formatted papers with‐
+          out even batting an eye!
+
+
+           Lists and blocks are also normally indented  (floating
+      keeps  are  normally left justified).  To get a left‐justi‐
+      fied list, type ..((ll LL.  To get a  list  centered  line‐for‐
+      line,  type ..((ll CC.  For example, to get a filled, left jus‐
+      tified list, enter:
+
+          .(l L F
+          text of block
+          .)l
+
+      The input:
+
+          .(l
+          first line of unfilled display
+          more lines
+          .)l
+
+      produces the indented text:
+
+          first line of unfilled display
+          more lines
+
+      Typing the character LL after the ..((ll request  produces  the
+      left justified result:
+
+      first line of unfilled display
+      more lines
+
+      Using  CC  instead of LL produces the line‐at‐a‐time centered
+      output:
+
+                    first line of unfilled display
+                              more lines
+
+
+           Sometimes it may be that you want  to  center  several
+      lines  as a group, rather than centering them one line at a
+      time.  To do this use centered blocks, which are surrounded
+      by the requests ..((cc and ..))cc.  All the lines are centered as
+      a unit, such that the longest line is centered and the rest
+      are  lined  up  around that line.  Notice that lines do not
+      move relative to each other using centered blocks,  whereas
+      they do using the CC argument to keeps.
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐1100                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+           Centered blocks are _n_o_t keeps, and may be used in con‐
+      junction with keeps.  For example, to  center  a  group  of
+      lines as a unit and keep them on one page, use:
+
+          .(b L
+          .(c
+          first line of unfilled display
+          more lines
+          .)c
+          .)b
+
+      to produce:
+
+                 first line of unfilled display
+                 more lines
+
+      If  the  block  requests (..((bb and ..))bb) had been omitted the
+      result would have been the same, but with no guarantee that
+      the  lines of the centered block would have all been on one
+      page.  Note the use of the LL argument to ..((bb;  this  causes
+      the  centered block to center within the entire line rather
+      than within the line minus the indent.   Also,  the  center
+      requests must be nested _i_n_s_i_d_e the keep requests.
+
+44..  AAnnnnoottaattiioonnss
+
+        There  are  a  number  of requests to save text for later
+   printing.  _F_o_o_t_n_o_t_e_s are printed at the bottom of the  current
+   page.   _D_e_l_a_y_e_d _t_e_x_t is intended to be a variant form of foot‐
+   note; the text is printed only  when  explicitly  called  for,
+   such  as  at  the  end of each chapter.  _I_n_d_e_x_e_s are a type of
+   delayed text having a tag (usually the page  number)  attached
+   to  each  entry  after  a row of dots.  Indexes are also saved
+   until called for explicitly.
+
+   44..11..  FFoooottnnootteess
+
+           Footnotes begin with the request ..((ff and end with  the
+      request  ..))ff.   The  current  footnote number is maintained
+      automatically, and can be used by typing \**, to produce  a
+      footnote  number1.  The number is automatically incremented
+      after every footnote.  For example, the input:
+
+
+
+
+
+
+
+____________________
+   1Like this.
+
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐1111
+
+
+          .(q
+          A man who is not upright
+          and at the same time is presumptuous;
+          one who is not diligent and at the same time is ignorant;
+          one who is untruthful and at the same time is incompetent;
+          such men I do not count among acquaintances.\**
+          .(f
+          \**James R. Ware,
+          .ul
+          The Best of Confucius,
+          Halcyon House, 1950.
+          Page 77.
+          .)f
+          .)q
+
+      generates the result:
+
+          A man who is not upright and at the  same  time  is
+          presumptuous;  one  who  is not diligent and at the
+          same time is ignorant; one who is untruthful and at
+          the  same  time  is  incompetent; such men I do not
+          count among acquaintances.2
+
+      It is important that the footnote appears _i_n_s_i_d_e the quote,
+      so that you can be sure that the footnote  will  appear  on
+      the same page as the quote.
+
+   44..22..  DDeellaayyeedd TTeexxtt
+
+           Delayed text is very similar to a footnote except that
+      it is printed when called for explicitly.   This  allows  a
+      list  of  references  to appear (for example) at the end of
+      each chapter, as is the  convention  in  some  disciplines.
+      Use \\**## on delayed text instead of \\**** as on footnotes.
+
+           If  you are using delayed text as your standard refer‐
+      ence mechanism, you can still use  footnotes,  except  that
+      you  may  want  to  reference them with special characters*
+      rather than numbers.
+
+   44..33..  IInnddeexxeess
+
+           An “index” (actually more like a  table  of  contents,
+      since  the entries are not sorted alphabetically) resembles
+      delayed text, in that it is saved until called  for.   How‐
+      ever,  each  entry  has the page number (or some other tag)
+      appended to the last line of the index entry after a row of
+____________________
+   2James R. Ware, _T_h_e _B_e_s_t _o_f _C_o_n_f_u_c_i_u_s_,  Halcyon  House,  1950.
+Page 77.
+   *Such as an asterisk.
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐1122                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+      dots.
+
+           Index  entries begin with the request ..((xx and end with
+      ..))xx.  The ..))xx request may have a  argument,  which  is  the
+      value  to  print  as the “page number”.  It defaults to the
+      current page number.  If the page number given is an under‐
+      score  (“_”)  no  page number or line of dots is printed at
+      all.  To get the line of dots without a page  number,  type
+      ..))xx """", which specifies an explicitly null page number.
+
+           The ..xxpp request prints the index.
+
+           For example, the input:
+
+          .(x
+          Sealing wax
+          .)x
+          .(x
+          Cabbages and kings
+          .)x _
+          .(x
+          Why the sea is boiling hot
+          .)x 2.5a
+          .(x
+          Whether pigs have wings
+          .)x ""
+          .(x
+          This is a terribly long index entry, such as might be used
+          for a list of illustrations, tables, or figures; I expect it to
+          take at least two lines.
+          .)x
+          .xp
+
+      generates:
+      Sealing wax ..........................................   12
+      Cabbages and kings
+      Why the sea is boiling hot ........................... 2.5a
+      Whether pigs have wings ..............................
+      This  is a terribly long index entry, such as might
+           be used for a list of  illustrations,  tables,
+           or  figures;  I expect it to take at least two
+           lines.  .........................................   12
+
+           The ..((xx request may have a single character  argument,
+      specifying  the “name” of the index; the normal index is xx.
+      Thus, several “indices” may  be  maintained  simultaneously
+      (such as a list of tables, table of contents, etc.).
+
+           Notice  that  the  index must be printed at the _e_n_d of
+      the paper, rather than at the beginning where it will prob‐
+      ably appear (as a table of contents); the pages may have to
+      be physically rearranged after printing.
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐1133
+
+
+55..  FFaanncciieerr FFeeaattuurreess
+
+        A  large  number  of  fancier  requests  exist,   notably
+   requests  to  provide other sorts of paragraphs, numbered sec‐
+   tions of the form 11..22..33 (such as used in this  document),  and
+   multicolumn output.
+
+   55..11..  MMoorree PPaarraaggrraapphhss
+
+           Paragraphs  generally start with a blank line and with
+      the first line indented.  It is possible to get left‐justi‐
+      fied block‐style paragraphs by using ..llpp instead of ..pppp, as
+      demonstrated by the next paragraph.
+
+      Sometimes you want to use paragraphs  that  have  the  _b_o_d_y
+      indented,   and   the  first  line  exdented  (opposite  of
+      indented) with a label.  This can  be  done  with  the  ..iipp
+      request.   A  word  specified  on  the  same line as ..iipp is
+      printed in the margin, and the body is lined up at  a  pre‐
+      specified  position  (normally  five spaces).  For example,
+      the input:
+
+          .ip one
+          This is the first paragraph.
+          Notice how the first line
+          of the resulting paragraph lines up
+          with the other lines in the paragraph.
+          .ip two
+          And here we are at the second paragraph already.
+          You may notice that the argument to ..iipp
+          appears
+          in the margin.
+          .lp
+          We can continue text...
+
+      produces as output:
+
+      one  This is the first paragraph.   Notice  how  the  first
+           line  of  the  resulting  paragraph  lines up with the
+           other lines in the paragraph.
+
+      two  And here we are at the second paragraph already.   You
+           may  notice  that  the  argument to ..iipp appears in the
+           margin.
+
+      We can continue text without starting a new indented  para‐
+      graph by using the ..llpp request.
+
+           If  you have spaces in the label of a ..iipp request, you
+      must use an “unpaddable space” instead of a regular  space.
+      This  is typed as a backslash character (“\”) followed by a
+      space.  For example, to print the label “Part 1”, enter:
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐1144                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+          .ip "Part\ 1"
+
+
+           If a label of an  indented  paragraph  (that  is,  the
+      argument to ..iipp) is longer than the space allocated for the
+      label, ..iipp will begin a new  line  after  the  label.   For
+      example, the input:
+
+          .ip longlabel
+          This paragraph had a long label.
+          The first character of text on the first line
+          will not line up with the text on second and subsequent lines,
+          although they will line up with each other.
+
+      will produce:
+
+      longlabel
+           This  paragraph had a long label.  The first character
+           of text on the first line will not line  up  with  the
+           text  on  second  and  subsequent lines, although they
+           will line up with each other.
+
+           It is possible to change the  size  of  the  label  by
+      using  a  second  argument  which is the size of the label.
+      For example, the above example could be done  correctly  by
+      saying:
+
+          .ip longlabel 10
+
+      which  will  make  the  paragraph indent 10 spaces for this
+      paragraph only.  If you have many paragraphs to indent  all
+      the  same amount, use the _n_u_m_b_e_r _r_e_g_i_s_t_e_r iiii.  For example,
+      to leave one inch of space for the label, type:
+
+          .nr ii 1i
+
+      somewhere before the first call to ..iipp.  Refer to the  ref‐
+      erence manual for more information.
+
+           If  ..iipp is used with no argument at all no hanging tag
+      will be printed.  For example, the input:
+
+          .ip [a]
+          This is the first paragraph of the example.
+          We have seen this sort of example before.
+          .ip
+          This paragraph is lined up with the previous paragraph,
+          but it has no tag in the margin.
+
+      produces as output:
+
+      [a]  This is the first paragraph of the example.   We  have
+           seen this sort of example before.
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐1155
+
+
+           This  paragraph  is  lined  up with the previous para‐
+           graph, but it has no tag in the margin.
+
+           A special case of ..iipp is ..nnpp, which automatically num‐
+      bers  paragraphs  sequentially  from  1.   The numbering is
+      reset at the next ..pppp, ..llpp, or ..sshh (to be described in  the
+      next section) request.  For example, the input:
+
+          .np
+          This is the first point.
+          .np
+          This is the second point.
+          Points are just regular paragraphs
+          which are given sequence numbers automatically
+          by the .np request.
+          .pp
+          This paragraph will reset numbering by .np.
+          .np
+          For example,
+          we have reverted to numbering from one now.
+
+      generates:
+
+       (1)   This is the first point.
+
+       (2)   This  is  the second point.  Points are just regular
+             paragraphs which are given sequence numbers automat‐
+             ically by the .np request.
+
+           This paragraph will reset numbering by .np.
+
+       (1)   For  example, we have reverted to numbering from one
+             now.
+
+           The ..bbuu request gives lists  of  this  sort  that  are
+      identified  with  bullets  rather  than numbers.  The para‐
+      graphs are also crunched together.  For example, the input:
+
+          .bu
+          One egg yolk
+          .bu
+          One tablespoon cream or top milk
+          .bu
+          Salt, cayenne, and lemon juice to taste
+          .bu
+          A generous two tablespoonfuls of butter
+
+      produces3:
+____________________
+   3By the way, if you put the first three  ingredients  in  a  a
+heavy,  deep  pan  and  whisk the ingredients madly over a medium
+flame (never taking your hand off the handle of  the  pot)  until
+the  mixture reaches the consistency of custard (just a minute or
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐1166                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+       • One egg yolk
+       • One tablespoon cream or top milk
+       • Salt, cayenne, and lemon juice to taste
+       • A generous two tablespoonfuls of butter
+
+   55..22..  SSeeccttiioonn HHeeaaddiinnggss
+
+           Section  numbers  (such as the ones used in this docu‐
+      ment) can be automatically generated using the ..sshh request.
+      You  must  tell  ..sshh  the _d_e_p_t_h of the section number and a
+      section title.  The depth specifies how many numbers are to
+      appear (separated by decimal points) in the section number.
+      For example, the section number 44..22..55 has a depth of three.
+
+           Section numbers are incremented in a fairly  intuitive
+      fashion.  If you add a number (increase the depth), the new
+      number starts out at one.  If you subtract section  numbers
+      (or  keep the same number) the final number is incremented.
+      For example, the input:
+
+          .sh 1 "The Preprocessor"
+          .sh 2 "Basic Concepts"
+          .sh 2 "Control Inputs"
+          .sh 3
+          .sh 3
+          .sh 1 "Code Generation"
+          .sh 3
+
+      produces as output the result:
+
+          11..  TThhee PPrreepprroocceessssoorr
+          11..11..  BBaassiicc CCoonncceeppttss
+          11..22..  CCoonnttrrooll IInnppuuttss
+          11..22..11..
+          11..22..22..
+          22..  CCooddee GGeenneerraattiioonn
+          22..11..11..
+
+
+           You can specify the section number to begin by placing
+      the  section  number  after the section title, using spaces
+      instead of dots.  For example, the request:
+
+          .sh 3 "Another section" 7 3 4
+
+      will begin the section numbered 77..33..44; all  subsequent  ..sshh
+      requests will number relative to this number.
+
+____________________
+two), then mix in the butter off‐heat, you will have a  wonderful
+Hollandaise sauce.
+
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐1177
+
+
+           There  are more complex features which will cause each
+      section to be indented proportionally to the depth  of  the
+      section.  For example, if you enter:
+
+          .nr si _N
+
+      each  section will be indented by an amount _N.  _N must have
+      a scaling factor attached, that is, it must be of the  form
+      _N_x,  where  _x  is  a  character telling what units _N is in.
+      Common values for _x are ii for inches,  cc  for  centimeters,
+      and nn for _e_n_s (the width of a single character).  For exam‐
+      ple, to indent each section one‐half inch, type:
+
+          .nr si 0.5i
+
+      After this, sections will be indented by one‐half inch  per
+      level  of  depth  in the section number.  For example, this
+      document was produced using the request
+
+          .nr si 3n
+
+      at the beginning of the input file, giving three spaces  of
+      indent per section depth.
+
+           Section  headers  without automatically generated num‐
+      bers can be done using:
+
+          .uh "Title"
+
+      which will do a section heading, but will put no number  on
+      the section.
+
+   55..33..  PPaarrttss ooff tthhee BBaassiicc PPaappeerr
+
+           There  are  some  requests  which assist in setting up
+      papers.  The ..ttpp request  initializes  for  a  title  page.
+      There are no headers or footers on a title page, and unlike
+      other pages you can space down and leave blank space at the
+      top.  For example, a typical title page might appear as:
+
+          .tp
+          .sp 2i
+          .(l C
+          THE GROWTH OF TOENAILS
+          IN UPPER PRIMATES
+          .sp
+          by
+          .sp
+          Frank N. Furter
+          .)l
+          .bp
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐1188                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+           The  request  ..tthh sets up the environment of the NROFF
+      processor to do a thesis, using the  rules  established  at
+      Berkeley.   It  defines  the correct headers and footers (a
+      page number in the upper right hand corner only), sets  the
+      margins correctly, and double spaces.
+
+           The ..++cc _T request can be used to start chapters.  Each
+      chapter is automatically numbered from one, and  a  heading
+      is printed at the top of each chapter with the chapter num‐
+      ber and the chapter name _T.  For example, to begin a  chap‐
+      ter called “Conclusions”, use the request:
+
+          .+c "CONCLUSIONS"
+
+      which will produce, on a new page, the lines
+
+                               CHAPTER 5
+                              CONCLUSIONS
+
+      with appropriate spacing for a thesis.  Also, the header is
+      moved to the foot of the page on the first page of a  chap‐
+      ter.   Although  the  ..++cc  request was not designed to work
+      only with the ..tthh request,  it  is  tuned  for  the  format
+      acceptable for a PhD thesis at Berkeley.
+
+           If  the  title  parameter  _T  is  omitted from the ..++cc
+      request, the result is a chapter with no heading.  This can
+      also  be used at the beginning of a paper; for example, ..++cc
+      was used to generate page one of this document.
+
+           Although papers traditionally have the abstract, table
+      of  contents, and so forth at the front of the paper, it is
+      more convenient to format and print them  last  when  using
+      NROFF.   This is so that index entries can be collected and
+      then printed for the table of contents (or  whatever).   At
+      the end of the paper, issue the ..++++ PP request, which begins
+      the preliminary part of  the  paper.   After  issuing  this
+      request,  the  ..++cc request will begin a preliminary section
+      of the paper.  Most notably, this prints  the  page  number
+      restarted from one in lower case Roman numbers.  ..++cc may be
+      used repeatedly to begin different parts of the front mate‐
+      rial  for  example,  the  abstract,  the table of contents,
+      acknowledgments, list of illustrations, etc.   The  request
+      ..++++  BB  may also be used to begin the bibliographic section
+      at the end of the paper.   For  example,  the  paper  might
+      appear  as outlined in figure 2.  (In this figure, comments
+      begin with the sequence \\"".)
+
+   55..44..  EEqquuaattiioonnss aanndd TTaabblleess
+
+           Two special UNIX  programs  exist  to  format  special
+      types of material.  EEqqnn and nneeqqnn set equations for the pho‐
+      totypesetter and NROFF respectively.  TTbbll arranges to print
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐1199
+
+
+
+_________________________________________________________________
+
+.th                           \" set for thesis mode
+.fo ´´DRAFT´´                 \" define footer for each page
+.tp                           \" begin title page
+.(l C                         \" center a large block
+THE GROWTH OF TOENAILS
+IN UPPER PRIMATES
+.sp
+by
+.sp
+Frank Furter
+.)l                           \" end centered part
+.+c INTRODUCTION              \" begin chapter named "INTRODUCTION"
+.(x t                         \" make an entry into index ‘t’
+Introduction
+.)x                           \" end of index entry
+text of chapter one
+.+c "NEXT CHAPTER"            \" begin another chapter
+.(x t                         \" enter into index ‘t’ again
+Next Chapter
+.)x
+text of chapter two
+.+c CONCLUSIONS
+.(x t
+Conclusions
+.)x
+text of chapter three
+.++ B                         \" begin bibliographic information
+.+c BIBLIOGRAPHY              \" begin another ‘chapter’
+.(x t
+Bibliography
+.)x
+text of bibliography
+.++ P                         \" begin preliminary material
+.+c "TABLE OF CONTENTS"
+.xp t                         \" print index ‘t’ collected above
+.+c PREFACE                   \" begin another preliminary section
+text of preface
+
+
+              Figure 2.  Outline of a Sample Paper
+_________________________________________________________________
+
+
+      extremely pretty tables in a variety of formats.  This doc‐
+      ument will only describe the embellishments to the standard
+      features;  consult  the reference manuals for those proces‐
+      sors for a description of their use.
+
+           The eeqqnn and nneeqqnn programs are described fully  in  the
+      document _T_y_p_e_s_e_t_t_i_n_g _M_a_t_h_e_m_a_t_i_c_s _− _U_s_e_r_’_s _G_u_i_d_e by Brian W.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐2200                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+      Kernighan and Lorinda L. Cherry.  Equations  are  centered,
+      and  are  kept on one page.  They are introduced by the ..EEQQ
+      request and terminated by the ..EENN request.
+
+           The ..EEQQ request may take  an  equation  number  as  an
+      optional  argument, which is printed vertically centered on
+      the right hand side  of  the  equation.   If  the  equation
+      becomes  too long it should be split between two lines.  To
+      do this, type:
+
+          .EQ (eq 34)
+          text of equation 34
+          .EN C
+          .EQ
+          continuation of equation 34
+          .EN
+
+      The CC on the ..EENN request specifies that the  equation  will
+      be continued.
+
+           The   ttbbll   program  produces  tables.   It  is  fully
+      described (including numerous examples) in the document _T_b_l
+      _−  _A  _P_r_o_g_r_a_m _t_o _F_o_r_m_a_t _T_a_b_l_e_s by M. E. Lesk.  Tables begin
+      with the ..TTSS request and end with the ..TTEE request.   Tables
+      are  normally  kept  on a single page.  If you have a table
+      which is too big to fit on a single page, so that you  know
+      it  will  extend to several pages, begin the table with the
+      request ..TTSS HH and put the request ..TTHH after the part of the
+      table  which  you  want duplicated at the top of every page
+      that the table is printed on.  For example, a table defini‐
+      tion for a long table might look like:
+
+          .TS H
+          c s s
+          n n n.
+          THE TABLE TITLE
+          .TH
+          text of the table
+          .TE
+
+
+   55..55..  TTwwoo CCoolluummnn OOuuttppuutt
+
+           You  can  get two column output automatically by using
+      the request ..22cc.  This causes everything  after  it  to  be
+      output  in  two‐column  form.  The request ..bbcc will start a
+      new column; it differs from ..bbpp in that  ..bbpp  may  leave  a
+      totally  blank column when it starts a new page.  To revert
+      to single column output, use ..11cc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐2211
+
+
+   55..66..  DDeeffiinniinngg MMaaccrrooss
+
+           A _m_a_c_r_o is a collection of requests and text which may
+      be used by stating a simple request.  Macros begin with the
+      line ..ddee _x_x (where _x_x is  the  name  of  the  macro  to  be
+      defined)  and  end  with  the  line consisting of two dots.
+      After defining the macro, stating the line .._x_x is the  same
+      as  stating  all the other lines.  For example, to define a
+      macro that spaces 3 lines and then centers the  next  input
+      line, enter:
+
+          .de SS
+          .sp 3
+          .ce
+          ..
+
+      and use it by typing:
+
+          .SS
+          Title Line
+          (beginning of text)
+
+
+           Macro names may be one or two characters.  In order to
+      avoid conflicts with names in −me, always  use  upper  case
+      letters  as names.  The only names to avoid are TTSS, TTHH, TTEE,
+      EEQQ, and EENN.
+
+   55..77..  AAnnnnoottaattiioonnss IInnssiiddee KKeeeeppss
+
+           Sometimes you may want to  put  a  footnote  or  index
+      entry  inside a keep.  For example, if you want to maintain
+      a “list of figures” you will want to do something like:
+
+          .(z
+          .(c
+          text of figure
+          .)c
+          .ce
+          Figure 5.
+          .(x f
+          Figure 5
+          .)x
+          .)z
+
+      which you may hope will give you a figure with a label  and
+      an  entry  in  the  index  ff  (presumably a list of figures
+      index).  Unfortunately, the index entry is read and  inter‐
+      preted  when  the  keep is read, not when it is printed, so
+      the page number in the index is likely to  be  wrong.   The
+      solution is to use the magic string \\!!  at the beginning of
+      all the lines dealing with the index.  In other words,  you
+      should use:
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐2222                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+          .(z
+          .(c
+          Text of figure
+          .)c
+          .ce
+          Figure 5.
+          \!.(x f
+          \!Figure 5
+          \!.)x
+          .)z
+
+      which will defer the processing of the index until the fig‐
+      ure is output.  This will guarantee that the page number in
+      the  index  is  correct.  The same comments apply to blocks
+      (with ..((bb and ..))bb) as well.
+
+66..  TTRROOFFFF aanndd tthhee PPhhoottoosseetttteerr
+
+        With a little care, you can prepare documents  that  will
+   print nicely on either a regular terminal or when phototypeset
+   using the TROFF formatting program.
+
+   66..11..  FFoonnttss
+
+           A _f_o_n_t is a style of type.  There are three fonts that
+      are  available  simultaneously,  Times Roman, Times Italic,
+      and Times Bold, plus the special  math  font.   The  normal
+      font  is  Roman.   Text  which would be underlined in NROFF
+      with the ..uull request is set in italics in TROFF.
+
+           There  are  ways  of  switching  between  fonts.   The
+      requests  ..rr,  ..ii, and ..bb switch to Roman, italic, and bold
+      fonts respectively.  You can set a single word in some font
+      by typing (for example):
+
+          .i word
+
+      which will set _w_o_r_d in italics but does not affect the sur‐
+      rounding text.  In NROFF, italic and bold  text  is  under‐
+      lined.
+
+           Notice  that  if you are setting more than one word in
+      whatever font, you must  surround  that  word  with  double
+      quote  marks (‘"’) so that it will appear to the NROFF pro‐
+      cessor as a single word.  The quote marks will  not  appear
+      in  the  formatted  text.   If  you do want a quote mark to
+      appear, you should quote the entire string (even if a  sin‐
+      gle  word),  and  use _t_w_o quote marks where you want one to
+      appear.  For example, if you want to produce the text:
+
+          _"_M_a_s_t_e_r _C_o_n_t_r_o_l_"
+
+      in italics, you must type:
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐2233
+
+
+          .i """Master Control\|"""
+
+      The \\|| produces a very narrow space so that  the  “l”  does
+      not overlap the quote sign in TROFF, like this:
+
+          _"_M_a_s_t_e_r _C_o_n_t_r_o_l_"
+
+
+           There  are also several “pseudo‐fonts” available.  The
+      input:
+
+          .(b
+          .u underlined
+          .bi "bold italics"
+          .bx "words in a box"
+          .)b
+
+      generates
+
+          ─u─n─d─e─r─l─i─n─e─d─
+          _bb_oo_ll_dd _ii_tt_aa_ll_ii_cc_ss
+          │‾_w‾_o‾_r‾_d‾_s‾_‾_i‾_n‾_‾_a‾_‾_b‾_o‾_x‾_│‾_
+
+      In NROFF these all just underline the  text.   Notice  that
+      pseudo  font  requests set only the single parameter in the
+      pseudo font; ordinary font requests will begin setting  all
+      text in the special font if you do not provide a parameter.
+      No more than one word should appear with these  three  font
+      requests  in  the  middle of lines.  This is because of the
+      way TROFF justifies text.  For  example,  if  you  were  to
+      issue the requests:
+
+          .bi "some bold italics"
+          and
+          .bx "words in a box"
+
+      in the middle of a line TROFF would produce _ss_oo_mm_ee _bb_oo_ll_dd _ii_tt_aa_ll_‐‐
+      _ii_cc_ss and │‾_w‾_o‾_r‾_d‾_s‾_‾_i‾_n‾_‾_a‾_‾_b‾_o‾_x‾_│‾_, which would look really lousy  in
+      TROFF.
+
+           The  second  parameter  of all font requests is set in
+      the original font.  For example, the font request:
+
+          .b bold face
+
+      generates “bold” in bold font, but sets “face” in the  font
+      of the surrounding text, resulting in:
+
+          bboollddface.
+
+      To set the two words bboolldd and ffaaccee both in bboolldd ffaaccee, type:
+
+          .b "bold face"
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐2244                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+           You  can  mix  fonts  in  a  word by using the special
+      sequence \\cc at the end of a line to indicate “continue text
+      processing”;  this allows input lines to be joined together
+      without a space between them.  For example, the input:
+
+          .u under \c
+          .i italics
+
+      generates ─u─n─d─e─r─_i_t_a_l_i_c_s, but if we had typed:
+
+          .u under
+          .i italics
+
+      the result would have been ─u─n─d─e─r─_i_t_a_l_i_c_s as two words.
+
+   66..22..  PPooiinntt SSiizzeess
+
+           The phototypesetter supports different sizes of  type,
+      measured  in  points.   The default point size is 10 points
+      for most text, 8  points  for  footnotes.   To  change  the
+      pointsize, type:
+
+          .sz _+_N
+
+      where _N is the size wanted in points.  The _v_e_r_t_i_c_a_l _s_p_a_c_i_n_g
+      (distance between the bottom of most letters (the _b_a_s_e_l_i_n_e)
+      between  adjacent  lines)  is set to be proportional to the
+      type size.
+
+           These pointsize changes are _t_e_m_p_o_r_a_r_y!!!  For example,
+      to reset the pointsize of basic text to twelve point, use:
+
+          .nr pp 12
+          .nr sp 12
+          .nr tp 12
+
+      to reset the default pointsize of paragraphs, section head‐
+      ers, and titles respectively.  If you only want to set  the
+      names of sections in a larger pointsize, use:
+
+          .nr sp 11
+
+      alone  — this sets section titles (e.g., PPooiinntt SSiizzeess above)
+      in a larger font than the default.
+
+           A single word or phrase can be set in a smaller point‐
+      size than the surrounding text using the ..ssmm request.  This
+      is especially convenient for words that are  all  capitals,
+      due  to  the  optical  illusion  that  makes them look even
+      larger than they actually are.  For example:
+
+          .sm UNIX
+
+
+
+
+
+
+
+
+
+
+
+WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee                     UUSSDD::1199‐‐2255
+
+
+      prints as UNIX rather than UNIX.
+
+           Warning: changing point sizes on  the  phototypesetter
+      is  a  slow mechanical operation.  On laser printers it may
+      require loading new fonts.  Size changes should be  consid‐
+      ered carefully.
+
+   66..33..  QQuuootteess
+
+           It  is  conventional  when using the typesetter to use
+      pairs of grave and acute accents to generate double quotes,
+      rather  than  the  double  quote  character (‘"’).  This is
+      because it looks better to use grave and acute accents; for
+      example, compare "quote" to ‘‘quote’’.
+
+           In  order  to make quotes compatible between the type‐
+      setter and terminals, you may use the sequences  \\**((llqq  and
+      \\**((rrqq  to  stand for the left and right quote respectively.
+      These both appear as "" on most terminals, but  are  typeset
+      as ‘‘‘‘ and ’’’’ respectively.  For example, use:
+
+          \*(lqSome things aren´t true
+          even if they did happen.\*(rq
+
+      to generate the result:
+
+          “Some things aren’t true even if they did happen.”
+
+      As a shorthand, the special font request:
+
+          .q "quoted text"
+
+      will generate “quoted text”.  Notice that you must surround
+      the material to be quoted with double quote marks if it  is
+      more than one word.
+
+
+
+
+
+
+
+AAcckknnoowwlleeddggmmeennttss
+
+     I  would like to thank Bob Epstein, Bill Joy, and Larry Rowe
+for having the courage to use the −me macros to produce non‐triv‐
+ial  papers  during  the  development  stages; Ricki Blau, Pamela
+Humphrey, and Jim Joyce for their  help  with  the  documentation
+phase;  peter  kessler  for numerous complaints years after I was
+“done” with this project, most accompanied by fixes (hence  forc‐
+ing me to fix several small bugs); and the plethora of people who
+have contributed ideas and have given support for the project.
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::1199‐‐2266                     WWrriittiinngg PPaappeerrss wwiitthh NNRROOFFFF uussiinngg −−mmee
+
+
+This document was NROFF’ed
+
+on October 28, 2021 and  applies  to  version  2.29  of  the  −me
+macros.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

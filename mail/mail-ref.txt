@@ -1,0 +1,2640 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   MMAAIILL RREEFFEERREENNCCEE MMAANNUUAALL
+
+
+
+
+                        _K_u_r_t _S_h_o_e_n_s
+
+
+                         Revised by
+
+
+                _C_r_a_i_g _L_e_r_e_s and _M_a_r_k _A_n_d_r_e_w_s
+
+
+                        Version 5.5
+
+
+
+
+11..  IInnttrroodduuccttiioonn
+
+     _M_a_i_l  provides  a  simple  and friendly environment for
+sending and receiving mail.  It divides incoming  mail  into
+its  constituent  messages  and allows the user to deal with
+them in any order.  In addition, it provides a  set  of  _e_d-
+like  commands  for  manipulating messages and sending mail.
+_M_a_i_l offers the user simple editing capabilities to ease the
+composition  of  outgoing messages, as well as providing the
+ability to define and send to names which address groups  of
+users.   Finally,  _M_a_i_l is able to send and receive messages
+across such networks as the ARPANET, UUCP, and Berkeley net-
+work.
+
+     This  document describes how to use the _M_a_i_l program to
+send and receive messages.  The reader is not assumed to  be
+familiar  with other message handling systems, but should be
+familiar with the UNIX1 shell, the text editor, and some  of
+the  common  UNIX commands.  "The UNIX Programmer's Manual,"
+"An Introduction to Csh," and "Text Editing with Ex and  Vi"
+can be consulted for more information on these topics.
+
+
+____________________
+   1 UNIX is a trademark of Bell Laboratories.
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--22                                MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     Here  is  how messages are handled: the mail system ac-
+cepts incoming _m_e_s_s_a_g_e_s for you from other people  and  col-
+lects  them in a file, called your _s_y_s_t_e_m _m_a_i_l_b_o_x.  When you
+login, the system notifies you if  there  are  any  messages
+waiting  in your system mailbox.  If you are a _c_s_h user, you
+will be notified when new mail arrives  if  you  inform  the
+shell  of  the  location of your mailbox.  On version 7 sys-
+tems, your  system  mailbox  is  located  in  the  directory
+/var/mail  in  a  file  with your login name.  If your login
+name is "sam," then you can make _c_s_h notify you of new  mail
+by including the following line in your .cshrc file:
+
+    set mail=/var/mail/sam
+
+When  you  read  your  mail using _M_a_i_l, it reads your system
+mailbox and separates that file into the individual messages
+that  have  been  sent to you.  You can then read, reply to,
+delete, or save these messages.  Each message is marked with
+its author and the date they sent it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                                UUSSDD::77--33
+
+
+22..  CCoommmmoonn uussaaggee
+
+     The  _M_a_i_l command has two distinct usages, according to
+whether one wants to send or receive mail.  Sending mail  is
+simple:   to  send  a message to a user whose login name is,
+say, "root," use the shell command:
+
+    % Mail root
+
+then type your message.  When you reach the end of the  mes-
+sage,  type  an  EOT (control-d) at the beginning of a line,
+which will cause _M_a_i_l to echo "EOT" and return  you  to  the
+Shell.  When the user you sent mail to next logs in, he will
+receive the message:
+
+    You have mail.
+
+to alert him to the existence of your message.
+
+     If, while you are composing the message you decide that
+you do not wish to send it after all, you can abort the let-
+ter with a RUBOUT.  Typing a single RUBOUT  causes  _M_a_i_l  to
+print
+
+    (Interrupt -- one more to kill letter)
+
+Typing a second RUBOUT causes _M_a_i_l to save your partial let-
+ter on the file "dead.letter" in  your  home  directory  and
+abort the letter.  Once you have sent mail to someone, there
+is no way to undo the act, so be careful.
+
+     The message your recipient reads will  consist  of  the
+message  you  typed, preceded by a line telling who sent the
+message (your login name) and the date and time it was sent.
+
+     If you want to send the same message to  several  other
+people,  you can list their login names on the command line.
+Thus,
+
+    % Mail sam bob john
+    Tuition fees are due next Friday.  Don't forget!!
+    <Control-d>
+    EOT
+    %
+
+will send the reminder to sam, bob, and john.
+
+     If, when you log in, you see the message,
+
+    You have mail.
+
+you can read the mail by typing simply:
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--44                                MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+    % Mail
+
+_M_a_i_l will respond by typing its version number and date  and
+then  listing  the  messages you have waiting.  Then it will
+type a prompt and await your command.  The messages are  as-
+signed  numbers starting with 1 -- you refer to the messages
+with these numbers.  _M_a_i_l keeps track of which messages  are
+_n_e_w  (have been sent since you last read your mail) and _r_e_a_d
+(have been read by you).  New messages have  an  NN  next  to
+them in the header listing and old, but unread messages have
+a UU next to them.  _M_a_i_l keeps track of new/old and  read/un-
+read messages by putting a header field called "Status" into
+your messages.
+
+     To look at a specific message, use  the  ttyyppee  command,
+which  may  be abbreviated to simply tt.  For example, if you
+had the following messages:
+
+    N 1 root     Wed Sep 21 09:21  "Tuition fees"
+    N 2 sam      Tue Sep 20 22:55
+
+you could examine the first message by giving the command:
+
+    type 1
+
+which might cause _M_a_i_l to respond with, for example:
+
+    Message  1:
+    From root  Wed Sep 21 09:21:45 1978
+    Subject: Tuition fees
+    Status: R
+
+    Tuition fees are due next Wednesday.  Don't forget!!
+
+
+Many _M_a_i_l commands that operate on messages take  a  message
+number as an argument like the ttyyppee command.  For these com-
+mands, there is a notion of a current message.  When you en-
+ter  the  _M_a_i_l program, the current message is initially the
+first one.  Thus, you can often omit the message number  and
+use, for example,
+
+    t
+
+to  type  the  current message.  As a further shorthand, you
+can type a message by  simply  giving  its  message  number.
+Hence,
+
+    1
+
+would type the first message.
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                                UUSSDD::77--55
+
+
+     Frequently,  it  is useful to read the messages in your
+mailbox in order, one after another.  You can read the  next
+message  in  _M_a_i_l  by simply typing a newline.  As a special
+case, you can type a newline as your first command  to  _M_a_i_l
+to type the first message.
+
+     If,  after  typing  a  message, you wish to immediately
+send a reply, you can do so with the rreeppllyy command.   RReeppllyy,
+like ttyyppee, takes a message number as an argument.  _M_a_i_l then
+begins a message addressed to the user who sent you the mes-
+sage.   You  may then type in your letter in reply, followed
+by a <control-d> at the beginning  of  a  line,  as  before.
+_M_a_i_l  will type EOT, then type the ampersand prompt to indi-
+cate its readiness to accept another command.  In our  exam-
+ple, if, after typing the first message, you wished to reply
+to it, you might give the command:
+
+    reply
+
+_M_a_i_l responds by typing:
+
+    To: root
+    Subject: Re: Tuition fees
+
+and waiting for you to enter your letter.  You  are  now  in
+the  message  collection  mode described at the beginning of
+this section and _M_a_i_l will gather up your message  up  to  a
+control-d.   Note that it copies the subject header from the
+original message.  This is  useful  in  that  correspondence
+about  a particular matter will tend to retain the same sub-
+ject heading, making it easy to  recognize.   If  there  are
+other  header  fields  in the message, the information found
+will also be used.  For example, if the letter had  a  "To:"
+header  listing  several  recipients,  _M_a_i_l would arrange to
+send your replay to the same people as well.  Similarly,  if
+the  original  message  contained a "Cc:" (carbon copies to)
+field, _M_a_i_l would send your reply to _t_h_o_s_e users, too.  _M_a_i_l
+is careful, though, not too send the message to _y_o_u, even if
+you appear in the "To:" or "Cc:" field, unless you ask to be
+included explicitly.  See section 4 for more details.
+
+     After typing in your letter, the dialog with _M_a_i_l might
+look like the following:
+
+    reply
+    To: root
+    Subject: Tuition fees
+
+    Thanks for the reminder
+    EOT
+    &
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--66                                MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     The rreeppllyy command is especially useful  for  sustaining
+extended  conversations  over the message system, with other
+"listening" users receiving copies of the conversation.  The
+rreeppllyy command can be abbreviated to rr.
+
+     Sometimes you will receive a message that has been sent
+to several people and wish to reply _o_n_l_y to the  person  who
+sent  it.   RReeppllyy with a capital RR replies to a message, but
+sends a copy to the sender only.
+
+     If you wish, while reading your mail, to send a message
+to  someone, but not as a reply to one of your messages, you
+can send the message directly with the mmaaiill  command,  which
+takes  as  arguments the names of the recipients you wish to
+send to.  For example, to send a  message  to  "frank,"  you
+would do:
+
+    mail frank
+    This is to confirm our meeting next Friday at 4.
+    EOT
+    &
+
+The mmaaiill command can be abbreviated to mm.
+
+     Normally, each message you receive is saved in the file
+_m_b_o_x in your login directory at the  time  you  leave  _M_a_i_l.
+Often,  however, you will not want to save a particular mes-
+sage you have received because it is only of passing  inter-
+est.   To  avoid  saving a message in _m_b_o_x you can delete it
+using the ddeelleettee command.  In our example,
+
+    delete 1
+
+will prevent _M_a_i_l from saving message 1 (from root) in _m_b_o_x.
+In  addition  to  not saving deleted messages, _M_a_i_l will not
+let you type them, either.  The effect is to make  the  mes-
+sage  disappear  altogether,  along  with  its  number.  The
+ddeelleettee command can be abbreviated to simply dd.
+
+     Many features of _M_a_i_l can be tailored  to  your  liking
+with  the  sseett  command.  The sseett command has two forms, de-
+pending on whether you are setting a _b_i_n_a_r_y option or a _v_a_l_-
+_u_e_d option.  Binary options are either on or off.  For exam-
+ple, the "ask" option informs _M_a_i_l that each time you send a
+message,  you want it to prompt you for a subject header, to
+be included in the message.  To set the  "ask"  option,  you
+would type
+
+    set ask
+
+
+     Another useful _M_a_i_l option is "hold."  Unless told oth-
+erwise, _M_a_i_l moves the messages from your system mailbox  to
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                                UUSSDD::77--77
+
+
+the  file  _m_b_o_x  in your home directory when you leave _M_a_i_l.
+If you want _M_a_i_l to keep your letters in the system  mailbox
+instead, you can set the "hold" option.
+
+     Valued  options  are values which _M_a_i_l uses to adapt to
+your tastes.  For example, the  "SHELL"  option  tells  _M_a_i_l
+which shell you like to use, and is specified by
+
+    set SHELL=/bin/csh
+
+for   example.    Note   that   no  spaces  are  allowed  in
+"SHELL=/bin/csh."  A complete list of the _M_a_i_l  options  ap-
+pears in section 5.
+
+     Another important valued option is "crt."  If you use a
+fast video terminal, you will find that when you print  long
+messages,  they  fly  by  too  quickly for you to read them.
+With the "crt" option, you can make _M_a_i_l print  any  message
+larger  than a given number of lines by sending it through a
+paging program. This program is specified by the valued  op-
+tion  PPAAGGEERR.   If  PPAAGGEERR  is not set, a default paginator is
+used.  For example, most  CRT  users  with  24-line  screens
+should do:
+
+    set crt=24
+
+to paginate messages that will not fit on their screens.  In
+the default state, _m_o_r_e (default paginator) prints a screen-
+ful  of  information,  then types --More--.  Type a space to
+see the next screenful.
+
+     Another adaptation to user needs that _M_a_i_l provides  is
+that of _a_l_i_a_s_e_s.  An alias is simply a name which stands for
+one or more real user names.  _M_a_i_l sent to an alias  is  re-
+ally sent to the list of real users associated with it.  For
+example, an alias can  be  defined  for  the  members  of  a
+project,  so  that you can send mail to the whole project by
+sending mail to just a single name.  The  aalliiaass  command  in
+_M_a_i_l  defines an alias.  Suppose that the users in a project
+are named Sam, Sally, Steve, and Susan.  To define an  alias
+called "project" for them, you would use the _M_a_i_l command:
+
+    alias project sam sally steve susan
+
+The  aalliiaass  command can also be used to provide a convenient
+name for someone whose user name is inconvenient.  For exam-
+ple,  if a user named "Bob Anderson" had the login name "an-
+derson,"" you might want to use:
+
+    alias bob anderson
+
+so that you could send mail to the shorter name, "bob."
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--88                                MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     While the aalliiaass and sseett commands allow you to customize
+_M_a_i_l,  they have the drawback that they must be retyped each
+time you enter _M_a_i_l.  To make them more convenient  to  use,
+_M_a_i_l  always  looks  for  two  files when it is invoked.  It
+first reads a system wide file "/etc/mail.rc," then  a  user
+specific  file, ".mailrc," which is found in the user's home
+directory.  The system wide file is maintained by the system
+administrator  and contains sseett commands that are applicable
+to all users of the system.  The ".mailrc" file  is  usually
+used by each user to set options the way he likes and define
+individual aliases.  For example, my .mailrc file looks like
+this:
+
+    set ask nosave SHELL=/bin/csh
+
+As  you  can  see, it is possible to set many options in the
+same sseett command.  The "nosave" option is described in  sec-
+tion 5.
+
+     Mail  aliasing  is implemented at the system-wide level
+by the mail delivery system  _s_e_n_d_m_a_i_l.   These  aliases  are
+stored  in  the  file /usr/lib/aliases and are accessible to
+all users of the system.  The lines in /usr/lib/aliases  are
+of the form:
+
+    alias: name1, name2, name3
+
+where  _a_l_i_a_s  is the mailing list name and the _n_a_m_e_i are the
+members of the list.  Long lists can be continued  onto  the
+next  line  by  starting  the next line with a space or tab.
+Remember that you must execute the shell command  _n_e_w_a_l_i_a_s_e_s
+after  editing  /usr/lib/aliases  since  the delivery system
+uses an indexed file created by _n_e_w_a_l_i_a_s_e_s.
+
+     We have seen that _M_a_i_l can be invoked with command line
+arguments  which  are people to send the message to, or with
+no arguments to read mail.  Specifying the --ff  flag  on  the
+command  line causes _M_a_i_l to read messages from a file other
+than your system mailbox.  For example, if you have  a  col-
+lection  of  messages in the file "letters" you can use _M_a_i_l
+to read them with:
+
+    % Mail -f letters
+
+You can use all the _M_a_i_l commands described in this document
+to  examine,  modify, or delete messages from your "letters"
+file, which will be rewritten when you leave _M_a_i_l  with  the
+qquuiitt command described below.
+
+     Since  mail  that you read is saved in the file _m_b_o_x in
+your home directory by default, you can read  _m_b_o_x  in  your
+home directory by using simply
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                                UUSSDD::77--99
+
+
+    % Mail -f
+
+
+     Normally, messages that you examine using the ttyyppee com-
+mand are saved in the file "mbox" in your home directory  if
+you  leave  _M_a_i_l  with the qquuiitt command described below.  If
+you wish to retain a message in your system mailbox you  can
+use  the  pprreesseerrvvee  command  to tell _M_a_i_l to leave it there.
+The pprreesseerrvvee command accepts a list of message numbers, just
+like ttyyppee and may be abbreviated to pprree.
+
+     Messages in your system mailbox that you do not examine
+are normally retained in your system mailbox  automatically.
+If  you  wish  to  have such a message saved in _m_b_o_x without
+reading it, you may use the mmbbooxx command  to  have  them  so
+saved.  For example,
+
+    mbox 2
+
+in  our example would cause the second message (from sam) to
+be saved in _m_b_o_x when the qquuiitt command is executed.  MMbbooxx is
+also  the  way  to  direct messages to your _m_b_o_x file if you
+have set the "hold" option described above.  MMbbooxx can be ab-
+breviated to mmbb.
+
+     When you have perused all the messages of interest, you
+can leave _M_a_i_l with the qquuiitt command, which saves  the  mes-
+sages  you  have  typed  but not deleted in the file _m_b_o_x in
+your login directory.  Deleted messages are discarded  irre-
+trievably, and messages left untouched are preserved in your
+system mailbox so that you will see them the next  time  you
+type:
+
+    % Mail
+
+The qquuiitt command can be abbreviated to simply qq.
+
+     If you wish for some reason to leave _M_a_i_l quickly with-
+out altering either your system mailbox  or  _m_b_o_x,  you  can
+type  the xx command (short for eexxiitt), which will immediately
+return you to the Shell without changing anything.
+
+     If, instead, you want to execute a Shell command  with-
+out  leaving  _M_a_i_l,  you can type the command preceded by an
+exclamation point, just as in the text  editor.   Thus,  for
+instance:
+
+    !date
+
+will print the current date without leaving _M_a_i_l.
+
+     Finally,  the  hheellpp command is available to print out a
+brief summary of the _M_a_i_l commands, using  only  the  single
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--1100                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+character command abbreviations.
+
+33..  MMaaiinnttaaiinniinngg ffoollddeerrss
+
+     _M_a_i_l  includes a simple facility for maintaining groups
+of messages together in  folders.   This  section  describes
+this facility.
+
+     To  use  the  folder facility, you must tell _M_a_i_l where
+you wish to keep your folders.  Each folder of messages will
+be  a single file.  For convenience, all of your folders are
+kept in a single directory of your choosing.  To  tell  _M_a_i_l
+where your folder directory is, put a line of the form
+
+    set folder=letters
+
+in  your  _._m_a_i_l_r_c  file.   If, as in the example above, your
+folder directory does not begin with a `/,' _M_a_i_l will assume
+that your folder directory is to be found starting from your
+home directory.  Thus, if your home directory is  //hhoommee//ppeerr--
+ssoonn  the  above example told _M_a_i_l to find your folder direc-
+tory in //hhoommee//ppeerrssoonn//lleetttteerrss.
+
+     Anywhere a file name is expected, you can use a  folder
+name, preceded with `+.'  For example, to put a message into
+a folder with the ssaavvee command, you can use:
+
+    save +classwork
+
+to save the current message in the _c_l_a_s_s_w_o_r_k folder.  If the
+_c_l_a_s_s_w_o_r_k  folder  does  not  yet exist, it will be created.
+Note that messages which are saved with the ssaavvee command are
+automatically removed from your system mailbox.
+
+     In  order to make a copy of a message in a folder with-
+out causing that message to  be  removed  from  your  system
+mailbox,  use  the  ccooppyy  command, which is identical in all
+other respects to the ssaavvee command.  For example,
+
+    copy +classwork
+
+copies the current message into  the  _c_l_a_s_s_w_o_r_k  folder  and
+leaves a copy in your system mailbox.
+
+     The  ffoollddeerr  command  can be used to direct _M_a_i_l to the
+contents of a different folder.  For example,
+
+    folder +classwork
+
+directs _M_a_i_l to read the contents of the  _c_l_a_s_s_w_o_r_k  folder.
+All  of the commands that you can use on your system mailbox
+are also applicable to folders, including ttyyppee, ddeelleettee,  and
+rreeppllyy.   To  inquire which folder you are currently editing,
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--1111
+
+
+use simply:
+
+    folder
+
+
+     To list your current set of folders,  use  the  ffoollddeerrss
+command.
+
+     To  start _M_a_i_l reading one of your folders, you can use
+the --ff option described in section 2.  For example:
+
+    % Mail -f +classwork
+
+will cause _M_a_i_l to read your _c_l_a_s_s_w_o_r_k folder without  look-
+ing at your system mailbox.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--1122                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+44..  MMoorree aabboouutt sseennddiinngg mmaaiill
+
+44..11..  TTiillddee eessccaappeess
+
+     While  typing  in a message to be sent to others, it is
+often useful to be able to invoke the  text  editor  on  the
+partial message, print the message, execute a shell command,
+or do some other auxiliary function.   _M_a_i_l  provides  these
+capabilities through _t_i_l_d_e _e_s_c_a_p_e_s, which consist of a tilde
+(~) at the beginning of a line, followed by a single charac-
+ter which indicates the function to be performed.  For exam-
+ple, to print the text of the message so far, use:
+
+    ~p
+
+which will print a line of dashes, the  recipients  of  your
+message, and the text of the message so far.  Since _M_a_i_l re-
+quires two consecutive RUBOUT's to abort a letter,  you  can
+use a single RUBOUT to abort the output of ~p or any other ~
+escape without killing your letter.
+
+     If you are dissatisfied with the message as it  stands,
+you can invoke the text editor on it using the escape
+
+    ~e
+
+which  causes the message to be copied into a temporary file
+and an instance of the editor to be spawned.  After  modify-
+ing  the message to your satisfaction, write it out and quit
+the editor.  _M_a_i_l will respond by typing
+
+    (continue)
+
+after which you may continue typing text which will  be  ap-
+pended  to your message, or type <control-d> to end the mes-
+sage.  A standard text editor is provided by _M_a_i_l.  You  can
+override  this default by setting the valued option "EDITOR"
+to something else.  For example, you might prefer:
+
+    set EDITOR=/usr/bin/ex
+
+
+     Many systems offer a screen editor as an alternative to
+the  standard  text  editor,  such  as the _v_i editor from UC
+Berkeley.  To use the screen, or _v_i_s_u_a_l editor, on your cur-
+rent message, you can use the escape,
+
+    ~v
+
+~v  works  like ~e, except that the screen editor is invoked
+instead.  A default screen editor is defined by _M_a_i_l.  If it
+does not suit you, you can set the valued option "VISUAL" to
+the path name of a different editor.
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--1133
+
+
+     It is often useful to be able to include  the  contents
+of some file in your message; the escape
+
+    ~r filename
+
+is  provided  for this purpose, and causes the named file to
+be appended to your current message.  _M_a_i_l complains if  the
+file  doesn't  exist  or can't be read.  If the read is suc-
+cessful, the number of lines and characters appended to your
+message  is  printed, after which you may continue appending
+text.  The filename may contain shell metacharacters like  *
+and  ?   which  are expanded according to the conventions of
+your shell.
+
+     As a special case of ~r, the escape
+
+    ~d
+
+reads in the file  "dead.letter"  in  your  home  directory.
+This is often useful since _M_a_i_l copies the text of your mes-
+sage there when you abort a message with RUBOUT.
+
+     To save the current text of your message on a file  you
+may use the
+
+    ~w filename
+
+escape.  _M_a_i_l will print out the number of lines and charac-
+ters written to the file, after which you may  continue  ap-
+pending  text  to your message.  Shell metacharacters may be
+used in the filename, as in ~r and  are  expanded  with  the
+conventions of your shell.
+
+     If you are sending mail from within _M_a_i_l_'_s command mode
+you can read a message sent to you into the message you  are
+constructing with the escape:
+
+    ~m 4
+
+which  will read message 4 into the current message, shifted
+right by one tab stop.  You can name  any  non-deleted  mes-
+sage,  or  list of messages.  Messages can also be forwarded
+without shifting by a tab stop with ~f.  This is  the  usual
+way to forward a message.
+
+     If,  in  the process of composing a message, you decide
+to add additional people to the list of message  recipients,
+you can do so with the escape
+
+    ~t name1 name2 ...
+
+You  may  name  as  few or many additional recipients as you
+wish.  Note that the users originally on the recipient  list
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--1144                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+will  still  receive  the message; you cannot remove someone
+from the recipient list with ~t.
+
+     If you wish, you can associate a subject with your mes-
+sage by using the escape
+
+    ~s Arbitrary string of text
+
+which  replaces  any previous subject with "Arbitrary string
+of text."  The subject, if given, is sent near  the  top  of
+the  message  prefixed  with "Subject:" You can see what the
+message will look like by using ~p.
+
+     For political reasons, one occasionally prefers to list
+certain  people  as recipients of carbon copies of a message
+rather than direct recipients.  The escape
+
+    ~c name1 name2 ...
+
+adds the named people to the  "Cc:"  list,  similar  to  ~t.
+Again,  you can execute ~p to see what the message will look
+like.
+
+     The escape
+
+    ~b name1 name2 ...
+
+adds the named people to the "Cc:" list, but does  not  make
+the names visible in the "Cc:" line ("blind" carbon copy).
+
+     The  recipients  of the message together constitute the
+"To:" field, the subject the "Subject:" field, and the  car-
+bon  copies  the  "Cc:" field.  If you wish to edit these in
+ways impossible with the ~t, ~s, ~c and ~b escapes, you  can
+use the escape
+
+    ~h
+
+which  prints  "To:" followed by the current list of recipi-
+ents and leaves the cursor (or printhead) at the end of  the
+line.  If you type in ordinary characters, they are appended
+to the end of the current list of recipients.  You can  also
+use  your erase character to erase back into the list of re-
+cipients, or your kill character to erase  them  altogether.
+Thus, for example, if your erase and kill characters are the
+standard (on printing terminals) # and @ symbols,
+
+    ~h
+    To: root kurt####bill
+
+would change the initial recipients  "root  kurt"  to  "root
+bill."   When you type a newline, _M_a_i_l advances to the "Sub-
+ject:" field, where the same rules apply.   Another  newline
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--1155
+
+
+brings  you  to  the "Cc:" field, which may be edited in the
+same fashion.  Another newline  brings  you  to  the  "Bcc:"
+("blind" carbon copy) field, which follows the same rules as
+the "Cc:" field.  Another newline leaves you appending  text
+to  the  end  of  your message.  You can use ~p to print the
+current text of the header fields and the body of  the  mes-
+sage.
+
+     To effect a temporary escape to the shell, the escape
+
+    ~!command
+
+is  used,  which executes _c_o_m_m_a_n_d and returns you to mailing
+mode without altering the text  of  your  message.   If  you
+wish,  instead, to filter the body of your message through a
+shell command, then you can use
+
+    ~|command
+
+which pipes your message through the command  and  uses  the
+output as the new text of your message.  If the command pro-
+duces no output, _M_a_i_l assumes that something  is  amiss  and
+retains  the old version of your message.  A frequently-used
+filter is the command _f_m_t, designed to format outgoing mail.
+
+     To effect a temporary escape to _M_a_i_l command  mode  in-
+stead, you can use the
+
+    ~:_M_a_i_l _c_o_m_m_a_n_d
+
+escape.   This is especially useful for retyping the message
+you are replying to, using, for example:
+
+    ~:t
+
+It is also useful for setting options and modifying aliases.
+
+     If you wish abort the current message, you can use  the
+escape
+
+    ~q
+
+This  will  terminate  the current message and return you to
+the shell (or _M_a_i_l if you were using the mmaaiill command).   If
+the  ssaavvee  option  is set, the message will be copied to the
+file "dead.letter" in your home directory.
+
+     If you wish (for some reason) to send  a  message  that
+contains  a line beginning with a tilde, you must double it.
+Thus, for example,
+
+    ~~This line begins with a tilde.
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--1166                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+sends the line
+
+    ~This line begins with a tilde.
+
+
+     Finally, the escape
+
+    ~?
+
+prints out a brief summary of the available tilde escapes.
+
+     On some terminals  (particularly  ones  with  no  lower
+case)  tilde's  are  difficult  to type.  _M_a_i_l allows you to
+change the escape character with the "escape"  option.   For
+example, I set
+
+    set escape=]
+
+and  use a right bracket instead of a tilde.  If I ever need
+to send a line beginning with right bracket,  I  double  it,
+just  as  for  ~.  Changing the escape character removes the
+special meaning of ~.
+
+44..22..  NNeettwwoorrkk aacccceessss
+
+     This section describes how to send mail  to  people  on
+other  machines.   Recall that sending to a plain login name
+sends mail to that person on your machine.  If your  machine
+is  directly  (or  sometimes, even, indirectly) connected to
+the Arpanet, you can send messages to people on the  Arpanet
+using a name of the form
+
+    name@host.domain
+
+where  _n_a_m_e is the login name of the person you're trying to
+reach, _h_o_s_t is the name of the machine on the  Arpanet,  and
+_d_o_m_a_i_n  is  the higher-level scope within which the hostname
+is known, e.g. EDU (for educational institutions), COM  (for
+commercial  entities), GOV (for governmental agencies), ARPA
+for many other things, BITNET or CSNET for those networks.
+
+     If your recipient logs in on  a  machine  connected  to
+yours  by  UUCP (the Bell Laboratories supplied network that
+communicates over telephone lines), sending mail  can  be  a
+bit  more  complicated.   You must know the list of machines
+through which your message must  travel  to  arrive  at  his
+site.   So,  if  his machine is directly connected to yours,
+you can send mail to him using the syntax:
+
+    host!name
+
+where, again, _h_o_s_t is the name of the machine  and  _n_a_m_e  is
+the  login  name.   If  your  message  must  go  through  an
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--1177
+
+
+intermediary machine first, you must use the syntax:
+
+    intermediary!host!name
+
+and so on.  It is actually a feature of UUCP that the map of
+all the systems in the network is not known anywhere (except
+where people decide to write it down for convenience).  Talk
+to  your system administrator about good ways to get places;
+the _u_u_n_a_m_e command will tell you  systems  whose  names  are
+recognized,  but  not  which  ones  are frequently called or
+well-connected.
+
+     When you use the rreeppllyy command to respond to a  letter,
+there is a problem of figuring out the names of the users in
+the "To:" and "Cc:" lists _r_e_l_a_t_i_v_e _t_o _t_h_e  _c_u_r_r_e_n_t  _m_a_c_h_i_n_e.
+If the original letter was sent to you by someone on the lo-
+cal machine, then this problem does not exist,  but  if  the
+message  came  from  a  remote  machine, the problem must be
+dealt with.  _M_a_i_l uses a heuristic to build the correct name
+for  each  user relative to the local machine.  So, when you
+rreeppllyy to remote mail, the names in the "To:" and "Cc:" lists
+may change somewhat.
+
+44..33..  SSppeecciiaall rreecciippiieennttss
+
+     As  described  previously,  you can send mail to either
+user names or aalliiaass names.  It is also possible to send mes-
+sages  directly  to files or to programs, using special con-
+ventions.  If a recipient name has a `/'  in  it  or  begins
+with a `+', it is assumed to be the path name of a file into
+which to send the message.  If the file already exists,  the
+message  is appended to the end of the file.  If you want to
+name a file in your current directory (ie, one for  which  a
+`/'  would  not  usually be needed) you can precede the name
+with `./' So, to send mail to the file "memo" in the current
+directory, you can give the command:
+
+    % Mail ./memo
+
+If  the name begins with a `+,' it is expanded into the full
+path name of the folder name in your folder directory.  This
+ability  to  send mail to files can be used for a variety of
+purposes, such as maintaining a journal and keeping a record
+of  mail sent to a certain group of users.  The second exam-
+ple can be done automatically by including the full pathname
+of  the record file in the aalliiaass command for the group.  Us-
+ing our previous aalliiaass example, you might give the command:
+
+    alias project sam sally steve susan /usr/project/mail_record
+
+Then, all mail sent to "project" would be saved on the  file
+"/usr/project/mail_record" as well as being sent to the mem-
+bers of the project.  This file can be examined  using  _M_a_i_l
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--1188                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+_-_f.
+
+     It  is sometimes useful to send mail directly to a pro-
+gram, for example one might write a project  billboard  pro-
+gram  and want to access it using _M_a_i_l.  To send messages to
+the billboard program, one can send mail to the special name
+`|billboard'  for example.  _M_a_i_l treats recipient names that
+begin with a `|' as a program to send the mail to.  An aalliiaass
+can  be  set up to reference a `|' prefaced name if desired.
+_C_a_v_e_a_t_s: the shell treats  `|'  specially,  so  it  must  be
+quoted  on  the command line.  Also, the `| program' must be
+presented as a single argument to mail.  The  safest  course
+is  to  surround  the  entire name with double quotes.  This
+also applies to usage in the aalliiaass command.  For example, if
+we  wanted  to  alias `rmsgs' to `rmsgs -s' we would need to
+say:
+
+    alias rmsgs "| rmsgs -s"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--1199
+
+
+55..  AAddddiittiioonnaall ffeeaattuurreess
+
+     This section describes some additional commands  useful
+for  reading  your mail, setting options, and handling lists
+of messages.
+
+55..11..  MMeessssaaggee lliissttss
+
+     Several _M_a_i_l commands accept a list of messages  as  an
+argument.   Along with ttyyppee and ddeelleettee, described in section
+2, there is the ffrroomm command, which prints the message head-
+ers associated with the message list passed to it.  The ffrroomm
+command is particularly useful in conjunction with  some  of
+the message list features described below.
+
+     A  _m_e_s_s_a_g_e  _l_i_s_t consists of a list of message numbers,
+ranges, and names, separated by  spaces  or  tabs.   Message
+numbers  may be either decimal numbers, which directly spec-
+ify messages, or one of the special characters "|^"  "."   or
+"$" to specify the first relevant, current, or last relevant
+message, respectively.  _R_e_l_e_v_a_n_t here means, for  most  com-
+mands "not deleted" and "deleted" for the uunnddeelleettee command.
+
+     A range of messages consists of two message numbers (of
+the form described in the previous paragraph) separated by a
+dash.  Thus, to print the first four messages, use
+
+    type 1-4
+
+and  to  print  all the messages from the current message to
+the last message, use
+
+    type .-$
+
+
+     A _n_a_m_e is a user name.  The user  names  given  in  the
+message  list  are  collected  together and each message se-
+lected by other means is checked to make sure it was sent by
+one of the named users.  If the message consists entirely of
+user names, then every message sent by one  of  those  users
+that  is  _r_e_l_e_v_a_n_t  (in  the sense described earlier) is se-
+lected.  Thus, to print every message sent to you by "root,"
+do
+
+    type root
+
+
+     As  a shorthand notation, you can specify simply "*" to
+get every _r_e_l_e_v_a_n_t (same sense) message.  Thus,
+
+    type *
+
+prints all undeleted messages,
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--2200                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+    delete *
+
+deletes all undeleted messages, and
+
+    undelete *
+
+undeletes all deleted messages.
+
+     You can search for the presence of a  word  in  subject
+lines with //.  For example, to print the headers of all mes-
+sages that contain the word "PASCAL," do:
+
+    from /pascal
+
+Note that subject searching ignores upper/lower case differ-
+ences.
+
+55..22..  LLiisstt ooff ccoommmmaannddss
+
+     This  section describes all the _M_a_i_l commands available
+when receiving mail.
+
+--    The -- command goes to the previous message  and  prints
+     it.   The  -- command may be given a decimal number _n as
+     an argument, in which case the _nth previous message  is
+     gone to and printed.
+
+??    Prints a brief summary of commands.
+
+!!    Used to preface a command to be executed by the shell.
+
+PPrriinntt
+     Like  pprriinntt,  but also print out ignored header fields.
+     See also pprriinntt, iiggnnoorree and rreettaaiinn.  PPrriinntt can be abbre-
+     viated to PP.
+
+RReeppllyy or RReessppoonndd
+     Note the capital RR in the name.  Frame a reply to a one
+     or more messages.  The reply (or replies if you are us-
+     ing this on multiple messages) will be sent ONLY to the
+     person who sent you the message (respectively, the  set
+     of  people  who sent the messages you are replying to).
+     You can add people using the ~~tt, ~~cc and  ~~bb  tilde  es-
+     capes.   The subject in your reply is formed by prefac-
+     ing the subject in the original message with "Re:"  un-
+     less  it  already  began thus.  If the original message
+     included a "reply-to" header field, the reply  will  go
+     _o_n_l_y to the recipient named by "reply-to."  You type in
+     your message using the same  conventions  available  to
+     you through the mmaaiill command.  The RReeppllyy command is es-
+     pecially useful for replying to messages that were sent
+     to  enormous  distribution  groups when you really just
+     want to send a  message  to  the  originator.   Use  it
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--2211
+
+
+     often.  RReeppllyy (and RReessppoonndd) can be abbreviated to RR.
+
+TTyyppee
+     Identical  to  the PPrriinntt command.  TTyyppee can be abbrevi-
+     ated to TT.
+
+aalliiaass
+     Define a name to stand for a set of other names.   This
+     is  used  when  you  want to send messages to a certain
+     group of people and want to avoid retyping their names.
+     For example
+
+         alias project john sue willie kathryn
+
+     creates an alias _p_r_o_j_e_c_t which expands to the four peo-
+     ple John, Sue, Willie, and Kathryn.   If  no  arguments
+     are  given,  all currently-defined aliases are printed.
+     If one argument is given, that alias is printed (if  it
+     exists).  AAlliiaass can be abbreviated to aa.
+
+aalltteerrnnaatteess
+     If  you have accounts on several machines, you may find
+     it convenient to use the /usr/lib/aliases  on  all  the
+     machines except one to direct your mail to a single ac-
+     count.  The aalltteerrnnaatteess command is used to  inform  _M_a_i_l
+     that  each of these other addresses is really _y_o_u.  _A_l_-
+     _t_e_r_n_a_t_e_s takes a list of user names and remembers  that
+     they  are all actually you.  When you rreeppllyy to messages
+     that were sent to one of these  alternate  names,  _M_a_i_l
+     will  not  bother to send a copy of the message to this
+     other address (which would simply be directed  back  to
+     you by the alias mechanism).  If _a_l_t_e_r_n_a_t_e_s is given no
+     argument, it lists the current set of alternate  names.
+     AAlltteerrnnaatteess is usually used in the .mailrc file.  AAlltteerr--
+     nnaatteess can be abbreviated to aalltt.
+
+cchhddiirr
+     The cchhddiirr command allows you to change your current di-
+     rectory.  CChhddiirr takes a single argument, which is taken
+     to be the pathname of the directory to change  to.   If
+     no argument is given, cchhddiirr changes to your home direc-
+     tory.  CChhddiirr can be abbreviated to cc.
+
+ccooppyy
+     The ccooppyy command does the same thing  that  ssaavvee  does,
+     except that it does not mark the messages it is used on
+     for deletion when you quit.  CCooppyy can be abbreviated to
+     ccoo.
+
+ddeelleettee
+     Deletes  a  list  of messages.  Deleted messages can be
+     reclaimed with the uunnddeelleettee command.  DDeelleettee can be ab-
+     breviated to dd.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--2222                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+ddpp or ddtt
+     These commands delete the current message and print the
+     next message.  They are useful for quickly reading  and
+     disposing  of  mail.  If there is no next message, _m_a_i_l
+     says ``at EOF.''
+
+eeddiitt
+     To edit individual messages using the text editor,  the
+     eeddiitt  command  is  provided.   The eeddiitt command takes a
+     list of messages as described under  the  ttyyppee  command
+     and processes each by writing it into the file Message_x
+     where _x is the message number being edited and  execut-
+     ing  the  text  editor on it.  When you have edited the
+     message to your satisfaction, write the message out and
+     quit,  upon  which  _M_a_i_l will read the message back and
+     remove the file.  EEddiitt can be abbreviated to ee.
+
+eellssee
+     Marks the end of the then-part of an iiff  statement  and
+     the  beginning of the part to take effect if the condi-
+     tion of the iiff statement is false.
+
+eennddiiff
+     Marks the end of an iiff statement.
+
+eexxiitt or xxiitt
+     Leave _M_a_i_l without updating the system mailbox  or  the
+     file  your  were  reading.   Thus,  if you accidentally
+     delete several messages, you  can  use  eexxiitt  to  avoid
+     scrambling your mailbox.  EExxiitt can be abbreviated to eexx
+     or xx.
+
+ffiillee
+     The same as ffoollddeerr.  FFiillee can be abbreviated to ffii.
+
+ffoollddeerrss
+     List the names of the folders in your folder directory.
+
+ffoollddeerr
+     The ffoollddeerr command switches  to  a  new  mail  file  or
+     folder.  With no arguments, it tells you which file you
+     are currently reading.  If you give it an argument,  it
+     will  write  out  changes  (such as deletions) you have
+     made in the current file and read the new  file.   Some
+     special conventions are recognized for the name:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--2233
+
+
+
+              Name                  Meaning
+             --------------------------------------------
+             #          Previous file read
+             %          Your system mailbox
+             %name      _N_a_m_e's system mailbox
+             &          Your ~/mbox file
+             +folder    A file in your folder directory
+
+
+     FFoollddeerr can be abbreviated to ffoo.
+
+ffrroomm
+     The  ffrroomm  command  takes a list of messages and prints
+     out the header lines for each one; hence
+
+         from joe
+
+     is the easy way to display all the message headers from
+     "joe."  FFrroomm can be abbreviated to ff.
+
+hheeaaddeerrss
+     When  you start up _M_a_i_l to read your mail, it lists the
+     message headers that you have.  These headers tell  you
+     who  each message is from, when they were received, how
+     many lines and characters  each  message  is,  and  the
+     "Subject:"  header  field  of each message, if present.
+     In addition, _M_a_i_l tags the message header of each  mes-
+     sage  that  has been the object of the pprreesseerrvvee command
+     with a "P."  Messages that have been ssaavveedd  or  wwrriitttteenn
+     are  flagged with a "*."  Finally, ddeelleetteedd messages are
+     not printed at all.  If you wish to reprint the current
+     list of message headers, you can do so with the hheeaaddeerrss
+     command.  The hheeaaddeerrss command  (and  thus  the  initial
+     header  listing)  only  lists the first so many message
+     headers.  The number of headers listed depends  on  the
+     speed  of  your  terminal.   This  can be overridden by
+     specifying the number of headers you want with the _w_i_n_-
+     _d_o_w  option.   _M_a_i_l  maintains  a notion of the current
+     "window" into your messages for the purposes of  print-
+     ing  headers.   Use  the  zz command to move forward and
+     back a window.  You can move _M_a_i_l_'_s notion of the  cur-
+     rent  window directly to a particular message by using,
+     for example,
+
+         headers 40
+
+     to move _M_a_i_l_'_s attention to the messages around message
+     40.   If  a  ``+''  argument  is  given,  then the next
+     screenful of message headers is printed, and if a ``-''
+     argument  is  given,  the previous screenful of message
+     headers is printed.  HHeeaaddeerrss can be abbreviated to hh.
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--2244                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+hheellpp
+     Print a brief and usually  out  of  date  help  message
+     about  the  commands in _M_a_i_l.  The _m_a_n page for _m_a_i_l is
+     usually more up-to-date than either the help message or
+     this manual.  It is also a synonym for ??.
+
+hhoolldd
+     Arrange  to hold a list of messages in the system mail-
+     box, instead of moving them to the file  _m_b_o_x  in  your
+     home  directory.   If  you  set the binary option _h_o_l_d,
+     this will happen by default.  It does not override  the
+     ddeelleettee command.  HHoolldd can be abbreviated to hhoo.
+
+iiff   Commands  in your ".mailrc" file can be executed condi-
+     tionally depending on whether you are  sending  or  re-
+     ceiving mail with the iiff command.  For example, you can
+     do:
+
+         if receive
+              _c_o_m_m_a_n_d_s...
+         endif
+
+     An eellssee form is also available:
+
+         if send
+              _c_o_m_m_a_n_d_s...
+         else
+              _c_o_m_m_a_n_d_s...
+         endif
+
+     Note that the only allowed conditions are  rreecceeiivvee  and
+     sseenndd.
+
+iiggnnoorree
+     NN..BB..:: _I_g_n_o_r_e has been superseded by _r_e_t_a_i_n_.
+     Add the list of header fields named to the _i_g_n_o_r_e _l_i_s_t.
+     Header fields in the ignore list  are  not  printed  on
+     your  terminal  when  you print a message.  This allows
+     you to suppress printing of  certain  machine-generated
+     header fields, such as _V_i_a which are not usually of in-
+     terest.  The TTyyppee and PPrriinntt commands  can  be  used  to
+     print  a  message  in  its  entirety, including ignored
+     fields.  If iiggnnoorree is executed with  no  arguments,  it
+     lists the current set of ignored fields.
+
+lliisstt
+     List  the valid _M_a_i_l commands.  LLiisstt can be abbreviated
+     to ll.
+
+mmaaiill
+     Send mail to one or more people.  If you have  the  _a_s_k
+     option  set, _M_a_i_l will prompt you for a subject to your
+     message.  Then you can  type  in  your  message,  using
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--2255
+
+
+     tilde escapes as described in section 4 to edit, print,
+     or modify your message.  To  signal  your  satisfaction
+     with the message and send it, type control-d at the be-
+     ginning of a line, or a . alone on a line  if  you  set
+     the  option _d_o_t.  To abort the message, type two inter-
+     rupt characters (RUBOUT by default) in a row or use the
+     ~~qq escape.  The mmaaiill command can be abbreviated to mm.
+
+mmbbooxx
+     Indicate  that  a  list  of messages be sent to _m_b_o_x in
+     your home directory when you quit.  This is the default
+     action  for messages if you do _n_o_t have the _h_o_l_d option
+     set.
+
+nneexxtt or ++
+     The nneexxtt command goes to the next message and types it.
+     If  given  a  message list, nneexxtt goes to the first such
+     message and types it.  Thus,
+
+         next root
+
+     goes to the next message sent by "root" and  types  it.
+     The  nneexxtt  command  can be abbreviated to simply a new-
+     line, which means that one can go to and type a message
+     by simply giving its message number or one of the magic
+     characters "^" "."  or "$".  Thus,
+
+         .
+
+     prints the current message and
+
+         4
+
+     prints message 4, as described previously.  NNeexxtt can be
+     abbreviated to nn.
+
+pprreesseerrvvee
+     Same  as  hhoolldd.  Cause a list of messages to be held in
+     your system mailbox when you quit.  PPrreesseerrvvee can be ab-
+     breviated to pprree.
+
+pprriinntt
+     Print  the  specified  messages. If the ccrrtt variable is
+     set, messages longer than the number of lines it  indi-
+     cates  are  paged  through the command specified by the
+     PPAAGGEERR variable.  The pprriinntt command can  be  abbreviated
+     to pp.
+
+qquuiitt
+     Terminates  the  session, saving all undeleted, unsaved
+     and unwritten messages in the user's _m_b_o_x file in their
+     login  directory (messages marked as having been read),
+     preserving all messages marked with hhoolldd or pprreesseerrvvee or
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--2266                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     never referenced in their system mailbox.  Any messages
+     that were deleted, saved, written or saved to _m_b_o_x  are
+     removed from their system mailbox.  If new mail has ar-
+     rived during the session, the message  ``You  have  new
+     mail'' is given.  If given while editing a mailbox file
+     with the --ff flag, then the edit file is  rewritten.   A
+     return  to the Shell is effected, unless the rewrite of
+     edit file fails, in which case the user can escape with
+     the eexxiitt command.  QQuuiitt can be abbreviated to qq.
+
+rreeppllyy or rreessppoonndd
+     Frame  a  reply to a single message.  The reply will be
+     sent to the person who sent you the message  (to  which
+     you are replying), plus all the people who received the
+     original message, except you.  You can add people using
+     the  ~~tt,  ~~cc and ~~bb tilde escapes.  The subject in your
+     reply is formed by prefacing the subject in the  origi-
+     nal  message  with  "Re:" unless it already began thus.
+     If the original message included  a  "reply-to"  header
+     field, the reply will go _o_n_l_y to the recipient named by
+     "reply-to."  You type in your message  using  the  same
+     conventions  available to you through the mmaaiill command.
+     The rreeppllyy (and rreessppoonndd) command can be  abbreviated  to
+     rr.
+
+rreettaaiinn
+     Add  the  list  of  header fields named to the _r_e_t_a_i_n_e_d
+     _l_i_s_t.  Only the header fields in the  retain  list  are
+     shown  on  your terminal when you print a message.  All
+     other header fields are suppressed.  The TTyyppee and PPrriinntt
+     commands  can  be  used  to  print a message in its en-
+     tirety.  If rreettaaiinn is executed with  no  arguments,  it
+     lists the current set of retained fields.
+
+ssaavvee
+     It  is  often useful to be able to save messages on re-
+     lated topics in a file.  The ssaavvee command gives you the
+     ability to do this.  The ssaavvee command takes as an argu-
+     ment a list of message numbers, followed by the name of
+     the  file  in which to save the messages.  The messages
+     are appended to the named file, thus  allowing  one  to
+     keep  several messages in the file, stored in the order
+     they were put there.  The filename in quotes,  followed
+     by  the line count and character count is echoed on the
+     user's terminal.  An example of the ssaavvee command  rela-
+     tive to our running example is:
+
+         s 1 2 tuitionmail
+
+     SSaavveedd  messages  are not automatically saved in _m_b_o_x at
+     quit time, nor are they selected by  the  nneexxtt  command
+     described above, unless explicitly specified.  SSaavvee can
+     be abbreviated to ss.
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--2277
+
+
+sseett
+     Set an option or give an option a value.  Used to  cus-
+     tomize  _M_a_i_l.   Section  5.3 contains a list of the op-
+     tions.  Options can be _b_i_n_a_r_y, in which case  they  are
+     _o_n  or  _o_f_f,  or _v_a_l_u_e_d.  To set a binary option _o_p_t_i_o_n
+     _o_n, do
+
+         set option
+
+     To give the valued option _o_p_t_i_o_n the value _v_a_l_u_e, do
+
+         set option=value
+
+     There must be no space before or after the ``=''  sign.
+     If  no  arguments  are  given,  all variable values are
+     printed.  Several options can be specified in a  single
+     sseett command.  SSeett can be abbreviated to ssee.
+
+sshheellll
+     The  sshheellll  command  allows you to escape to the shell.
+     SShheellll invokes an interactive shell and  allows  you  to
+     type  commands  to  it.   When you leave the shell, you
+     will return to _M_a_i_l.  The shell used is a  default  as-
+     sumed by _M_a_i_l; you can override this default by setting
+     the valued option "SHELL," eg:
+
+         set SHELL=/bin/csh
+
+     SShheellll can be abbreviated to sshh.
+
+ssiizzee
+     Takes a message list and prints out the size in charac-
+     ters of each message.
+
+ssoouurrccee
+     The ssoouurrccee command reads _m_a_i_l commands from a file.  It
+     is useful when you are trying  to  fix  your  ".mailrc"
+     file  and you need to re-read it.  SSoouurrccee can be abbre-
+     viated to ssoo.
+
+ttoopp
+     The ttoopp command takes a message  list  and  prints  the
+     first  five  lines  of  each addressed message.  If you
+     wish, you can change  the  number  of  lines  that  ttoopp
+     prints out by setting the valued option "toplines."  On
+     a CRT terminal,
+
+         set toplines=10
+
+     might be preferred.  TToopp can be abbreviated to ttoo.
+
+ttyyppee
+     Same as pprriinntt.  Takes a message list and types out each
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--2288                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     message  on  the terminal.  The ttyyppee command can be ab-
+     breviated to tt.
+
+uunnddeelleettee
+     Takes a message list and marks each message as _n_o_t  be-
+     ing deleted.  UUnnddeelleettee can be abbreviated to uu.
+
+uunnrreeaadd
+     Takes a message list and marks each message as _n_o_t hav-
+     ing been read.  UUnnrreeaadd can be abbreviated to UU.
+
+uunnsseett
+     Takes a list of option names and discards their  remem-
+     bered values; the inverse of sseett .
+
+vviissuuaall
+     It is often useful to be able to invoke one of two edi-
+     tors, based on the type of terminal one is  using.   To
+     invoke  a display oriented editor, you can use the vviiss--
+     uuaall command.  The operation of the  vviissuuaall  command  is
+     otherwise identical to that of the eeddiitt command.
+
+     Both  the  eeddiitt and vviissuuaall commands assume some default
+     text editors.  These default editors can be  overridden
+     by  the  valued  options  "EDITOR" and "VISUAL" for the
+     standard and screen editors.  You might want to do:
+
+         set EDITOR=/usr/bin/ex VISUAL=/usr/bin/vi
+
+     VViissuuaall can be abbreviated to vv.
+
+wwrriittee
+     The ssaavvee command always writes the entire message,  in-
+     cluding  the  headers,  into  the file.  If you want to
+     write just the message itself, you can  use  the  wwrriittee
+     command.   The wwrriittee command has the same syntax as the
+     ssaavvee command, and  can  be  abbreviated  to  simply  ww.
+     Thus, we could write the second message by doing:
+
+         w 2 file.c
+
+     As suggested by this example, the wwrriittee command is use-
+     ful for such tasks as sending and receiving source pro-
+     gram  text  over  the  message system.  The filename in
+     quotes, followed by the line count and character  count
+     is echoed on the user's terminal.
+
+zz    _M_a_i_l  presents  message  headers  in  windowfuls as de-
+     scribed under the hheeaaddeerrss command.  You can move _M_a_i_l_'_s
+     attention forward to the next window by giving the
+
+         z+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--2299
+
+
+     command.   Analogously,  you  can  move to the previous
+     window with:
+
+         z-
+
+
+55..33..  CCuussttoomm ooppttiioonnss
+
+     Throughout this manual, we have seen examples of binary
+and  valued options.  This section describes each of the op-
+tions in alphabetical order, including some  that  you  have
+not  seen yet.  To avoid confusion, please note that the op-
+tions are either all lower case letters or  all  upper  case
+letters.  When I start a sentence such as: "Ask" causes _M_a_i_l
+to prompt you for a subject header, I am  only  capitalizing
+"ask" as a courtesy to English.
+
+EEDDIITTOORR
+     The  valued option "EDITOR" defines the pathname of the
+     text editor to be used in the eeddiitt command and ~e.   If
+     not defined, a standard editor is used.
+
+PPAAGGEERR
+     Pathname  of  the  program to use for paginating output
+     when it exceeds _c_r_t lines.  A default paginator is used
+     if this option is not defined.
+
+SSHHEELLLL
+     The  valued  option "SHELL" gives the path name of your
+     shell.  This shell is used for the !!   command  and  ~!
+     escape.   In  addition,  this  shell expands file names
+     with shell metacharacters like * and ? in them.
+
+VVIISSUUAALL
+     The valued option "VISUAL" defines the pathname of  the
+     screen  editor  to be used in the vviissuuaall command and ~v
+     escape.  A standard screen editor is used if you do not
+     define one.
+
+aappppeenndd
+     The "append" option is binary and causes messages saved
+     in  _m_b_o_x  to  be  appended  to  the  end  rather   than
+     prepended.  Normally, _M_a_i_l will put messages in _m_b_o_x in
+     the same order that the system puts  messages  in  your
+     system  mailbox.  By setting "append," you are request-
+     ing that _m_b_o_x be appended to regardless.  It is in  any
+     event quicker to append.
+
+aasskk
+     "Ask"  is  a  binary option which causes _M_a_i_l to prompt
+     you for the subject of each message you send.   If  you
+     respond with simply a newline, no subject field will be
+     sent.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--3300                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+aasskkcccc
+     "Askcc" is a binary  option  which  causes  you  to  be
+     prompted  for  additional carbon copy recipients at the
+     end of each message.  Responding with a  newline  shows
+     your satisfaction with the current list.
+
+aauuttoopprriinntt
+     "Autoprint"  is a binary option which causes the ddeelleettee
+     command to behave like ddpp --  thus,  after  deleting  a
+     message,  the  next  one  will  be typed automatically.
+     This is useful when quickly scanning and deleting  mes-
+     sages in your mailbox.
+
+ccrrtt
+     The  valued  option "crt" is used as a threshold to de-
+     termine how long a message must be before PPAAGGEERR is used
+     to read it.
+
+ddeebbuugg
+     The  binary option "debug" causes debugging information
+     to be displayed. Use of this option is the same as  us-
+     ing the --dd command line flag.
+
+ddoott
+     "Dot"  is a binary option which, if set, causes _M_a_i_l to
+     interpret a period alone on a line as the terminator of
+     the message you are sending.
+
+eessccaappee
+     To  allow  you to change the escape character used when
+     sending mail, you can set the valued  option  "escape."
+     Only  the  first  character  of  the "escape" option is
+     used, and it must be doubled if it is to appear as  the
+     first  character  of  a  line  of your message.  If you
+     change your escape character, then ~ loses all its spe-
+     cial  meaning, and need no longer be doubled at the be-
+     ginning of a line.
+
+ffoollddeerr
+     The name of the directory to use for storing folders of
+     messages.   If this name begins with a `/' _M_a_i_l consid-
+     ers it to  be  an  absolute  pathname;  otherwise,  the
+     folder  directory is found relative to your home direc-
+     tory.
+
+hhoolldd
+     The binary option "hold" causes messages that have been
+     read but not manually dealt with to be held in the sys-
+     tem mailbox. This prevents such messages from being au-
+     tomatically swept into your _m_b_o_x file.
+
+iiggnnoorree
+     The  binary  option  "ignore"  causes RUBOUT characters
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--3311
+
+
+     from your terminal to be  ignored  and  echoed  as  @'s
+     while  you  are sending mail.  RUBOUT characters retain
+     their original meaning in _M_a_i_l command  mode.   Setting
+     the  "ignore"  option is equivalent to supplying the --ii
+     flag on the command line as described in section 6.
+
+iiggnnoorreeeeooff
+     An option related to "dot" is "ignoreeof"  which  makes
+     _M_a_i_l  refuse to accept a control-d as the end of a mes-
+     sage.  "Ignoreeof" also applies to _M_a_i_l command mode.
+
+kkeeeepp
+     The "keep" option causes _M_a_i_l to truncate  your  system
+     mailbox  instead of deleting it when it is empty.  This
+     is useful if you elect to protect your  mailbox,  which
+     you would do with the shell command:
+
+         chmod 600 /var/mail/yourname
+
+     where  _y_o_u_r_n_a_m_e  is  your login name.  If you do not do
+     this, anyone can probably read your mail, although peo-
+     ple usually don't.
+
+kkeeeeppssaavvee
+     When  you ssaavvee a message, _M_a_i_l usually discards it when
+     you qquuiitt.  To retain all saved messages, set the "keep-
+     save" option.
+
+mmeettoooo
+     When  sending mail to an alias, _M_a_i_l makes sure that if
+     you are included in the alias, that mail  will  not  be
+     sent to you.  This is useful if a single alias is being
+     used by all members of the group.  If however, you wish
+     to  receive  a copy of all the messages you send to the
+     alias, you can set the binary option "metoo."
+
+nnoohheeaaddeerr
+     The binary option "noheader" suppresses the printing of
+     the  version  and  headers  when _M_a_i_l is first invoked.
+     Setting this option is the same as using --NN on the com-
+     mand line.
+
+nnoossaavvee
+     Normally,  when  you  abort a message with two RUBOUTs,
+     _M_a_i_l copies the partial letter to the  file  "dead.let-
+     ter" in your home directory.  Setting the binary option
+     "nosave" prevents this.
+
+RReeppllyyaallll
+     Reverses the sense of _r_e_p_l_y and _R_e_p_l_y commands.
+
+qquuiieett
+     The binary option "quiet" suppresses  the  printing  of
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--3322                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+     the  version  when  _M_a_i_l  is  first invoked, as well as
+     printing the for example "Message  4:"  from  the  ttyyppee
+     command.
+
+rreeccoorrdd
+     If  you  love  to  keep records, then the valued option
+     "record" can be set to the name of a file to save  your
+     outgoing  mail.   Each new message you send is appended
+     to the end of the file.
+
+ssccrreeeenn
+     When _M_a_i_l initially prints the message headers, it  de-
+     termines the number to print by looking at the speed of
+     your terminal.  The faster your terminal, the  more  it
+     prints.  The valued option "screen" overrides this cal-
+     culation and specifies how  many  message  headers  you
+     want  printed.   This number is also used for scrolling
+     with the zz command.
+
+sseennddmmaaiill
+     To use an  alternate  mail  delivery  system,  set  the
+     "sendmail"  option  to the full pathname of the program
+     to use.  Note:  this is not for everyone!  Most  people
+     should use the default delivery system.
+
+ttoopplliinneess
+     The  valued  option  "toplines"  defines  the number of
+     lines that the "top" command will print out instead  of
+     the default five lines.
+
+vveerrbboossee
+     The binary option "verbose" causes _M_a_i_l to invoke send-
+     mail with the --vv flag, which causes it to go into  ver-
+     bose  mode and announce expansion of aliases, etc. Set-
+     ting the "verbose" option  is  equivalent  to  invoking
+     _M_a_i_l with the --vv flag as described in section 6.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--3333
+
+
+66..  CCoommmmaanndd lliinnee ooppttiioonnss
+
+     This  section  describes  command line options for _M_a_i_l
+and what they are used for.
+
+-N   Suppress the initial printing of headers.
+
+-d   Turn on debugging information.  Not of  general  inter-
+     est.
+
+-f file
+     Show  the messages in _f_i_l_e instead of your system mail-
+     box.  If _f_i_l_e is omitted, _M_a_i_l reads _m_b_o_x in your  home
+     directory.
+
+-i   Ignore  tty  interrupt  signals.  Useful on noisy phone
+     lines, which generate spurious RUBOUT or DELETE charac-
+     ters.   It's  usually more effective to change your in-
+     terrupt character to control-c, for which see the  _s_t_t_y
+     shell command.
+
+-n   Inhibit reading of /etc/mail.rc.  Not generally useful,
+     since /etc/mail.rc is usually empty.
+
+-s string
+     Used for sending mail.  _S_t_r_i_n_g is used as  the  subject
+     of  the  message  being  composed.   If _s_t_r_i_n_g contains
+     blanks, you must surround it with quote marks.
+
+-u name
+     Read _n_a_m_e_s_'_s mail instead of your own.  Unwitting  oth-
+     ers  often neglect to protect their mailboxes, but dis-
+     cretion is advised. Essentially, --uu uusseerr is a shorthand
+     way of doing --ff //vvaarr//mmaaiill//uusseerr.
+
+-v   Use  the  --vv  flag when invoking sendmail. This feature
+     may also be enabled by setting the option "verbose".
+
+     The following command line flags are  also  recognized,
+but  are  intended for use by programs invoking _M_a_i_l and not
+for people.
+
+-T file
+     Arrange to print on _f_i_l_e the contents of the _a_r_t_i_c_l_e_-_i_d
+     fields  of  all  messages  that  were  either  read  or
+     deleted.  --TT is for the _r_e_a_d_n_e_w_s program and should NOT
+     be used for reading your mail.
+
+-h number
+     Pass on hop count information.  _M_a_i_l will take the num-
+     ber, increment it, and pass it with --hh to the mail  de-
+     livery  system.   --hh  only has effect when sending mail
+     and is used for network mail forwarding.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--3344                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+-r name
+     Used for network mail forwarding:   interpret  _n_a_m_e  as
+     the  sender of the message.  The _n_a_m_e and --rr are simply
+     sent along to the mail  delivery  system.   Also,  _M_a_i_l
+     will  wait  for  the  message to be sent and return the
+     exit status.  Also restricts formatting of message.
+
+     Note that --hh and --rr, which are for  network  mail  for-
+warding,  are  not used in practice since mail forwarding is
+now handled separately.  They may disappear soon.
+
+77..  FFoorrmmaatt ooff mmeessssaaggeess
+
+     This section describes the format  of  messages.   Mes-
+sages  begin  with  a  _f_r_o_m line, which consists of the word
+"From" followed by a user name, followed by  anything,  fol-
+lowed  by a date in the format returned by the _c_t_i_m_e library
+routine described in section 3 of the Unix Programmer's Man-
+ual.  A possible _c_t_i_m_e format date is:
+
+    Tue Dec  1 10:58:23 1981
+
+The  _c_t_i_m_e date may be optionally followed by a single space
+and a time zone indication, which should  be  three  capital
+letters, such as PDT.
+
+     Following  the  _f_r_o_m line are zero or more _h_e_a_d_e_r _f_i_e_l_d
+lines.  Each header field line is of the form:
+
+    name: information
+
+_N_a_m_e can be anything, but only  certain  header  fields  are
+recognized  as  having  any  meaning.  The recognized header
+fields are: _a_r_t_i_c_l_e_-_i_d, _b_c_c,  _c_c,  _f_r_o_m,  _r_e_p_l_y_-_t_o,  _s_e_n_d_e_r,
+_s_u_b_j_e_c_t,  and  _t_o.  Other header fields are also significant
+to other systems; see, for example, the current Arpanet mes-
+sage  standard  for  much more information on this topic.  A
+header field can be continued onto following lines by making
+the  first  character  on  the following line a space or tab
+character.
+
+     If any headers are present, they must be followed by  a
+blank line.  The part that follows is called the _b_o_d_y of the
+message, and must be ASCII text, not containing null charac-
+ters.   Each line in the message body must be no longer than
+512 characters and terminated with an ASCII newline  charac-
+ter.  If binary data must be passed through the mail system,
+it is suggested that this data be encoded in a system  which
+encodes  six  bits  into  a printable character (i.e.: uuen-
+code).  For example, one could use the upper and lower  case
+letters,  the digits, and the characters comma and period to
+make up the 64 characters.  Then, one can send a 16-bit  bi-
+nary number as three characters.  These characters should be
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--3355
+
+
+packed into lines, preferably lines about 70 characters long
+as long lines are transmitted more efficiently.
+
+     The message delivery system always adds a blank line to
+the end of each  message.   This  blank  line  must  not  be
+deleted.
+
+     The UUCP message delivery system sometimes adds a blank
+line to the end of a  message  each  time  it  is  forwarded
+through a machine.
+
+     It  should  be noted that some network transport proto-
+cols enforce limits to the lengths of messages.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--3366                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+88..  GGlloossssaarryy
+
+     This section contains the definitions of a few  phrases
+peculiar to _M_a_i_l.
+
+_a_l_i_a_s
+     An alternative name for a person or list of people.
+
+_f_l_a_g An  option, given on the command line of _M_a_i_l, prefaced
+     with a -.  For example, --ff is a flag.
+
+_h_e_a_d_e_r _f_i_e_l_d
+     At the beginning of a message, a  line  which  contains
+     information  that  is part of the structure of the mes-
+     sage.  Popular header fields include _t_o, _c_c,  and  _s_u_b_-
+     _j_e_c_t.
+
+_m_a_i_l
+     A  collection  of  messages.  Often used in the phrase,
+     "Have you read your mail?"
+
+_m_a_i_l_b_o_x
+     The place where your mail is stored, typically  in  the
+     directory /var/mail.
+
+_m_e_s_s_a_g_e
+     A  single letter from someone, initially stored in your
+     _m_a_i_l_b_o_x.
+
+_m_e_s_s_a_g_e _l_i_s_t
+     A string used in _M_a_i_l command mode to  describe  a  se-
+     quence of messages.
+
+_o_p_t_i_o_n
+     A  piece  of special purpose information used to tailor
+     _M_a_i_l to your taste.  Options are specified with the sseett
+     command.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--3377
+
+
+99..  SSuummmmaarryy ooff ccoommmmaannddss,, ooppttiioonnss,, aanndd eessccaappeess
+
+     This  section  gives  a  quick summary of the _M_a_i_l com-
+mands, binary and valued options, and tilde escapes.
+
+     The following table describes the commands:
+
+ Command                             _D_e_s_c_r_i_p_t_i_o_n
+--------------------------------------------------------------------------
+++            Same as nneexxtt
+--            Back up to previous message
+??            Print brief summary of _M_a_i_l commands
+!!            Single command escape to shell
+PPrriinntt        Type message with ignored fields
+RReeppllyy        Reply to author of message only
+RReessppoonndd      Same as RReeppllyy
+TTyyppee         Type message with ignored fields
+aalliiaass        Define an alias as a set of user names
+aalltteerrnnaatteess   List other names you are known by
+cchhddiirr        Change working directory, home by default
+ccooppyy         Copy a message to a file or folder
+ddeelleettee       Delete a list of messages
+ddpp           Same as ddtt
+ddtt           Delete current message, type next message
+eeddiitt         Edit a list of messages
+eellssee         Start of else part of conditional; see iiff
+eennddiiff        End of conditional statement; see iiff
+eexxiitt         Leave mail without changing anything
+ffiillee         Interrogate/change current mail file
+ffoollddeerr       Same as ffiillee
+ffoollddeerrss      List the folders in your folder directory
+ffrroomm         List headers of a list of messages
+hheeaaddeerrss      List current window of messages
+hheellpp         Same as ??
+hhoolldd         Same as pprreesseerrvvee
+iiff           Conditional execution of _M_a_i_l commands
+iiggnnoorree       Set/examine list of ignored header fields
+lliisstt         List valid _M_a_i_l commands
+llooccaall        List other names for the local host
+mmaaiill         Send mail to specified names
+mmbbooxx         Arrange to save a list of messages in _m_b_o_x
+nneexxtt         Go to next message and type it
+pprreesseerrvvee     Arrange to leave list of messages in system mailbox
+pprriinntt        Print messages
+qquuiitt         Leave _M_a_i_l; update system mailbox, _m_b_o_x as appropriate
+rreeppllyy        Compose a reply to a message
+rreessppoonndd      Same as rreeppllyy
+rreettaaiinn       Supersedes iiggnnoorree
+ssaavvee         Append messages, headers included, on a file
+sseett          Set binary or valued options
+
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--3388                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+sshheellll        Invoke an interactive shell
+ssiizzee         Prints out size of message list
+ssoouurrccee       Read _m_a_i_l commands from a file
+ttoopp          Print first so many (5 by default) lines of list of messages
+ttyyppee         Same as pprriinntt
+uunnddeelleettee     Undelete list of messages
+uunnrreeaadd       Marks list of messages as not been read
+uunnsseett        Undo the operation of a sseett
+vviissuuaall       Invoke visual editor on a list of messages
+wwrriittee        Append messages to a file, don't include headers
+xxiitt          Same as eexxiitt
+zz            Scroll to next/previous screenful of headers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MMaaiill RReeffeerreennccee MMaannuuaall                               UUSSDD::77--3399
+
+
+
+     The following table describes  the  options.   Each
+option  is  shown as being either a binary or valued op-
+tion.
+
+ Option      _T_y_p_e                         _D_e_s_c_r_i_p_t_i_o_n
+---------------------------------------------------------------------------
+EDITOR      _v_a_l_u_e_d   Pathname of editor for ~e and eeddiitt
+PAGER       _v_a_l_u_e_d   Pathname of paginator for PPrriinntt, pprriinntt, TTyyppee and ttyyppee
+SHELL       _v_a_l_u_e_d   Pathname of shell for sshheellll, ~! and !!
+VISUAL      _v_a_l_u_e_d   Pathname of screen editor for ~v, vviissuuaall
+append      _b_i_n_a_r_y   Always append messages to end of _m_b_o_x
+ask         _b_i_n_a_r_y   Prompt user for Subject: field when sending
+askcc       _b_i_n_a_r_y   Prompt user for additional Cc's at end of message
+autoprint   _b_i_n_a_r_y   Print next message after ddeelleettee
+crt         _v_a_l_u_e_d   Minimum number of lines before using PPAAGGEERR
+debug       _b_i_n_a_r_y   Print out debugging information
+dot         _b_i_n_a_r_y   Accept . alone on line to terminate message input
+escape      _v_a_l_u_e_d   Escape character to be used instead of  ~
+folder      _v_a_l_u_e_d   Directory to store folders in
+hold        _b_i_n_a_r_y   Hold messages in system mailbox by default
+ignore      _b_i_n_a_r_y   Ignore RUBOUT while sending mail
+ignoreeof   _b_i_n_a_r_y   Don't terminate letters/command input with ||^^DD
+keep        _b_i_n_a_r_y   Don't unlink system mailbox when empty
+keepsave    _b_i_n_a_r_y   Don't delete ssaavveed messages by default
+metoo       _b_i_n_a_r_y   Include sending user in aliases
+noheader    _b_i_n_a_r_y   Suppress initial printing of version and headers
+nosave      _b_i_n_a_r_y   Don't save partial letter in _d_e_a_d_._l_e_t_t_e_r
+quiet       _b_i_n_a_r_y   Suppress printing of _M_a_i_l version and message numbers
+record      _v_a_l_u_e_d   File to save all outgoing mail in
+screen      _v_a_l_u_e_d   Size of window of message headers for zz, etc.
+sendmail    _v_a_l_u_e_d   Choose alternate mail delivery system
+toplines    _v_a_l_u_e_d   Number of lines to print in ttoopp
+verbose     _b_i_n_a_r_y   Invoke sendmail with the --vv flag
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::77--4400                               MMaaiill RReeffeerreennccee MMaannuuaall
+
+
+
+     The following table summarizes  the  tilde  escapes
+available while sending mail.
+
+Escape    _A_r_g_u_m_e_n_t_s                   _D_e_s_c_r_i_p_t_i_o_n
+----------------------------------------------------------------
+~!       _c_o_m_m_a_n_d        Execute shell command
+~b       _n_a_m_e _._._.       Add names to "blind" Cc: list
+~c       _n_a_m_e _._._.       Add names to Cc: field
+~d                      Read _d_e_a_d_._l_e_t_t_e_r into message
+~e                      Invoke text editor on partial message
+~f       _m_e_s_s_a_g_e_s       Read named messages
+~h                      Edit the header fields
+~m       _m_e_s_s_a_g_e_s       Read named messages, right shift by tab
+~p                      Print message entered so far
+~q                      Abort entry of letter; like RUBOUT
+~r       _f_i_l_e_n_a_m_e       Read file into message
+~s       _s_t_r_i_n_g         Set Subject: field to _s_t_r_i_n_g
+~t       _n_a_m_e _._._.       Add names to To: field
+~v                      Invoke screen editor on message
+~w       _f_i_l_e_n_a_m_e       Write message on file
+~|       _c_o_m_m_a_n_d        Pipe message through _c_o_m_m_a_n_d
+~:       _M_a_i_l _c_o_m_m_a_n_d   Execute a _M_a_i_l command
+~~       _s_t_r_i_n_g         Quote a ~ in front of _s_t_r_i_n_g
+
+
+
+
+     The  following  table  shows the command line flags
+that _M_a_i_l accepts:
+
+  Flag                        Description
+------------------------------------------------------------
+-N           Suppress the initial printing of headers
+-T _f_i_l_e      Article-id's of read/deleted messages to _f_i_l_e
+-d           Turn on debugging
+-f _f_i_l_e      Show messages in _f_i_l_e or _~_/_m_b_o_x
+-h _n_u_m_b_e_r    Pass on hop count for mail forwarding
+-i           Ignore tty interrupt signals
+-n           Inhibit reading of /etc/mail.rc
+-r _n_a_m_e      Pass on _n_a_m_e for mail forwarding
+-s _s_t_r_i_n_g    Use _s_t_r_i_n_g as subject in outgoing mail
+-u _n_a_m_e      Read _n_a_m_e_'_s mail instead of your own
+-v           Invoke sendmail with the --vv flag
+
+
+
+Notes: --TT, --dd, --hh, and --rr are not for human use.
+
+
+
+
+
+
+
+
+
+
+

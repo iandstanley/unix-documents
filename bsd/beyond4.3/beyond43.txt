@@ -1,0 +1,660 @@
+
+
+
+
+
+
+                    CCuurrrreenntt RReesseeaarrcchh bbyy
+            TThhee CCoommppuutteerr SSyysstteemmss RReesseeaarrcchh GGrroouupp
+                        ooff BBeerrkkeelleeyy
+
+
+                   Marshall Kirk McKusick
+                      Michael J Karels
+                       Keith Sklower
+                         Kevin Fall
+                      Marc Teitelbaum
+                        Keith Bostic
+
+
+                          _S_u_m_m_a_r_y
+
+     The  release  of 4.3BSD in April of 1986 addressed many
+of  the  performance  problems  and  unfinished   interfaces
+present  in  4.2BSD  [Leffler84] [McKusick85].  The Computer
+Systems Research Group at Berkeley has now embarked on a new
+development  phase  to  update other major components of the
+system, as well as to offer new  functionality.   There  are
+five major ongoing projects.  The first is to develop an OSI
+network protocol suite and to integrate existing ISO  appli-
+cations  into  Berkeley  UNIX.  The second is to develop and
+support an interface compliant with the P1003.1 POSIX  stan-
+dard  recently approved by the IEEE.  The third is to refine
+the TCP/IP networking to improve its performance  and  limit
+congestion  on slow and/or lossy networks.  The fourth is to
+provide a standard interface to file systems so that  multi-
+ple  local and remote file systems can be supported, much as
+multiple networking protocols are supported by 4.3BSD.   The
+fifth is to evaluate alternate access control mechanisms and
+audit the existing security features of the system, particu-
+larly with respect to network services.  Other areas of work
+include multi-architecture support, a general purpose kernel
+memory  allocator, disk labels, and extensions to the 4.2BSD
+fast filesystem.
+
+     We are planning to finish implementation prototypes for
+each  of the five main areas of work over the next year, and
+provide an informal test release sometime next year for  in-
+terested  developers.   After incorporating feedback and re-
+finements from the testers, they will  appear  in  the  next
+full  Berkeley release, which is typically made about a year
+after the test release.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             -2-
+
+
+11..  RReecceennttllyy CCoommpplleetteedd PPrroojjeeccttss
+
+     There have been several changes in the system that were
+included in the recent 4.3BSD Tahoe release.
+
+11..11..  MMuullttii--aarrcchhiitteeccttuurree ssuuppppoorrtt
+
+     Support  has  been added for the DEC VAX 8600/8650, VAX
+8200/8250, MicroVAXII and MicroVAXIII.
+
+     The largest change has been the incorporation  of  sup-
+port for the first non-VAX processor, the CCI Power 6/32 and
+6/32SX.  (This addition also supports the Harris  HCX-7  and
+HCX-9, as well as the Sperry 7000/40 and ICL machines.)  The
+Power 6 version of 4.3BSD is largely based on the  compilers
+and device drivers done for CCI's 4.2BSD UNIX, and is other-
+wise similar to the  VAX  release  of  4.3BSD.   The  entire
+source  tree,  including  all kernel and user-level sources,
+has been merged using a structure that will easily  accommo-
+date the addition of other processor families.  A MIPS R2000
+has been donated to  us,  making  the  MIPS  architecture  a
+likely candidate for inclusion into a future BSD release.
+
+11..22..  KKeerrnneell MMeemmoorryy AAllllooccaattoorr
+
+     The 4.3BSD UNIX kernel used 10 different memory alloca-
+tion mechanisms, each designed for the particular  needs  of
+the  utilizing  subsystem.   These  mechanisms have been re-
+placed by a general purpose dynamic  memory  allocator  that
+can  be used by all of the kernel subsystems.  The design of
+this allocator takes advantage of known  memory  usage  pat-
+terns in the UNIX kernel and a hybrid strategy that is time-
+efficient for  small  allocations  and  space-efficient  for
+large  allocations.   This  allocator  replaces the multiple
+memory allocation interfaces with a  single  easy-to-program
+interface, results in more efficient use of global memory by
+eliminating partitioned and specialized memory pools, and is
+quick  enough  (approximately  15  VAX instructions) that no
+performance loss is observed relative to the current  imple-
+mentations.  [McKusick88].
+
+11..33..  DDiisskk LLaabbeellss
+
+     During  the  work on the CCI machine, it became obvious
+that disk geometry and filesystem layout information must be
+stored  on  each disk in a pack label.  Disk labels were im-
+plemented for the CCI disks and for the most common types of
+disk  controllers on the VAX.  A utility was written to cre-
+ate and maintain the disk information, and other  user-level
+programs  that  use  such information now obtain it from the
+disk label.  The use of this facility has  allowed  improve-
+ments  in  the file system's knowledge of irregular disk ge-
+ometries such as track-to-track skew.
+
+
+
+
+
+
+
+
+
+
+                             -3-
+
+
+11..44..  FFaatt FFaasstt FFiillee SSyysstteemm
+
+     The 4.2 fast file system [McKusick84] contained several
+statically  sized  structures, imposing limits on the number
+of cylinders per cylinder group, inodes per cylinder  group,
+and  number  of distinguished rotational positions.  The new
+``fat'' filesystem allows these limits to be set at filesys-
+tem  creation time.  Old kernels will treat the new filesys-
+tems as read-only, and new  kernels  will  accommodate  both
+formats.  The filesystem check facility, ffsscckk, has also been
+modified to check either type.
+
+
+
+22..  CCuurrrreenntt UUNNIIXX RReesseeaarrcchh aatt BBeerrkkeelleeyy
+
+     Since the release of 4.3BSD in mid 1986, we have  begun
+work on several new major areas of research.  Our goal is to
+apply leading edge research ideas into a stable and reliable
+implementation  that  solves  current  problems in operating
+systems development.
+
+22..11..  OOSSII nneettwwoorrkk pprroottooccooll ddeevveellooppmmeenntt
+
+     The network architecture of 4.2BSD was designed to  ac-
+commodate  multiple  network  protocol  families and address
+formats, and an implementation of the ISO OSI network proto-
+cols  should  enter  into this framework without much diffi-
+culty.  We plan to implement the OSI connectionless internet
+protocol  (CLNP),  and  device  drivers for X.25, 802.3, and
+possibly 802.5 interfaces, and to integrate  these  with  an
+OSI  transport  class 4 (TP-4) implementation.  We will also
+incorporate into the Berkeley Software Distribution  an  up-
+dated ISO Development Environment (ISODE) featuring Interna-
+tional Standard (IS) versions of  utilities.   ISODE  imple-
+ments  the session and presentation layers of the OSI proto-
+col suite, and will include an implementation  of  the  file
+transfer protocol (FTAM).  It is also possible that an X.400
+implementation now being done at University College,  London
+and the University of Nottingham will be available for test-
+ing and distribution.
+
+This implementation is comprised of four areas.
+
+1)   We are updating the University  of  Wisconsin  TP-4  to
+     match  GOSIP requirements.  The University of Wisconsin
+     developed a transport class 4  implementation  for  the
+     4.2BSD  kernel under contract to Mitre.  This implemen-
+     tation must be updated to reflect the  National  Insti-
+     tute  of  Standards and Technology (NIST, formerly NBS)
+     workshop agreements, GOSIP,  and  4.3BSD  requirements.
+     We  will  make this TP-4 operate with an OSI IP, as the
+     original implementation was built to run over  the  DoD
+     IP.
+
+
+
+
+
+
+
+
+
+                             -4-
+
+
+2)   A kernel version of the OSI IP and ES-IS protocols must
+     be produced.  We will implement the kernel  version  of
+     these protocols.
+
+3)   The  required device drivers need to be integrated into
+     a BSD kernel.  4.3BSD has existing device  drivers  for
+     many  Ethernet  devices;  future  BSD versions may also
+     support X.25 devices as well as  token  ring  networks.
+     These device drivers must be integrated into the kernel
+     OSI protocol implementations.
+
+4)   The existing OSINET interoperability  test  network  is
+     available so that the interoperability of the ISODE and
+     BSD kernel protocols can be established  through  tests
+     with  several  vendors.   Testing is crucial because an
+     openly available version of GOSIP protocols  that  does
+     not  interoperate  with  DEC,  IBM,  SUN, ICL, HIS, and
+     other major vendors would be  embarrassing.   To  allow
+     testing of the integrated pieces the most desirable ap-
+     proach is to provide access to OSINET at UCB.  A second
+     approach  is  to do the interoperability testing at the
+     site of an existing OSINET member, such as the NBS.
+
+22..22..  CCoommpplliiaannccee wwiitthh PPOOSSIIXX 11000033
+
+     Berkeley became involved several months ago in the  de-
+velopment  of  the IEEE POSIX P1003.1 system interface stan-
+dard.  Since then, we have been participating in the working
+groups of P1003.2 (shell and application utility interface),
+P1003.6 (security),  P1003.7  (system  administration),  and
+P1003.8 (networking).
+
+     The  IEEE  published the POSIX P1003.1 standard in late
+1988.  POSIX related changes to the BSD system have included
+a  new  terminal  driver, support for POSIX sessions and job
+control, expanded signal functionality, restructured  direc-
+tory  access routines, and new set-user and set-group id fa-
+cilities.  We currently have a prototype  implementation  of
+the  POSIX driver with extensions to provide binary compati-
+bility with applications developed for the old Berkeley ter-
+minal  driver.   We  also have a prototype implementation of
+the 4.2BSD-based POSIX job control facility.
+
+     The P1003.2 draft is currently being voted  on  by  the
+IEEE  P1003.2 balloting group.  Berkeley is particularly in-
+terested in the results of this standard, as  it  will  pro-
+foundly  influence  the  user environment.  The other groups
+are in comparatively early phases,  with  drafts  coming  to
+ballot sometime in the 90's.  Berkeley will continue to par-
+ticipate in these groups, and move in the near future toward
+a P1003.1 and P1003.2 compliant system.  We have many of the
+utilities outlined in the current P1003.2 draft already  im-
+plemented,  and have other parties willing to contribute ad-
+ditional implementations.
+
+
+
+
+
+
+
+
+
+                             -5-
+
+
+22..33..  IImmpprroovveemmeennttss ttoo tthhee TTCCPP//IIPP NNeettwwoorrkkiinngg PPrroottooccoollss
+
+     The Internet and the Berkeley collection of  local-area
+networks  have  both  grown  at high rates in the last year.
+The Bay Area Regional Research Network (BARRNet), connecting
+several UC campuses, Stanford and NASA-Ames has recently be-
+come operational, increasing the complexity of  the  network
+connectivity.   Both  Internet  and local routing algorithms
+are showing the strain of continued growth.   We  have  made
+several  changes  in the local routing algorithm to keep ac-
+commodating the current topology, and are  participating  in
+the  development of new routing algorithms and standard pro-
+tocols.
+
+     Recent work in collaboration with Van Jacobson  of  the
+Lawrence  Berkeley  Laboratory has led to the design and im-
+plementation of several new algorithms for TCP that  improve
+throughput on both local and long-haul networks while reduc-
+ing unnecessary retransmission.  The  improvement  is  espe-
+cially  striking  when connections must traverse slow and/or
+lossy networks.  The new algorithms include  ``slow-start,''
+a  technique  for opening the TCP flow control window slowly
+and using the returning  stream  of  acknowledgements  as  a
+clock to drive the connection at the highest speed tolerated
+by the intervening network.  A modification  of  this  tech-
+nique  allows the sender to dynamically modify the send win-
+dow size to adjust to changing network conditions.  In addi-
+tion, the round-trip timer has been modified to estimate the
+variance in round-trip time, thus allowing earlier  retrans-
+mission  of  lost  packets with less spurious retransmission
+due to increasing network delay.  Along with a  scheme  pro-
+posed  by Phil Karn of Bellcore, these changes reduce unnec-
+essary retransmission over difficult paths such as Satnet by
+nearly  two  orders  of magnitude while improving throughput
+dramatically.
+
+     The current TCP implementation is now being readied for
+more  widespread distribution via the network and as a stan-
+dard Berkeley distribution unencumbered  by  any  commercial
+licensing.   We  are continuing to refine the TCP and IP im-
+plementations using the ARPANET, BARRNet,  the  NSF  network
+and  local campus nets as testbeds.  In addition, we are in-
+corporating applicable algorithms from this  work  into  the
+TP-4 protocol implementation.
+
+22..44..  TToowwaarrdd aa CCoommppaattiibbllee FFiillee SSyysstteemm IInntteerrffaaccee
+
+     The most critical shortcoming of the 4.3BSD UNIX system
+was in the area of distributed file systems.  As  with  net-
+working  protocols, there is no single distributed file sys-
+tem that provides sufficient speed and functionality for all
+problems.   It  is  frequently  necessary to support several
+different remote file system protocols, just as it is neces-
+sary to run several different network protocols.
+
+
+
+
+
+
+
+
+
+                             -6-
+
+
+     As network or remote file systems have been implemented
+for UNIX, several stylized interfaces between the file  sys-
+tem  implementation and the rest of the kernel have been de-
+veloped.  Among these are  Sun  Microsystems'  Virtual  File
+System    interface    (VFS)   using   vvnnooddeess   [Sandburg85]
+[Kleiman86], Digital Equipment's Generic File  System  (GFS)
+architecture  [Rodriguez86], AT&T's File System Switch (FSS)
+[Rifkin86], the LOCUS distributed  file  system  [Walker85],
+and  Masscomp's extended file system [Cole85].  Other remote
+file systems have been implemented in research or university
+groups  for internal use, notably the network file system in
+the Eighth Edition UNIX system [Weinberger84] and  two  dif-
+ferent  file  systems  used  at  Carnegie  Mellon University
+[Satyanarayanan85].  Numerous other remote file access meth-
+ods  have  been  devised for use within individual UNIX pro-
+cesses, many of them by modifications to the C  I/O  library
+similar   to  those  in  the  Newcastle  Connection  [Brown-
+bridge82].
+
+     Each design attempts to isolate  file  system-dependent
+details below a generic interface and to provide a framework
+within which new file systems may be incorporated.  However,
+each  of these interfaces is different from and incompatible
+with the others.  Each addresses somewhat  different  design
+goals,  having  been  based  on a different version of UNIX,
+having targeted a different set of file systems with varying
+characteristics, and having selected a different set of file
+system primitive operations.
+
+     Our effort in this area is aimed at providing a  common
+framework  to  support these different distributed file sys-
+tems simultaneously rather than to simply implement yet  an-
+other  protocol.   This requires a detailed study of the ex-
+isting protocols, and discussion with their implementors  to
+determine  whether they could modify their implementation to
+fit within our proposed framework.  We have studied the var-
+ious  file  system interfaces to determine their generality,
+completeness, robustness, efficiency, and aesthetics and are
+currently working on a file system interface that we believe
+includes the best features of each of the existing implemen-
+tations.   This work and the rationale underlying its devel-
+opment have been presented to major software vendors  as  an
+early  step toward convergence on a standard compatible file
+system interface.  Briefly, the proposal adopts  the  4.3BSD
+calling  convention  for  file  name lookup but otherwise is
+closely related to Sun's VFS and DEC's GFS. [Karels86].
+
+22..55..  SSyysstteemm SSeeccuurriittyy
+
+     The recent invasion of the DARPA Internet by a  quickly
+reproducing ``worm'' highlighted the need for a thorough re-
+view of the access safeguards built into the system.   Until
+now,  we have taken a passive approach to dealing with weak-
+nesses in the system access mechanisms, rather than actively
+
+
+
+
+
+
+
+
+
+                             -7-
+
+
+searching  for possible weaknesses.  When we are notified of
+a problem or loophole in a system  utility  by  one  of  our
+users, we have a well defined procedure for fixing the prob-
+lem and expeditiously disseminating the fix to the BSD mail-
+ing  list.  This procedure has proven itself to be effective
+in solving known problems as they arise (witness its success
+in  handling  the  recent  worm).   However, we feel that it
+would be useful to take a more active  role  in  identifying
+problems  before  they are reported (or exploited).  We will
+make a complete audit of the system  utilities  and  network
+servers to find unintended system access mechanisms.
+
+     As a part of the work to make the system more resistant
+to attack from local users or via the network,  it  will  be
+necessary to produce additional documentation on the config-
+uration and operation of  the  system.   This  documentation
+will  cover  such topics as file and directory ownership and
+access, network and server  configuration,  and  control  of
+privileged operations such as file system backups.
+
+     We  are  investigating  the  addition of access control
+lists (ACLs) for filesystem objects.  ACLs  provide  a  much
+finer  granularity  of  control over file access permissions
+than the  current  discretionary  access  control  mechanism
+(mode  bits).   Furthermore,  they are necessary in environ-
+ments where C2 level security or better, as defined  in  the
+DoD  TCSEC [DoD83], is required.  The POSIX P1003.6 security
+group has made notable progress in determining  how  an  ACL
+mechanism  should work, and several vendors have implemented
+ACLs for their commercial systems.  Berkeley  will  investi-
+gate  the existing implementations and determine how to best
+integrate ACLs with the existing mechanism.
+
+     A major shortcoming of the present system is  that  au-
+thentication  over the network is based solely on the privi-
+leged port mechanism between trusting hosts and users.   Al-
+though  privileged  ports  can  only be created by processes
+running as root on a UNIX system, such  processes  are  easy
+for  a  workstation user to obtain; they simply reboot their
+workstation in single user mode.  Thus, a better authentica-
+tion  mechanism  is needed.  At present, we believe that the
+MIT Kerberos authentication server [Steiner88] provides  the
+best  solution  to  this problem.  We propose to investigate
+Kerberos further as well as other authentication  mechanisms
+and then to integrate the best one into Berkeley UNIX.  Part
+of this integration would be the addition of the authentica-
+tion  mechanism into utilities such as telnet, login, remote
+shell, etc.  We will add support for telnet (eventually  re-
+placing  rlogin),  the  X window system, and the mail system
+within an authentication domain (a Kerberos _r_e_a_l_m).  We hope
+to replace the existing password authentication on each host
+with the network authentication system.
+
+
+
+
+
+
+
+
+
+
+
+                             -8-
+
+
+33..  RReeffeerreenncceess
+
+
+Brownbridge82
+     Brownbridge, D.R., L.F.  Marshall,  B.  Randell,  ``The
+     Newcastle  Connection, or UNIXes of the World Unite!,''
+     _S_o_f_t_w_a_r_e_-  _P_r_a_c_t_i_c_e  _a_n_d  _E_x_p_e_r_i_e_n_c_e,  Vol.   12,   pp.
+     1147-1162, 1982.
+
+
+Cole85
+     Cole, C.T., P.B. Flinn, A.B. Atlas, ``An Implementation
+     of an Extended File System for UNIX,''  _U_s_e_n_i_x  _C_o_n_f_e_r_-
+     _e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 131-150, June, 1985.
+
+
+DoD83
+     Department of Defense, ``Trusted Computer System Evalu-
+     ation Criteria,'' _C_S_C_-_S_T_D_-_0_0_1_-_8_3, DoD Computer Security
+     Center, August, 1983.
+
+
+Karels86
+     Karels,  M.,  M.  McKusick, ``Towards a Compatible File
+     System Interface,'' _P_r_o_c_e_e_d_i_n_g_s _o_f  _t_h_e  _E_u_r_o_p_e_a_n  _U_N_I_X
+     _U_s_e_r_s  _G_r_o_u_p _M_e_e_t_i_n_g, Manchester, England, pp. 481-496,
+     September 1986.
+
+
+Kleiman86
+     Kleiman, S., ``Vnodes:  An  Architecture  for  Multiple
+     File System Types in Sun UNIX,'' _U_s_e_n_i_x _C_o_n_f_e_r_e_n_c_e _P_r_o_-
+     _c_e_e_d_i_n_g_s, pp. 238-247, June, 1986.
+
+
+Leffler84
+     Leffler, S., M.K. McKusick, M. Karels, ``Measuring  and
+     Improving  the  Performance of 4.2BSD,'' _U_s_e_n_i_x _C_o_n_f_e_r_-
+     _e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 237-252, June, 1984.
+
+
+McKusick84
+     McKusick, M.K., W. Joy, S. Leffler, R. Fabry, ``A  Fast
+     File  System  for  UNIX'', _A_C_M _T_r_a_n_s_a_c_t_i_o_n_s _o_n _C_o_m_p_u_t_e_r
+     _S_y_s_t_e_m_s _2, 3.  pp 181-197, August 1984.
+
+
+McKusick85
+     McKusick, M.K., M. Karels,  S.  Leffler,  ``Performance
+     Improvements  and  Functional Enhancements in 4.3BSD,''
+     _U_s_e_n_i_x _C_o_n_f_e_r_e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 519-531, June, 1985.
+
+
+
+
+
+
+
+
+
+
+
+
+                             -9-
+
+
+McKusick86
+     McKusick, M.K., M. Karels, ``A New Virtual  Memory  Im-
+     plementation  for  Berkeley  UNIX,'' _P_r_o_c_e_e_d_i_n_g_s _o_f _t_h_e
+     _E_u_r_o_p_e_a_n _U_N_I_X _U_s_e_r_s _G_r_o_u_p _M_e_e_t_i_n_g, Manchester, England,
+     pp. 451-460, September 1986.
+
+
+McKusick88
+     McKusick,  M.K.,  M. Karels, ``Design of a General Pur-
+     pose Memory Allocator for  the  4.3BSD  UNIX  Kernel,''
+     _U_s_e_n_i_x _C_o_n_f_e_r_e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 295-303, June, 1988.
+
+
+Rifkin86
+     Rifkin, A.P., M.P. Forbes, R.L. Hamilton, M. Sabrio, S.
+     Shah, K. Yueh, ``RFS Architectural  Overview,''  _U_s_e_n_i_x
+     _C_o_n_f_e_r_e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 248-259, June, 1986.
+
+
+Rodriguez86
+     Rodriguez,  R., M. Koehler, R. Hyde, ``The Generic File
+     System,'' _U_s_e_n_i_x _C_o_n_f_e_r_e_n_c_e _P_r_o_c_e_e_d_i_n_g_s,  pp.  260-269,
+     June, 1986.
+
+
+Sandberg85
+     Sandberg,  R.,  D.  Goldberg,  S. Kleiman, D. Walsh, B.
+     Lyon, ``Design and Implementation of  the  Sun  Network
+     File   System,''  _U_s_e_n_i_x  _C_o_n_f_e_r_e_n_c_e  _P_r_o_c_e_e_d_i_n_g_s,  pp.
+     119-130, June, 1985.
+
+
+Satyanarayanan85
+     Satyanarayanan, M., _e_t _a_l_., ``The ITC Distributed  File
+     System:  Principles  and Design,'' _P_r_o_c_. _1_0_t_h _S_y_m_p_o_s_i_u_m
+     _o_n _O_p_e_r_a_t_i_n_g _S_y_s_t_e_m_s _P_r_i_n_c_i_p_l_e_s, pp. 35-50, ACM, Decem-
+     ber, 1985.
+
+
+Steiner88
+     Steiner, J., C. Newman, J. Schiller, ``_K_e_r_b_e_r_o_s_: An Au-
+     thentication Service for Open Network Systems,'' _U_s_e_n_i_x
+     _C_o_n_f_e_r_e_n_c_e _P_r_o_c_e_e_d_i_n_g_s, pp. 191-202, February, 1988.
+
+
+Walker85
+     Walker,  B.J.  and  S.H. Kiser, ``The LOCUS Distributed
+     File System,'' _T_h_e _L_O_C_U_S _D_i_s_t_r_i_b_u_t_e_d  _S_y_s_t_e_m  _A_r_c_h_i_t_e_c_-
+     _t_u_r_e,  G.J.  Popek and B.J. Walker, ed., The MIT Press,
+     Cambridge, MA, 1985.
+
+
+Weinberger84
+     Weinberger,  P.J.,  ``The  Version   8   Network   File
+
+
+
+
+
+
+
+
+
+                            -10-
+
+
+     System,'' _U_s_e_n_i_x _C_o_n_f_e_r_e_n_c_e _p_r_e_s_e_n_t_a_t_i_o_n, June, 1984.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

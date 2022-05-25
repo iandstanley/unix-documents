@@ -1,0 +1,1386 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      −−MMEE RREEFFEERREENNCCEE MMAANNUUAALL
+
+                          _R_e_l_e_a_s_e _2_._2_9
+
+
+                         _E_r_i_c _P_. _A_l_l_m_a_n_*
+
+                         Project INGRES
+                 Electronics Research Laboratory
+               University of California, Berkeley
+                   Berkeley, California  94720
+
+
+
+
+
+     This document describes in extremely terse form the features
+of the −−mmee macro package for version seven NROFF/TROFF.  Some fa‐
+miliarity is assumed  with  those  programs.   Specifically,  the
+reader  should  understand breaks, fonts, pointsizes, the use and
+definition of number registers and strings, how to define macros,
+and  scaling factors for ens, points, vv’s (vertical line spaces),
+etc.
+
+     For a more casual  introduction  to  text  processing  using
+NROFF, refer to the document _W_r_i_t_i_n_g _P_a_p_e_r_s _w_i_t_h _N_R_O_F_F _u_s_i_n_g _−_m_e_.
+
+     There are a number of macro parameters that may be adjusted.
+Fonts may be set to a font number only.  Font 8 means  bold  font
+in  TROFF;  in NROFF font 8 is underlined unless the −−rrbb33 flag is
+specified to use “true bold” font (most versions of NROFF do  not
+interpret  bold font nicely).  Font 0 is no font change; the font
+of the surrounding text is used instead.  Notice that fonts 0 and
+8  are “pseudo‐fonts”; that is, they are simulated by the macros.
+This means that although it is legal to set a  font  register  to
+zero  or eight, it is not legal to use the escape character form,
+such as:
+
+    \f8
+
+
+     All distances are in basic units, so  it  is  nearly  always
+necessary  to  use a scaling factor.  For example, the request to
+set the paragraph indent to eight one‐en spaces is:
+____________________
+   *Author’s  current  address:  Computer Science Division, EECS,
+University of California, Berkeley, California 94720.
+   †NROFF and TROFF may be trademarks of AT&T Bell Laboratories.
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                     UUSSDD::2200‐‐11
+
+
+
+
+
+
+
+UUSSDD::2200‐‐22                                     −−mmee RReeffeerreennccee MMaannuuaall
+
+
+    .nr pi 8n
+
+and not
+
+    .nr pi 8
+
+which would set the paragraph indent to  eight  basic  units,  or
+about  0.02 inch.  Default parameter values are given in brackets
+in the remainder of this document.
+
+     Registers and strings of the form $$_x may be used in  expres‐
+sions  but  should not be changed.  Macros of the form $$_x perform
+some function (as described) and may be redefined to change  this
+function.  This may be a sensitive operation; look at the body of
+the original macro before changing it.
+
+     All names in −me follow a rigid naming convention.  The user
+may  define  number registers, strings, and macros, provided that
+s/he uses single character upper case names or  double  character
+names  consisting  of letters and digits, with at least one upper
+case letter.  In no case should special  characters  be  used  in
+user‐defined names.
+
+     On  daisy wheel type printers in twelve pitch, the −−rrxx11 flag
+can be stated to make lines default to one eighth inch (the  nor‐
+mal spacing for a newline in twelve‐pitch).  This is normally too
+small for easy readability, so the default is to space one  sixth
+inch.
+
+     The  −−rrvv22 flag will indicates that this _i_s being output on a
+C/A/T phototypesetter; this changes the page offset  and  inserts
+cut marks.
+
+     This documentation was NROFF’ed
+
+on  October  28,  2021  and  applies  to  version 2.29 of the −me
+macros.
+
+11..  PPaarraaggrraapphhiinngg
+
+     These macros are used to  begin  paragraphs.   The  standard
+paragraph  macro  is  ..pppp; the others are all variants to be used
+for special purposes.
+
+     The first call to one of the paragraphing macros defined  in
+this  section or the ..sshh macro (defined in the next session) _i_n_i_‐
+_t_i_a_l_i_z_e_s the macro processor.  After  initialization  it  is  not
+possible  to use any of the following requests: ..sscc, ..lloo, ..tthh, or
+..aacc.  Also, the effects of changing parameters which will have  a
+global  effect on the format of the page (notably page length and
+header and footer margins) are not well  defined  and  should  be
+avoided.
+
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                     UUSSDD::2200‐‐33
+
+
+..llpp            Begin left‐justified paragraph.  Centering and un‐
+               derlining are turned off if they were on, the font
+               is  set to \\nn((ppff [1] the type size is set to \\nn((pppp
+               [10p], and a \\nn((ppss space is  inserted  before  the
+               paragraph [0.35v in TROFF, 1v or 0.5v in NROFF de‐
+               pending on device resolution].  The indent is  re‐
+               set  to  \\nn(($$ii [0] plus \\nn((ppoo [0] unless the para‐
+               graph is inside a display.  (see ..bbaa).   At  least
+               the  first two lines of the paragraph are kept to‐
+               gether on a page.
+
+..pppp            Like ..llpp, except that it puts \\nn((ppii [5n] units  of
+               indent.  This is the standard paragraph macro.
+
+..iipp_ _T_ _I        Indented  paragraph with hanging tag.  The body of
+               the following paragraph is indented _I  spaces  (or
+               \\nn((iiii [5n] spaces if _I is not specified) more than
+               a non‐indented paragraph (such as  with  ..pppp)  is.
+               The  title  _T  is exdented (opposite of indented).
+               The result is a paragraph with an even  left  edge
+               and _T printed in the margin.  Any spaces in _T must
+               be unpaddable.  If _T will not  fit  in  the  space
+               provided, ..iipp will start a new line.
+
+..nnpp            A  variant  of .ip which numbers paragraphs.  Num‐
+               bering is reset after a ..llpp,  ..pppp,  or  ..sshh.   The
+               current paragraph number is in \\nn(($$pp.
+
+..bbuu            Like  ..nnpp  except  that paragraphs are marked with
+               bullets (•).  Leading space is eliminated to  cre‐
+               ate compact lists.
+
+22..  SSeeccttiioonn HHeeaaddiinnggss
+
+     Numbered  sections  are  similar to paragraphs except that a
+section number is automatically generated for each one.  The sec‐
+tion  numbers are of the form 11..22..33.  The _d_e_p_t_h of the section is
+the count of numbers (separated by decimal points) in the section
+number.
+
+     Unnumbered section headings are similar, except that no num‐
+ber is attached to the heading.
+
+..sshh_ _+_N_ _T_ _a_ _b_ _c _dBe_egi_fn numbered section of depth _N.  If _N is  miss‐
+               ing  the  current  depth (maintained in the number
+               register \\nn(($$00) is used.  The values of the  indi‐
+               vidual  parts of the section number are maintained
+               in \\nn(($$11 through \\nn(($$66.  There  is  a  \\nn((ssss  [1v]
+               space  before the section.  _T is printed as a sec‐
+               tion title in font \\nn((ssff [8] and size \\nn((sspp [10p].
+               The  “name”  of  the  section  may be accessed via
+               \\**(($$nn.  If \\nn((ssii is non‐zero, the base  indent  is
+               set  to  \\nn((ssii  times  the  section depth, and the
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐44                                     −−mmee RReeffeerreennccee MMaannuuaall
+
+
+               section title is exdented.  (See ..bbaa.)   Also,  an
+               additional  indent  of  \\nn((ssoo  [0] is added to the
+               section title (but not to the  body  of  the  sec‐
+               tion).   The  font  is  then  set to the paragraph
+               font, so that more information may  occur  on  the
+               line  with  the section number and title.  ..sshh in‐
+               sures that there is enough room to print the  sec‐
+               tion head plus the beginning of a paragraph (about
+               3 lines total).  If _a through _f are specified, the
+               section  number  is set to that number rather than
+               incremented automatically.  If any of _a through  _f
+               are  a hyphen that number is not reset.  If _T is a
+               single underscore (“_”) then the section depth and
+               numbering is reset, but the base indent is not re‐
+               set and nothing is printed out.  This is useful to
+               automatically   coordinate  section  numbers  with
+               chapter numbers.
+
+..ssxx_ _+_N         Go to section depth _N [−−11], but do not  print  the
+               number and title, and do not increment the section
+               number at level _N.  This has the effect of  start‐
+               ing a new paragraph at level _N.
+
+..uuhh_ _T          Unnumbered   section  heading.   The  title  _T  is
+               printed with the same  rules  for  spacing,  font,
+               etc., as for ..sshh.
+
+..$$pp_ _T_ _B_ _N      Print  section  heading.   May be redefined to get
+               fancier headings.  _T is the title  passed  on  the
+               ..sshh  or ..uuhh line; _B is the section number for this
+               section, and _N  is  the  depth  of  this  section.
+               These  parameters  are not always present; in par‐
+               ticular, ..sshh passes all three, ..uuhh passes only the
+               first, and ..ssxx passes three, but the first two are
+               null strings.  Care should be taken if this  macro
+               is redefined; it is quite complex and subtle.
+
+..$$00_ _T_ _B_ _N      This  macro  is  called  automatically after every
+               call to ..$$pp.  It is normally undefined, but may be
+               used to automatically put every section title into
+               the table of contents or for  some  similar  func‐
+               tion.   _T is the section title for the section ti‐
+               tle which was just printed, _B is the section  num‐
+               ber, and _N is the section depth.
+
+..$$11_ −_ ..$$66      Traps  called just before printing that depth sec‐
+               tion.  May be defined to (for example) give  vari‐
+               able  spacing  before  sections.  These macros are
+               called from ..$$pp, so if you redefine that macro you
+               may lose this feature.
+
+
+
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                     UUSSDD::2200‐‐55
+
+
+33..  HHeeaaddeerrss aanndd FFooootteerrss
+
+     Headers  and  footers are put at the top and bottom of every
+page automatically.  They are set in  font  \\nn((ttff  [3]  and  size
+\\nn((ttpp  [10p].  Each of the definitions apply as of the _n_e_x_t page.
+Three‐part titles must be quoted if there are two blanks adjacent
+anywhere in the title or more than eight blanks total.
+
+     The  spacing  of headers and footers are controlled by three
+number registers.  \\nn((hhmm [4v] is the distance from the top of the
+page  to  the  top of the header, \\nn((ffmm [3v] is the distance from
+the bottom of the page to the bottom of the footer, \\nn((ttmm [7v] is
+the distance from the top of the page to the top of the text, and
+\\nn((bbmm [6v] is the distance from the bottom of  the  page  to  the
+bottom  of the text (nominal).  The macros ..mm11, ..mm22, ..mm33, and ..mm44
+are also supplied for compatibility with ROFF documents.
+
+..hhee_ _´_l_´_m_´_r_´    Define three‐part header, to be printed on the top
+               of every page.
+
+..ffoo_ _´_l_´_m_´_r_´    Define  footer, to be printed at the bottom of ev‐
+               ery page.
+
+..eehh_ _´_l_´_m_´_r_´    Define header, to be printed at the top  of  every
+               even‐numbered page.
+
+..oohh_ _´_l_´_m_´_r_´    Define  header,  to be printed at the top of every
+               odd‐numbered page.
+
+..eeff_ _´_l_´_m_´_r_´    Define footer, to be printed at the bottom of  ev‐
+               ery even‐numbered page.
+
+..ooff_ _´_l_´_m_´_r_´    Define  footer, to be printed at the bottom of ev‐
+               ery odd‐numbered page.
+
+..hhxx            Suppress headers and footers on the next page.
+
+..mm11_ _+_N         Set the space between the top of the page and  the
+               header [4v].
+
+..mm22_ _+_N         Set  the  space  between  the header and the first
+               line of text [2v].
+
+..mm33_ _+_N         Set the space between the bottom of the  text  and
+               the footer [2v].
+
+..mm44_ _+_N         Set the space between the footer and the bottom of
+               the page [4v].
+
+..eepp            End this page, but do not  begin  the  next  page.
+               Useful  for  forcing out footnotes, but other than
+               that hardly every used.  Must be followed by a ..bbpp
+               or the end of input.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐66                                     −−mmee RReeffeerreennccee MMaannuuaall
+
+
+..$$hh            Called  at every page to print the header.  May be
+               redefined  to  provide  fancy  (e.g.,  multi‐line)
+               headers,  but  doing  so loses the function of the
+               ..hhee, ..ffoo, ..eehh, ..oohh, ..eeff, and ..ooff requests, as well
+               as the chapter‐style title feature of ..++cc.
+
+..$$ff            Print footer; same comments apply as in ..$$hh.
+
+..$$HH            A  normally undefined macro which is called at the
+               top of each page (after putting  out  the  header,
+               initial  saved  floating  keeps,  etc.);  in other
+               words, this macro  is  called  immediately  before
+               printing  text on a page.  It can be used for col‐
+               umn headings and the like.
+
+44..  DDiissppllaayyss
+
+     All displays except centered blocks  and  block  quotes  are
+preceded  and  followed  by an extra \\nn((bbss [same as \\nn((ppss] space.
+Quote spacing is stored in a separate register;  centered  blocks
+have  no default initial or trailing space.  The vertical spacing
+of all displays except quotes and centered blocks  is  stored  in
+register \\nn(($$RR instead of \\nn(($$rr.
+
+..((ll_ _m_ _f        Begin  list.   Lists  are  single spaced, unfilled
+               text.  If _f is FF, the list will be filled.   If  _m
+               [II]  is II the list is indented by \\nn((bbii [4m]; if MM
+               the list is indented to the left margin; if LL  the
+               list  is  left  justified with respect to the text
+               (different from MM only if the base indent  (stored
+               in  \\nn(($$ii and set with ..bbaa) is not zero); and if CC
+               the list is centered on a line‐by‐line basis.  The
+               list is set in font \\nn((ddff [0].  Must be matched by
+               a ..))ll.  This macro is almost like ..((bb except  that
+               no  attempt  is  made  to  keep the display on one
+               page.
+
+..))ll            End list.
+
+..((qq            Begin  major  quote.   These  are  single  spaced,
+               filled,  moved  in  from the text on both sides by
+               \\nn((qqii [4n], preceded and followed by  \\nn((qqss  [same
+               as  \\nn((bbss]  space, and are set in point size \\nn((qqpp
+               [one point smaller than surrounding text].
+
+..))qq            End major quote.
+
+..((bb_ _m_ _f        Begin block.  Blocks are a form of _k_e_e_p, where the
+               text  of  a  keep  is kept together on one page if
+               possible (keeps are useful for tables and  figures
+               which  should  not be broken over a page).  If the
+               block will not fit on the current page a new  page
+               is  begun, _u_n_l_e_s_s that would leave more than \\nn((bbtt
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                     UUSSDD::2200‐‐77
+
+
+               [0] white space at the bottom  of  the  text.   If
+               \\nn((bbtt  is  zero,  the  threshold feature is turned
+               off.  Blocks are not filled unless _f  is  FF,  when
+               they are filled.  The block will be left‐justified
+               if _m is LL, indented by \\nn((bbii [4m] if _m is II or ab‐
+               sent, centered (line‐for‐line) if _m is CC, and left
+               justified to the margin (not to the  base  indent)
+               if _m is MM.  The block is set in font \\nn((ddff [0].
+
+..))bb            End block.
+
+..((zz_ _m_ _f        Begin  floating  keep.   Like  ..((bb except that the
+               keep is _f_l_o_a_t_e_d to the bottom of the page  or  the
+               top  of  the  next  page.  Therefore, its position
+               relative to the text changes.  The  floating  keep
+               is  preceded  and  followed  by  \\nn((zzss [1v] space.
+               Also, it defaults to mode MM.
+
+..))zz            End floating keep.
+
+..((cc            Begin centered block.  The next keep  is  centered
+               as a block, rather than on a line‐by‐line basis as
+               with ..((bb CC.  This call may be nested inside keeps.
+
+..))cc            End centered block.
+
+55..  AAnnnnoottaattiioonnss
+
+..((dd            Begin delayed text.  Everything in the  next  keep
+               is  saved  for  output later with ..ppdd, in a manner
+               similar to footnotes.
+
+..))dd_ _n          End delayed text.  The delayed text number  regis‐
+               ter \\nn(($$dd and the associated string \\**## are incre‐
+               mented if \\**## has been referenced.
+
+..ppdd            Print delayed text.  Everything diverted  via  ..((dd
+               is  printed  and truncated.  This might be used at
+               the end of each chapter.
+
+..((ff            Begin footnote.   The  text  of  the  footnote  is
+               floated  to the bottom of the page and set in font
+               \\nn((ffff [1] and size \\nn((ffpp [8p].  Each entry is pre‐
+               ceded  by  \\nn((ffss  [0.2v]  space, is indented \\nn((ffii
+               [3n] on the first line, and is indented \\nn((ffuu  [0]
+               from  the  right margin.  Footnotes line up under‐
+               neath two column output.  If the text of the foot‐
+               note  will not all fit on one page it will be car‐
+               ried over to the next page.
+
+..))ff_ _n          End footnote.  The number register \\nn(($$ff  and  the
+               associated string \\**** are incremented if they have
+               been referenced.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐88                                     −−mmee RReeffeerreennccee MMaannuuaall
+
+
+..$$ss            The macro to output the footnote separator.   This
+               macro may be redefined to give other size lines or
+               other types of separators.  Currently it  draws  a
+               1.5i line.
+
+..((xx_ _x          Begin index entry.  Index entries are saved in the
+               index _x [xx] until called up with ..xxpp..  Each  entry
+               is  preceded  by a \\nn((xxss [0.2v] space.  Each entry
+               is “undented” by \\nn((xxuu [0.5i]; this register tells
+               how  far  the  page  number extends into the right
+               margin.
+
+..))xx_ _P_ _A        End index entry.  The index entry is finished with
+               a row of dots with _A [null] right justified on the
+               last line (such as for an author’s name), followed
+               by  P  [\\nn%%].  If _A is specified, _P must be speci‐
+               fied; \\nn%% can be used to print  the  current  page
+               number.  If _P is an underscore, no page number and
+               no row of dots are printed.
+
+..xxpp_ _x          Print index _x [xx].  The index is formatted in  the
+               font,  size, and so forth in effect at the time it
+               is printed, rather than at the  time  it  is  col‐
+               lected.
+
+66..  CCoolluummnneedd OOuuttppuutt
+
+..22cc_ _+_S_ _N       Enter  two‐column  mode.  The column separation is
+               set to _+_S [4n, 0.5i in ACM mode] (saved in \\nn(($$ss).
+               The  column  width,  calculated to fill the single
+               column line length with both columns, is stored in
+               \\nn(($$ll.   The  current column is in \\nn(($$cc.  You can
+               test register \\nn(($$mm [1] to see if you are in  sin‐
+               gle  column  or double column mode.  Actually, the
+               request enters _N [2] column output.
+
+..11cc            Revert to single‐column mode.
+
+..bbcc            Begin column.  This is like ..bbpp except that it be‐
+               gins a new column on a new page only if necessary,
+               rather than forcing a whole new page if  there  is
+               another column left on the current page.
+
+77..  FFoonnttss aanndd SSiizzeess
+
+..sszz_ _+_P         The  pointsize  is  set  to  _P [10p], and the line
+               spacing is set proportionally.  The ratio of  line
+               spacing  to pointsize is stored in \\nn(($$rr.  The ra‐
+               tio used internally by displays and annotations is
+               stored  in  \\nn(($$RR  (although  this  is not used by
+               ..sszz).  This size is _n_o_t sticky beyond many macros:
+               in  particular,  \\nn((pppp (paragraph pointsize) modi‐
+               fies the pointsize every time a new  paragraph  is
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                     UUSSDD::2200‐‐99
+
+
+               begun using the ..pppp, ..llpp, ..iipp, ..nnpp, or ..bbuu macros.
+               Also, \\nn((ffpp  (footnote  pointsize),  \\nn((qqpp  (quote
+               pointsize),  \\nn((sspp (section header pointsize), and
+               \\nn((ttpp (title pointsize) may modify the pointsize.
+
+..rr_ _W_ _X         Set _W in roman font, appending _X in  the  previous
+               font.   To append different font requests, use _X =
+               \\cc.  If no parameters, change to roman font.
+
+..ii_ _W_ _X         Set _W in italics,  appending  _X  in  the  previous
+               font.   If  no  parameters, change to italic font.
+               Underlines in NROFF.
+
+..bb_ _W_ _X         Set _W in bold font and append _X  in  the  previous
+               font.   If no parameters, switch to bold font.  In
+               NROFF, underlines.
+
+..rrbb_ _W_ _X        Set _W in bold font and append _X  in  the  previous
+               font.  If no parameters, switch to bold font.  ..rrbb
+               differs from ..bb in that ..rrbb does not underline  in
+               NROFF.
+
+..uu_ _W_ _X         Underline  _W  and append _X.  This is a true under‐
+               lining, as  opposed  to  the  ..uull  request,  which
+               changes  to  “underline  font” (usually italics in
+               TROFF).  It won’t work right if  _W  is  spread  or
+               broken (including hyphenated).  In other words, it
+               is safe in nofill mode only.
+
+..qq_ _W_ _X         Quote _W and append _X.  In  NROFF  this  just  sur‐
+               rounds  _W  with  double  quote marks (‘""’), but in
+               TROFF uses directed quotes.
+
+..bbii_ _W_ _X        Set _W in bold italics  and  append  _X.   Actually,
+               sets _W in italic and overstrikes once.  Underlines
+               in NROFF.  It won’t work right if _W is  spread  or
+               broken (including hyphenated).  In other words, it
+               is safe in nofill mode only.
+
+..bbxx_ _W_ _X        Sets _W in a box, with _X appended.   Underlines  in
+               NROFF.  It won’t work right if _W is spread or bro‐
+               ken (including hyphenated).  In other words, it is
+               safe in nofill mode only.
+
+ssmm_ _W_ _X         Sets _W in a smaller pointsize, with _X appended.
+
+88..  RRooffff SSuuppppoorrtt
+
+..iixx_ _+_N         Indent, no break.  Equivalent to ´´iinn _N.
+
+..bbll_ _N          Leave  _N  contiguous white space, on the next page
+               if not enough room on this page.  Equivalent to  a
+               ..sspp _N inside a block.
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐1100                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+..ppaa_ _+_N         Equivalent to ..bbpp.
+
+..rroo            Set  page number in roman numerals.  Equivalent to
+               ..aaff %% ii.
+
+..aarr            Set page number in Arabic.  Equivalent to ..aaff %% 11.
+
+..nn11            Number lines in margin from one on each page.
+
+..nn22_ _N          Number lines from _N, stop if _N = 0.
+
+..sskk            Leave the next output page blank, except for head‐
+               ers  and footers.  This is used to leave space for
+               a full‐page diagram which is  produced  externally
+               and pasted in later.  To get a partial‐page paste‐
+               in display, say ..ssvv _N, where _N is  the  amount  of
+               space  to leave; this space will be output immedi‐
+               ately if there is room, and will otherwise be out‐
+               put  at  the  top  of  the next page.  However, be
+               warned: if _N is greater than the amount of  avail‐
+               able space on an empty page, no space will ever be
+               output.
+
+99..  PPrreepprroocceessssoorr SSuuppppoorrtt
+
+..EEQQ_ _m_ _T        Begin equation.  The equation is centered if _m  is
+               CC  or  omitted, indented \\nn((bbii [4m] if _m is II, and
+               left justified if _m is LL.  _T is a title printed on
+               the  right margin next to the equation.  See _T_y_p_e_‐
+               _s_e_t_t_i_n_g _M_a_t_h_e_m_a_t_i_c_s _− _U_s_e_r_’_s  _G_u_i_d_e  by  Brian  W.
+               Kernighan and Lorinda L. Cherry.
+
+..EENN_ _c          End equation.  If _c is CC the equation must be con‐
+               tinued by immediately following with another  ..EEQQ,
+               the  text of which can be centered along with this
+               one.  Otherwise, the equation is  printed,  always
+               on  one  page,  with  \\nn((eess  [0.5v in TROFF, 1v in
+               NROFF] space above and below it.
+
+..TTSS_ _h          Table start.  Tables are single spaced and kept on
+               one  page  if possible.  If you have a large table
+               which will not fit on one page, use _h = HH and fol‐
+               low  the  header part (to be printed on every page
+               of the table) with a ..TTHH.  See _T_b_l _− _A _P_r_o_g_r_a_m  _t_o
+               _F_o_r_m_a_t _T_a_b_l_e_s by M. E. Lesk.
+
+..TTHH            With ..TTSS HH, ends the header portion of the table.
+
+..TTEE            Table  end.   Note that this table does not float,
+               in fact, it is not even guaranteed to stay on  one
+               page  if  you  use requests such as ..sspp intermixed
+               with the text of the table.  If  you  want  it  to
+               float  (or  if you use requests inside the table),
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                    UUSSDD::2200‐‐1111
+
+
+               surround the entire table (including the  ..TTSS  and
+               ..TTEE requests) with the requests ..((zz and ..))zz.
+
+..PPSS_ _h_ _w        Begin  _p_i_c  picture.  _H is the height and _w is the
+               width, both in basic units.  _D_i_t_r_o_f_f only.
+
+..PPEE            End picture.
+
+..IISS            Begin _i_d_e_a_l picture.
+
+..IIEE            End _i_d_e_a_l picture.
+
+..IIFF            End _i_d_e_a_l picture (alternate form).
+
+GGSS             Begin _g_r_e_m_l_i_n picture.
+
+GGEE             End _g_r_e_m_l_i_n picture.
+
+GGFF             End _g_r_e_m_l_i_n picture (alternate form).
+
+1100..  MMiisscceellllaanneeoouuss
+
+..rree            Reset tabs.  Set to every 0.5i in TROFF and  every
+               0.8i in NROFF.
+
+..bbaa_ _+_N         Set  the  base  indent to _+_N [0] (saved in \\nn(($$ii).
+               All paragraphs, sections, and  displays  come  out
+               indented by this amount.  Titles and footnotes are
+               unaffected.  The ..sshh request performs  a  ..bbaa  re‐
+               quest  if \\nn((ssii [0] is not zero, and sets the base
+               indent to \\nn((ssii**\\nn(($$00.
+
+..xxll_ _+_N         Set the line length to  _N  [6.0i].   This  differs
+               from ..llll because it only affects the current envi‐
+               ronment.
+
+..llll_ _+_N         Set line length in all environments to  _N  [6.0i].
+               This  should  not  be used after output has begun,
+               and particularly not in  two‐column  output.   The
+               current line length is stored in \\nn(($$ll.
+
+..hhll            Draws  a  horizontal  line the length of the page.
+               This is useful inside floating keeps to  differen‐
+               tiate between the text and the figure.
+
+..llhh            Print  a letterhead at the current position on the
+               page.  The format of the letterhead  must  be  de‐
+               fined  in  the  file  //uussrr//lliibb//mmee//lleetttteerrhheeaadd..mmee by
+               your local systems staff.  Some  environments  may
+               require  _d_i_t_r_o_f_f  for this macro to function prop‐
+               erly.
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐1122                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+..lloo            This  macro  loads  another  set  of  macros   (in
+               //uussrr//lliibb//mmee//llooccaall..mmee)  which  is  intended to be a
+               set  of  locally  defined  macros.   These  macros
+               should all be of the form ..**_X, where _X is any let‐
+               ter (upper or lower case) or digit.
+
+1111..  SSttaannddaarrdd PPaappeerrss
+
+..ttpp            Begin title page.  Spacing at the top of the  page
+               can occur, and headers and footers are suppressed.
+               Also, the page number is not incremented for  this
+               page.
+
+..tthh            Set  thesis  mode.  This defines the modes accept‐
+               able for a doctoral dissertation at Berkeley.   It
+               double  spaces,  defines the header to be a single
+               page number, and changes the  margins  to  be  1.5
+               inch on the left and one inch on the top.  ..++++ and
+               ..++cc should be used with it.  This  macro  must  be
+               stated  before initialization, that is, before the
+               first call of a paragraphing macro or ..sshh.
+
+..++++_ _m_ _H        This request defines  the  section  of  the  paper
+               which  we  are  entering.  The section type is de‐
+               fined by _m.  CC means  that  we  are  entering  the
+               chapter  portion of the paper, AA means that we are
+               entering the appendix  portion  of  the  paper,  PP
+               means  that  the  material following should be the
+               preliminary portion (abstract, table of  contents,
+               etc.)   portion of the paper, AABB means that we are
+               entering the abstract (numbered independently from
+               1 in Arabic numerals), and BB means that we are en‐
+               tering the bibliographic portion at the end of the
+               paper.   Also, the variants RRCC and RRAA are allowed,
+               which specify renumbering of pages from one at the
+               beginning  of  each  chapter  or appendix, respec‐
+               tively.  The _H parameter defines the  new  header.
+               If  there  are any spaces in it, the entire header
+               must be quoted.  If you want the  header  to  have
+               the chapter number in it, Use the string \\\\\\\\nn((cchh.
+               For example, to number appendixes AA..11  etc.,  type
+               ..++++ RRAA ´´´´´´\\\\\\\\nn((cchh..%%´´.  Each section (chapter, ap‐
+               pendix, etc.)  should be preceded by the  ..++cc  re‐
+               quest.   It  should be mentioned that it is easier
+               when using TROFF to put the front material at  the
+               end  of  the  paper, so that the table of contents
+               can be collected and put out;  this  material  can
+               then  be  physically moved to the beginning of the
+               paper.
+
+..++cc_ _T          Begin chapter with title _T.  The chapter number is
+               maintained in \\nn((cchh.  This register is incremented
+               every time ..++cc is called with  a  parameter.   The
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                    UUSSDD::2200‐‐1133
+
+
+               title  and chapter number are printed by ..$$cc.  The
+               header is moved to the footer on the first page of
+               each chapter.  If _T is omitted, ..$$cc is not called;
+               this is useful for doing your own “title page”  at
+               the  beginning  of  papers  without  a  title page
+               proper.  ..$$cc calls ..$$CC as a hook so  that  chapter
+               titles  can  be  inserted into a table of contents
+               automatically.  The footnote numbering is reset to
+               one.
+
+..$$cc_ _T          Print  chapter  number  (from  \\nn((cchh) and _T.  This
+               macro can be redefined to your liking.  It is  de‐
+               fined by default to be acceptable for a PhD thesis
+               at Berkeley.  This macro calls $$CC,  which  can  be
+               defined to make index entries, or whatever.
+
+..$$CC_ _K_ _N_ _T      This macro is called by ..$$cc.  It is normally unde‐
+               fined, but can be used to automatically insert in‐
+               dex  entries, or whatever.  _K is a keyword, either
+               “Chapter” or  “Appendix”  (depending  on  the  ..++++
+               mode);  _N is the chapter or appendix number, and _T
+               is the chapter or appendix title.
+
+..aacc_ _A_ _N        This macro (short for ..aaccmm) sets up the NROFF  en‐
+               vironment  for  camera‐ready papers as used by the
+               ACM.  This format is 25% larger, and has no  head‐
+               ers or footers.  The author’s name _A is printed at
+               the bottom of the page (but  off  the  part  which
+               will  be  printed  in the conference proceedings),
+               together with the current page number and the  to‐
+               tal  number  of pages _N.  Additionally, this macro
+               loads the file //uussrr//lliibb//mmee//aaccmm..mmee, which may later
+               be augmented with other macros useful for printing
+               papers for ACM conferences.  It  should  be  noted
+               that this macro will not work correctly in version
+               7 TROFF, since it sets the page length wider  than
+               the  physical  width  of the C/A/T phototypesetter
+               roll.
+
+1122..  PPrreeddeeffiinneedd SSttrriinnggss
+
+\\****            Footnote number, actually \\**{{\\nn(($$ff\\**}}.  This macro
+               is incremented after each call to ..))ff.
+
+\\**##            Delayed text number.  Actually [\\nn(($$dd].
+
+\\**{{            Superscript.   This  string  gives upward movement
+               and a change to a smaller point size if  possible,
+               otherwise  it  gives  the  left  bracket character
+               (‘[[’).  Extra space is left above the line to  al‐
+               low room for the superscript.
+
+
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐1144                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+\\**}}            Unsuperscript.   Inverse  to \\**{{.  For example, to
+               produce a superscript  you  might  type  xx\\**{{22\\**}},
+               which will produce xx22.
+
+\\**<<            Subscript.   Defaults  to ‘<’ if half‐carriage mo‐
+               tion not possible.  Extra space is left below  the
+               line to allow for the subscript.
+
+\\**>>            Inverse to \\**<<.
+
+\\**((ddww          The day of the week, as a word.
+
+\\**((mmoo          The month, as a word.
+
+\\**((ttdd          Today’s  date, directly printable.  The date is of
+               the form June 1, 1994.  Other forms  of  the  date
+               can  be used by using \\nn((ddyy (the day of the month;
+               for example, 22, \\**((mmoo (as noted above)  or  \\nn((mmoo
+               (the  same, but as an ordinal number; for example,
+               December is 12, and \\nn((yyrr (the last two digits  of
+               the current year).
+
+\\**((llqq          Left quote marks.  Double quote in NROFF.
+
+\\**((rrqq          Right quote.
+
+\\**−−            ¾ em dash in TROFF; two hyphens in NROFF.
+
+1133..  SSppeecciiaall CChhaarraacctteerrss aanndd MMaarrkkss
+
+     There  are  a  number  of special characters and diacritical
+marks (such as accents)  available  through  −me.   To  reference
+these characters, you must call the macro ..sscc to define the char‐
+acters before using them.
+
+..sscc            Define special characters and  diacritical  marks,
+               as  described  in  the  remainder of this section.
+               This macro must be stated  before  initialization.
+               The special characters available are listed below.
+                   Name           Usage      Example
+                   Acute accent   \*´  a\*´  a´
+                   Grave accent   \*`  e\*`  e`
+                   Umlat          \*:  u\*:  u..
+                   Tilde          \*~  n\*~  n~
+                   Caret          \*^  e\*^  e^
+                   Cedilla        \*,  c\*,  c,
+                   Czech          \*v  e\*v  ev
+                   Circle         \*o  A\*o  A°
+                   There exists   \*(qe      ———│
+                   For all        \*(qa      \/—
+
+
+
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                    UUSSDD::2200‐‐1155
+
+
+AAcckknnoowwlleeddggmmeennttss
+
+     I  would like to thank Bob Epstein, Bill Joy, and Larry Rowe
+for having the courage to use the −me macros to produce non‐triv‐
+ial  papers  during  the  development  stages; Ricki Blau, Pamela
+Humphrey, and Jim Joyce for their  help  with  the  documentation
+phase; peter kessler for numerous complaints, most accompanied by
+fixes; and the plethora of people who have contributed ideas  and
+have given support for the project.
+
+SSuummmmaarryy
+
+     This  alphabetical  list summarizes all macros, strings, and
+number registers available in the  −me  macros.   Selected  _t_r_o_f_f
+commands,  registers,  and  functions are included as well; those
+listed can generally be used with impunity.
+
+     The columns are the name of the command, macro, register, or
+string; the type of the object, and the description.  Types are MM
+for macro or builtin command (invoked with ..  or ´´ in  the  first
+input  column),  SS for a string (invoked with \\** or \\**((), RR for a
+number register (invoked with \\nn or  \\nn((),  and  FF  for  a  _t_r_o_f_f
+builtin  function  (invoked  by  preceding it with a single back‐
+slash).
+
+     Lines marked with § are _t_r_o_f_f internal codes.  Lines  marked
+with  † or ‡ may be defined by the user to get special functions;
+‡ indicates that these are defined by default and  changing  them
+may  have  unexpected side effects.  Lines marked with ° are spe‐
+cific to _d_i_t_r_o_f_f (device‐independent _t_r_o_f_f).
+
+    NAME      TYPE  DESCRIPTION
+    \(space)  F§    unpaddable space
+    \"        F§    comment (to end of line)
+    \*#       S     optional delayed text tag string
+    \$_N       F§    interpolate argument _N
+    \n($0     R     section depth
+    .$0       M†    invoked after section title printed
+    \n($1     R     first section number
+    .$1       M†    invoked before printing depth 1 section
+    \n($2     R     second section number
+    .$2       M†    invoked before printing depth 2 section
+    \n($3     R     third section number
+    .$3       M†    invoked before printing depth 3 section
+    \n($4     R     fourth section number
+    .$4       M†    invoked before printing depth 4 section
+    \n($5     R     fifth section number
+    .$5       M†    invoked before printing depth 5 section
+    \n($6     R     sixth section number
+    .$6       M†    invoked before printing depth 6 section
+    .$C       M†    called at beginning of chapter
+    .$H       M†    text header
+    \n($R     R‡    relative vertical spacing in displays
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐1166                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+    NAME      TYPE  DESCRIPTION
+    \n($c     R     current column number
+    .$c       M‡    print chapter title
+    \n($d     R     delayed text number
+    \n($f     R     footnote number
+    .$f       M‡    print footer
+    .$h       M‡    print header
+    \n($i     R     paragraph base indent
+    \n($l     R     column width
+    \n($m     R     number of columns in effect
+    \*($n     S     section name
+    \n($p     R     numbered paragraph number
+    .$p       M‡    print section heading (internal macro)
+    \n($r     R‡    relative vertical spacing in text
+    \n($s     R     column indent
+    .$s       M‡    footnote separator (from text)
+    \n%       R§    current page number
+    \&        F§    zero width character, useful for hiding controls
+    \(_x_x      F§    interpolate special character _x_x
+    .(b       M     begin block
+    .(c       M     begin centered block
+    .(d       M     begin delayed text
+    .(f       M     begin footnote
+    .(l       M     begin list
+    .(q       M     begin quote
+    .(x       M     begin index entry
+    .(z       M     begin floating keep
+    .)b       M     end block
+    .)c       M     end centered block
+    .)d       M     end delayed text
+    .)f       M     end footnote
+    .)l       M     end list
+    .)q       M     end quote
+    .)x       M     end index entry
+    .)z       M     end floating keep
+    \*_x       F§    interpolate string _x
+    \*(_x_x     F§    interpolate string _x_x
+    \**       S     optional footnote tag string
+    .++       M     set paper section type
+    .+c       M     begin chapter
+    \*,       S     cedilla
+    \−        F§    minus sign
+    \*−       S     3/4 em dash
+    \0        F§    unpaddable digit‐width space
+    .1c       M     revert to single column output
+    .2c       M     begin two column output
+    \*:       S     umlat
+    \*<       S     begin subscript
+    \*>       S     end subscript
+    .EN       M     end equation
+    .EQ       M     begin equation
+    \L´_d´     F§    vertical line drawing function for distance _d
+    .GE       M°    end _g_r_e_m_l_i_n picture
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                    UUSSDD::2200‐‐1177
+
+
+    NAME      TYPE  DESCRIPTION
+    .GF       M°    end _g_r_e_m_l_i_n picture (with flyback)
+    .GS       M°    start _g_r_e_m_l_i_n picture
+    .IE       M°    end _i_d_e_a_l picture
+    .IF       M°    end _i_d_e_a_l picture (with flyback)
+    .IS       M°    start _i_d_e_a_l picture
+    .PE       M°    end _p_i_c picture
+    .PF       M°    end _p_i_c picture (with flyback)
+    .PS       M°    start _p_i_c picture
+    .TE       M     end table
+    .TH       M     end header of table
+    .TS       M     begin table
+    \*{       S     begin superscript
+    \n(.$     R§    number of arguments to macro
+    \n(.i     R§    current indent
+    \n(.l     R§    current line length
+    \n(.s     R§    current point size
+    \*(´      S     acute accent
+    \*(`      S     grave accent
+    \(´       F§    acute accent
+    \(`       F§    grave accent
+    \*}       S     end superscript
+    \^        F§    1/12 em narrow space
+    \*^       S     caret
+    .ac       M     ACM mode
+    .ad       M§    set text adjustment
+    .af       M§    assign format to register
+    .am       M§    append to macro
+    .ar       M     set page numbers in Arabic
+    .as       M§    append to string
+    .b        M     bold font
+    .ba       M     set base indent
+    .bc       M     begin new column
+    .bi       M     bold italic
+    \n(bi     R     display (block) indent
+    .bl       M     blank lines (even at top of page)
+    \n(bm     R     bottom title margin
+    .bp       M§    begin page
+    .br       M§    break (start new line)
+    \n(bs     R     display (block) pre/post spacing
+    \n(bt     R     block keep threshold
+    .bx       M     boxed
+    \c        F§    continue input
+    .ce       M§    center lines
+    \n(ch     R     current chapter number
+    .de       M§    define macro
+    \n(df     R     display font
+    .ds       M§    define string
+    \n(dw     R§    current day of week
+    \*(dw     S     current day of week
+    \n(dy     R§    day of month
+    \e        F§    printable version of \
+    .ef       M     set footer (even numbered pages only)
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐1188                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+    NAME      TYPE  DESCRIPTION
+    .eh       M     set header (even numbered pages only)
+    .el       M§    else part of conditional
+    .ep       M     end page
+    \n(es     R     equation pre/post space
+    \f_f       F§    inline font change to font _f
+    \f(_f_f     F§    inline font change to font _f_f
+    .fc       M§    set field characters
+    \n(ff     R     footnote font
+    .fi       M§    fill output lines
+    \n(fi     R     footnote indent (first line only)
+    \n(fm     R     footer margin
+    .fo       M     set footer
+    \n(fp     R     footnote pointsize
+    \n(fs     R     footnote prespace
+    \n(fu     R     footnote undent (from right margin)
+    \h´_d´     F§    local horizontal motion for distance _d
+    .hc       M§    set hyphenation character
+    .he       M     set header
+    .hl       M     draw horizontal line
+    \n(hm     R     header margin
+    .hx       M     suppress headers and footers on next page
+    .hy       M§    set hyphenation mode
+    .i        M     italic font
+    .ie       M§    conditional with else
+    .if       M§    conditional
+    \n(ii     R     indented paragraph indent
+    .in       M§    indent (transient, use .ba for pervasive)
+    .ip       M     begin indented paragraph
+    .ix       M     indent, no break
+    \l´_d´     F§    horizontal line drawing function for distance _d
+    .lc       M§    set leader repetition character
+    .lh       M°    interpolate local letterhead
+    .ll       M     set line length
+    .lo       M     load local macros
+    .lp       M     begin left justified paragraph
+    \*(lq     S     left quote marks
+    .ls       M§    set multi‐line spacing
+    .m1       M     set space from top of page to header
+    .m2       M     set space from header to text
+    .m3       M     set space from text to footer
+    .m4       M     set space from footer to bottom of page
+    .mc       M§    insert margin character
+    .mk       M§    mark vertical position
+    \n(mo     R§    month of year
+    \*(mo     S     current month
+    \n_x       F§    interpolate number register _x
+    \n(_x_x     F§    interpolate number register _x_x
+    .n1       M     number lines in margin
+    .n2       M     number lines in margin
+    .na       M§    turn off text adjustment
+    .ne       M§    need vertical space
+    .nf       M§    don’t fill output lines
+
+
+
+
+
+
+
+
+
+
+−−mmee RReeffeerreennccee MMaannuuaall                                    UUSSDD::2200‐‐1199
+
+
+    NAME      TYPE  DESCRIPTION
+    .nh       M§    turn off hyphenation
+    .np       M     begin numbered paragraph
+    .nr       M§    set number register
+    .ns       M§    no space mode
+    \*o       S     circle (e.g., for Norse A°)
+    .of       M     set footer (odd numbered pages only)
+    .oh       M     set header (odd numbered pages only)
+    .pa       M     begin page
+    .pd       M     print delayed text
+    \n(pf     R     paragraph font
+    \n(pi     R     paragraph indent
+    .pl       M§    set page length
+    .pn       M§    set next page number
+    .po       M§    page offset
+    \n(po     R     simulated page offset
+    .pp       M     begin paragraph
+    \n(pp     R     paragraph pointsize
+    \n(ps     R     paragraph prespace
+    .q        M     quoted
+    \*(qa     S     for all
+    \*(qe     S     there exists
+    \n(qi     R     quote indent (also shortens line)
+    \n(qp     R     quote pointsize
+    \n(qs     R     quote pre/post space
+    .r        M     roman font
+    .rb       M     real bold font
+    .re       M     reset tabs
+    .rm       M§    remove macro or string
+    .rn       M§    rename macro or string
+    .ro       M     set page numbers in roman
+    \*(rq     S     right quote marks
+    .rr       M§    remove register
+    .rs       M§    restore spacing
+    .rt       M§    return to vertical position
+    \s_S       F§    inline size change to size _S
+    .sc       M     load special characters
+    \n(sf     R     section title font
+    .sh       M     begin numbered section
+    \n(si     R     relative base indent per section depth
+    .sk       M     skip next page
+    .sm       M     set argument in a smaller pointsize
+    .so       M§    source input file
+    \n(so     R     additional section title offset
+    .sp       M§    vertical space
+    \n(sp     R     section title pointsize
+    \n(ss     R     section prespace
+    .sx       M     change section depth
+    .sz       M     set pointsize and vertical spacing
+    .ta       M§    set tab stops
+    .tc       M§    set tab repetition character
+    \*(td     S     today’s date
+    \n(tf     R     title font
+
+
+
+
+
+
+
+
+
+
+UUSSDD::2200‐‐2200                                    −−mmee RReeffeerreennccee MMaannuuaall
+
+
+    NAME      TYPE  DESCRIPTION
+    .th       M     set thesis mode
+    .ti       M§    temporary indent (next line only)
+    .tl       M§    three part title
+    \n(tm     R     top title margin
+    .tp       M     begin title page
+    \n(tp     R     title pointsize
+    .tr       M§    translate
+    .u        M     underlined
+    .uh       M     unnumbered section
+    .ul       M§    underline next line
+    \v´_d´     F§    local vertical motion for distance _d
+    \*v       S     inverted ‘v’ for czeck ‘‘ev’’
+    \w´_S´     F§    return width of string _S
+    .xl       M     set line length (local)
+    .xp       M     print index
+    \n(xs     R     index entry prespace
+    \n(xu     R     index undent (from right margin)
+    \n(yr     R§    year (last two digits only)
+    \n(zs     R     floating keep pre/post space
+    \{        F§    begin conditional group
+    \|        F§    1/6 em narrow space
+    \}        F§    end conditional group
+    \*~       S     tilde
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

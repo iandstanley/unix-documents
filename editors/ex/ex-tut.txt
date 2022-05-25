@@ -1,0 +1,2244 @@
+
+
+
+
+
+
+                        EEddiitt::  AA TTuuttoorriiaall
+
+                           _R_i_c_k_i _B_l_a_u
+
+                           _J_a_m_e_s _J_o_y_c_e
+
+                       Computing Services
+                    University of California
+                   Berkeley, California 94720
+
+
+
+                            _A_B_S_T_R_A_C_T
+
+
+This  narrative  introduction  to the use of the text editor _e_d_i_t
+assumes no prior familiarity with computers or with text editing.
+Its aim is to lead the beginning UNIX† user through the fundamen‐
+tal steps of writing and revising a file of text.  Edit,  a  ver‐
+sion  of  the text editor _e_x_, was designed to provide an informa‐
+tive environment for new and casual users.
+
+     We welcome comments and suggestions about this tutorial  and
+the UNIX documentation in general.
+September 1981
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+───────────
+†UNIX is a trademark of Bell Laboratories.
+
+
+
+
+
+
+
+
+
+USD:11‐2                                         Edit: A Tutorial
+
+
+                            CCoonntteennttss
+
+Introduction   3
+
+Session 1  4
+     Making contact with UNIX   4
+     Logging in  4
+     Asking for _e_d_i_t   4
+     The ‘‘Command not found’’ message   5
+     A summary  5
+     Entering text   5
+     Messages from _e_d_i_t   5
+     Text input mode   6
+     Making corrections   6
+     Writing text to disk   7
+     Signing off  7
+
+Session 2   8
+     Adding more text to the file   8
+     Interrupt   8
+     Making corrections   8
+     Listing what’s in the buffer (p)   9
+     Finding things in the buffer   9
+     The current line   10
+     Numbering lines (nu)   10
+     Substitute command (s)   10
+     Another way to list what’s in the buffer (z)   11
+     Saving the modified text   12
+
+Session 3   13
+     Bringing text into the buffer (e)   13
+     Moving text in the buffer (m)   13
+     Copying lines (copy)   14
+     Deleting lines (d)   14
+     A word or two of caution   15
+     Undo (u) to the rescue   15
+     More about the dot (.) and buffer end ($)   16
+     Moving around in the buffer (+ and −)   16
+     Changing lines (c)   17
+
+Session 4   18
+     Making commands global (g)   18
+     More about searching and substituting   19
+     Special characters   19
+     Issuing UNIX commands from the editor   20
+     Filenames and file manipulation   20
+     The file (f) command   20
+     Reading additional files (r)   21
+     Writing parts of the buffer   21
+     Recovering files   21
+     Other recovery techniques   21
+     Further reading and other information   22
+     Using _e_x   22
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                         USD:11‐3
+
+
+Index   23
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐4                                         Edit: A Tutorial
+
+
+
+                          IInnttrroodduuccttiioonn
+
+     Text editing using a terminal connected to a computer allows
+you to create, modify, and print text easily.  A _t_e_x_t _e_d_i_t_o_r is a
+program that assists you as you create and modify text.  The text
+editor you will learn here is named _e_d_i_t_.   Creating  text  using
+edit  is as easy as typing it on an electric typewriter.  Modify‐
+ing text involves telling the text editor what you want  to  add,
+change,  or delete.  You can review your text by typing a command
+to print the file contents as they are currently.   Another  pro‐
+gram  (which  we do not discuss in this document), a text format‐
+ter, rearranges your text for you into ‘‘finished form.’’
+
+     These lessons assume no prior familiarity with computers  or
+with text editing.  They consist of a series of text editing ses‐
+sions which lead you through the fundamental  steps  of  creating
+and  revising text.  After scanning each lesson and before begin‐
+ning the next, you should try the examples at a terminal to get a
+feeling for the actual process of text editing.  If you set aside
+some time for experimentation, you will soon become familiar with
+using  the computer to write and modify text.  In addition to the
+actual use of the text editor, other features  of  UNIX  will  be
+very  important to your work.  You can begin to learn about these
+other features by reading one of the other tutorials that provide
+a  general introduction to the system.  You will be ready to pro‐
+ceed with this lesson as soon as you are familiar with  (1)  your
+terminal and its special keys, (2) how to login, (3) and the ways
+of correcting typing errors.  Let’s first define some terms:
+
+program     A set of instructions, given  to  the  computer,  de‐
+            scribing  the sequence of steps the computer performs
+            in order to accomplish a  specific  task.   The  task
+            must be specific, such as balancing your checkbook or
+            editing your text.  A general task, such  as  working
+            for  world peace, is something we can all do, but not
+            something we can currently write programs to do.
+
+UNIX        UNIX is a special type of program, called an  operat‐
+            ing  system,  that  supervises  the machinery and all
+            other programs comprising the total computer system.
+
+edit        _e_d_i_t is the name of the UNIX text editor you will  be
+            learning  to  use,  and is a program that aids you in
+            writing or revising text.  Edit was designed for  be‐
+            ginning users, and is a simplified version of an edi‐
+            tor named _e_x_.
+
+file        Each UNIX account is allotted space for the permanent
+            storage  of  information,  such  as programs, data or
+            text.  A file is a logical unit of data, for example,
+            an  essay, a program, or a chapter from a book, which
+            is stored on a computer system.  Once  you  create  a
+            file,  it  is  kept  until you instruct the system to
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                         USD:11‐5
+
+
+            remove it.  You may create a  file  during  one  UNIX
+            session,  end  the session, and return to use it at a
+            later time.  Files contain  anything  you  choose  to
+            write  and store in them.  The sizes of files vary to
+            suit your needs; one file might hold  only  a  single
+            number,  yet  another might contain a very long docu‐
+            ment or program.  The only way  to  save  information
+            from  one  session  to  the  next is to store it in a
+            file, which you will learn in Session 1.
+
+filename    Filenames are used to distinguish one file  from  an‐
+            other,  serving  the  same  purpose  as the labels of
+            manila folders in a file cabinet.  In order to  write
+            or  access information in a file, you use the name of
+            that file in a UNIX command, and the system will  au‐
+            tomatically locate the file.
+
+disk        Files  are  stored on an input/output device called a
+            disk, which looks something like a  stack  of  phono‐
+            graph  records.   Each surface is coated with a mate‐
+            rial similar to that on magnetic recording tape,  and
+            information is recorded on it.
+
+buffer      A  temporary  work  space, made available to the user
+            for the duration of a session  of  text  editing  and
+            used  for  creating  and modifying the text file.  We
+            can think of the  buffer  as  a  blackboard  that  is
+            erased  after each class, where each session with the
+            editor is a class.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐6                                         Edit: A Tutorial
+
+
+
+                            SSeessssiioonn 11
+
+
+MMaakkiinngg ccoonnttaacctt wwiitthh UUNNIIXX
+
+     To use the editor you must first make contact with the  com‐
+puter  by  logging in to UNIX.  We’ll quickly review the standard
+UNIX login procedure for the two ways you can make contact: on  a
+terminal that is directly linked to the computer, or over a tele‐
+phone line where the computer answers your call.
+
+DDiirreeccttllyy‐‐lliinnkkeedd tteerrmmiinnaallss
+
+     Turn on your terminal and press the RETURN key.  You are now
+ready to login.
+
+DDiiaall‐‐uupp tteerrmmiinnaallss
+
+     If your terminal connects with the computer over a telephone
+line, turn on the terminal, dial the system access  number,  and,
+when you hear a high‐pitched tone, place the telephone handset in
+the acoustic coupler, if you are using one.  You are now ready to
+login.
+
+LLooggggiinngg iinn
+
+     The message inviting you to login is:
+
+          login:
+
+
+Type  your  login name, which identifies you to UNIX, on the same
+line as the login message, and press RETURN.  If the terminal you
+are  using  has both upper and lower case, bbee ssuurree yyoouu eenntteerr yyoouurr
+llooggiinn nnaammee iinn lloowweerr ccaassee;; otherwise UNIX  assumes  your  terminal
+has only upper case and will not recognize lower case letters you
+may type.  UNIX types ‘‘login:’’ and you reply  with  your  login
+name, for example ‘‘susan’’:
+
+          login: ssuussaann _(_a_n_d _p_r_e_s_s _t_h_e _R_E_T_U_R_N _k_e_y_)
+
+(In  the  examples,  input you would type appears in bboolldd ffaaccee to
+distinguish it from the responses from UNIX.)
+
+     UNIX will next respond with a request for a password  as  an
+additional  precaution  to prevent unauthorized people from using
+your account.  The password will not appear when you type it,  to
+prevent others from seeing it.  The message is:
+
+          Password:    _(_t_y_p_e _y_o_u_r _p_a_s_s_w_o_r_d _a_n_d _p_r_e_s_s _R_E_T_U_R_N_)
+
+If  any of the information you gave during the login sequence was
+mistyped or incorrect, UNIX will respond with
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                         USD:11‐7
+
+
+          Login incorrect.
+
+          login:
+
+in which case you should start the login process anew.   Assuming
+that you have successfully logged in, UNIX will print the message
+of the day and eventually will present you with a % at the begin‐
+ning  of  a  fresh  line.   The % is the UNIX prompt symbol which
+tells you that UNIX is ready to accept a command.
+
+AAsskkiinngg ffoorr _e_e_d_d_i_i_t_t
+
+     You are ready to tell UNIX that you want to work with  edit,
+the  text  editor.  Now is a convenient time to choose a name for
+the file of text you are about to create.  To begin your  editing
+session,  type eeddiitt followed by a space and then the filename you
+have selected; for example, ‘‘text’’.  After that, press the  RE‐
+TURN key and wait for edit’s response:
+
+          % eeddiitt tteexxtt    _(_f_o_l_l_o_w_e_d _b_y _a _R_E_T_U_R_N_)
+          "text" No such file or directory
+          :
+
+If you typed the command correctly, you will now be in communica‐
+tion with edit.  Edit has set aside a buffer for use as a  tempo‐
+rary  working  space  during your current editing session.  Since
+‘‘text’’ is a new file we are about to create the editor was  un‐
+able to find that file, which it confirms by saying:
+
+          "text" No such file or directory
+
+On the next line appears edit’s prompt ‘‘:’’, announcing that you
+are in _c_o_m_m_a_n_d _m_o_d_e and edit expects a command from you.  You may
+now begin to create the new file.
+
+TThhee ‘‘‘‘CCoommmmaanndd nnoott ffoouunndd’’’’ mmeessssaaggee
+
+     If  you  misspelled  edit  by  typing, say, ‘‘editor’’, this
+might appear:
+
+          % eeddiittoorr
+          editor: Command not found
+          %
+
+Your mistake in calling edit ‘‘editor’’ was treated by UNIX as  a
+request  for  a program named ‘‘editor’’.  Since there is no pro‐
+gram named ‘‘editor’’, UNIX reported that the program  was  ‘‘not
+found’’.   A  new % indicates that UNIX is ready for another com‐
+mand, and you may then enter the correct command.
+
+AA ssuummmmaarryy
+
+     Your exchange with UNIX as you logged in  and  made  contact
+with edit should look something like this:
+
+
+
+
+
+
+
+
+
+USD:11‐8                                         Edit: A Tutorial
+
+
+          login: ssuussaann
+          Password:
+          ... A Message of General Interest ...
+          % eeddiitt tteexxtt
+          "text" No such file or directory
+          :
+
+
+EEnntteerriinngg tteexxtt
+
+     You  may  now  begin entering text into the buffer.  This is
+done by _a_p_p_e_n_d_i_n_g (or adding) text to whatever  is  currently  in
+the  buffer.  Since there is nothing in the buffer at the moment,
+you are appending text to  nothing;  in  effect,  since  you  are
+adding text to nothing you are creating text.  Most edit commands
+have two equivalent forms: a word that suggests what the  command
+does,  and  a  shorter abbreviation of that word.  Many beginners
+find the full command names easier to remember at first, but once
+you  are familiar with editing you may prefer to type the shorter
+abbreviations.  The command to input text is ‘‘append’’.  (It may
+be abbreviated ‘‘a’’.)  Type aappppeenndd and press the RETURN key.
+
+          % eeddiitt tteexxtt
+          :aappppeenndd
+
+
+MMeessssaaggeess ffrroomm _e_e_d_d_i_i_t_t
+
+     If  you  make a mistake in entering a command and type some‐
+thing that edit does not recognize, edit will respond with a mes‐
+sage  intended  to help you diagnose your error.  For example, if
+you misspell the  command  to  input  text  by  typing,  perhaps,
+‘‘add’’  instead  of  ‘‘append’’  or ‘‘a’’, you will receive this
+message:
+
+          :aadddd
+          add: Not an editor command
+          :
+
+When you receive a diagnostic message, check what  you  typed  in
+order  to determine what part of your command confused edit.  The
+message above means  that  edit  was  unable  to  recognize  your
+mistyped  command and, therefore, did not execute it.  Instead, a
+new ‘‘:’’ appeared to let you know that edit is  again  ready  to
+execute a command.
+
+TTeexxtt iinnppuutt mmooddee
+
+     By  giving the command ‘‘append’’ (or using the abbreviation
+‘‘a’’), you entered _t_e_x_t _i_n_p_u_t _m_o_d_e_, also known as  _a_p_p_e_n_d  _m_o_d_e_.
+When  you enter text input mode, edit stops sending you a prompt.
+You will not receive any prompts or error messages while in  text
+input  mode.   You can enter pretty much anything you want on the
+lines.  The lines are transmitted one by one to  the  buffer  and
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                         USD:11‐9
+
+
+held  there  during  the editing session.  You may append as much
+text as you want, and _w_h_e_n _y_o_u _w_i_s_h _t_o _s_t_o_p _e_n_t_e_r_i_n_g  _t_e_x_t  _l_i_n_e_s
+_y_o_u  _s_h_o_u_l_d  _t_y_p_e  _a _p_e_r_i_o_d _a_s _t_h_e _o_n_l_y _c_h_a_r_a_c_t_e_r _o_n _t_h_e _l_i_n_e _a_n_d
+_p_r_e_s_s _t_h_e _R_E_T_U_R_N _k_e_y_.  When you type the period and press RETURN,
+you  signal  that  you  want to stop appending text, and edit re‐
+sponds by allowing you to exit text input mode and  reenter  com‐
+mand  mode.  Edit will again prompt you for a command by printing
+‘‘:’’.
+
+     Leaving append mode does not destroy the text in the buffer.
+You  have  to  leave  append mode to do any of the other kinds of
+editing, such as changing, adding, or printing text.  If you type
+a  period  as the first character and type any other character on
+the same line, edit will believe you want  to  remain  in  append
+mode  and will not let you out.  As this can be very frustrating,
+be sure to type oonnllyy the period and the RETURN key.
+
+     This is a good place to learn an important lesson about com‐
+puters  and  text:  a blank space is a character as far as a com‐
+puter is concerned.  If you so much as type a period followed  by
+a  blank  (that  is,  type a period and then the space bar on the
+keyboard), you will remain in append mode with the last  line  of
+text being:
+
+          ..
+
+Let’s  say that you enter the lines (try to type eexxaaccttllyy what you
+see, including ‘‘thiss’’):
+
+          TThhiiss iiss ssoommee ssaammppllee tteexxtt..
+          AAnndd tthhiissss iiss ssoommee mmoorree tteexxtt..
+          TTeexxtt eeddiittiinngg iiss ssttrraannggee,, bbuutt nniiccee..
+          ..
+
+The last line is the period followed by a RETURN  that  gets  you
+out of append mode.
+
+MMaakkiinngg ccoorrrreeccttiioonnss
+
+     If  you  have  read a general introduction to UNIX, you will
+recall that it is possible to erase individual letters  that  you
+have  typed.  This is done by typing the designated erase charac‐
+ter as many times as there are characters you want to erase.
+
+     The usual erase character varies from  place  to  place  and
+user  to user.  Often it is the backspace (control‐H), so you can
+correct typing errors in the line you are typing by holding  down
+the  CTRL key and typing the ‘‘H’’ key.  (Sometimes it is the DEL
+key.)  If you type the erase character you will notice  that  the
+terminal  backspaces  in  the line you are on.  You can backspace
+over your error, and then type what you want to be  the  rest  of
+the line.
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐10                                        Edit: A Tutorial
+
+
+     If  you  make  a bad start in a line and would like to begin
+again, you can either backspace to the beginning of the  line  or
+you can use the at‐sign ‘‘@’’ to erase everything on the line:
+
+          TTeexxtt eeddttiiiinngg iiss ssttrraannggee,, bbuutt@@
+          TTeexxtt eeddiittiinngg iiss ssttrraannggee,, bbuutt nniiccee..
+
+When you type the at‐sign (@), you erase the entire line typed so
+far and are given a fresh line to type on.  You  may  immediately
+begin to retype the line.  This, unfortunately, does not work af‐
+ter you type the line and press RETURN.  To make  corrections  in
+lines  that have been completed, it is necessary to use the edit‐
+ing commands covered in the next sessions.
+
+WWrriittiinngg tteexxtt ttoo ddiisskk
+
+     You are now ready to edit the text.  One common operation is
+to  write  the  text  to disk as a file for safekeeping after the
+session is over.  This is the only way to save  information  from
+one  session  to the next, since the editor’s buffer is temporary
+and will last only until the end of the editing session.   Learn‐
+ing  how  to write a file to disk is second in importance only to
+entering the text.  To write the contents of the buffer to a disk
+file, use the command ‘‘write’’ (or its abbreviation ‘‘w’’):
+
+          :wwrriittee
+
+Edit will copy the contents of the buffer to a disk file.  If the
+file does not yet exist, a new file will be created automatically
+and  the  presence of a ‘‘[New file]’’ will be noted.  The newly‐
+created file will be given the name specified  when  you  entered
+the editor, in this case ‘‘text’’.  To confirm that the disk file
+has been successfully written, edit will repeat the filename  and
+give  the  number  of lines and the total number of characters in
+the file.  The buffer remains unchanged by the ‘‘write’’ command.
+All  of  the lines that were written to disk will still be in the
+buffer, should you want to modify or add to them.
+
+     Edit must have a name for the file to be  written.   If  you
+forgot  to  indicate the name of the file when you began to edit,
+edit will print in response to your write command:
+
+          No current filename
+
+If this happens, you can specify the filename in a new write com‐
+mand:
+
+          :wwrriittee tteexxtt
+
+After the ‘‘write’’ (or ‘‘w’’), type a space and then the name of
+the file.
+
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐11
+
+
+SSiiggnniinngg ooffff
+
+     We have done enough for this first lesson on using the  UNIX
+text  editor, and are ready to quit the session with edit.  To do
+this we type ‘‘quit’’ (or ‘‘q’’) and press RETURN:
+
+          :wwrriittee
+          "text" [New file]  3 lines, 90 characters
+          :qquuiitt
+          %
+
+The % is from UNIX to tell you that your  session  with  edit  is
+over  and you may command UNIX further.  Since we want to end the
+entire session at the terminal, we also need to exit  from  UNIX.
+In response to the UNIX prompt of ‘‘%’’ type the command
+
+          %llooggoouutt
+
+This will end your session with UNIX, and will ready the terminal
+for the next user.  It is always important to type llooggoouutt at  the
+end  of  a  session to make absolutely sure no one could acciden‐
+tally stumble into your abandoned session and thus gain access to
+your files, tempting even the most honest of souls.
+
+
+     This is the end of the first session on UNIX text editing.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐12                                        Edit: A Tutorial
+
+
+                            SSeessssiioonn 22
+
+
+
+     Login with UNIX as in the first session:
+
+          login: ssuussaann  _(_c_a_r_r_i_a_g_e _r_e_t_u_r_n_)
+          Password:       _(_g_i_v_e _p_a_s_s_w_o_r_d _a_n_d _c_a_r_r_i_a_g_e _r_e_t_u_r_n_)
+
+          ... A Message of General Interest ...
+          %
+
+When  you  indicate you want to edit, you can specify the name of
+the file you worked on last time.  This will start edit  working,
+and  it  will  fetch the contents of the file into the buffer, so
+that you can resume editing the same file.  When edit has  copied
+the  file  into  the buffer, it will repeat its name and tell you
+the number of lines and characters it contains.  Thus,
+
+          %% eeddiitt tteexxtt
+          "text" 3 lines, 90 characters
+          :
+
+means you asked edit to fetch the file named ‘‘text’’  for  edit‐
+ing,  causing  it to copy the 90 characters of text into the buf‐
+fer.  Edit awaits your further instructions, and  indicates  this
+by its prompt character, the colon (:).  In this session, we will
+append more text to our file, print the contents of  the  buffer,
+and learn to change the text of a line.
+
+AAddddiinngg mmoorree tteexxtt ttoo tthhee ffiillee
+
+     If  you  want to add more to the end of your text you may do
+so by using the append command to enter text  input  mode.   When
+‘‘append’’  is  the  first  command  of your editing session, the
+lines you enter are placed at the end of the buffer.  Here  we’ll
+use the abbreviation for the append command, ‘‘a’’:
+
+          :aa
+          TThhiiss iiss tteexxtt aaddddeedd iinn SSeessssiioonn 22..
+          IItt ddooeessnn’’tt mmeeaann mmuucchh hheerree,, bbuutt
+          iitt ddooeess iilllluussttrraattee tthhee eeddiittoorr..
+          ..
+
+You  may  recall  that once you enter append mode using the ‘‘a’’
+(or ‘‘append’’) command, you need to type a line containing  only
+a period (.)  to exit append mode.
+
+IInntteerrrruupptt
+
+     Should  you  press  the  RUB key (sometimes labelled DELETE)
+while working with edit, it will send this message to you:
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐13
+
+
+          Interrupt
+          :
+
+Any command that edit might be executing is terminated by rub  or
+delete, causing edit to prompt you for a new command.  If you are
+appending text at the time, you will exit from append mode and be
+expected to give another command.  The line of text you were typ‐
+ing when the append command was interrupted will not  be  entered
+into the buffer.
+
+MMaakkiinngg ccoorrrreeccttiioonnss
+
+     If  while  typing  the line you hit an incorrect key, recall
+that you may delete the incorrect character or cancel the  entire
+line  of  input by erasing in the usual way.  Refer either to the
+last few pages of Session 1 if you need to review the  procedures
+for  making a correction.  The most important idea to remember is
+that erasing a character or cancelling a line must be done before
+you press the RETURN key.
+
+LLiissttiinngg wwhhaatt’’ss iinn tthhee bbuuffffeerr ((pp))
+
+     Having  appended  text  to  what you wrote in Session 1, you
+might want to see all the lines in the buffer.  To print the con‐
+tents of the buffer, type the command:
+
+          :11,,$$pp
+
+The ‘‘1’’† stands for line 1 of the buffer, the ‘‘$’’ is  a  spe‐
+cial  symbol  designating  the last line of the buffer, and ‘‘p’’
+(or pprriinntt) is the command to print from line 1 to the end of  the
+buffer.  The command ‘‘1,$p’’ gives you:
+
+          This is some sample text.
+          And thiss is some more text.
+          Text editing is strange, but nice.
+          This is text added in Session 2.
+          It doesn’t mean much here, but
+          it does illustrate the editor.
+
+Occasionally, you may accidentally type a character that can’t be
+printed, which can be done by striking a key while the  CTRL  key
+is  pressed.   In printing lines, edit uses a special notation to
+show the existence of non‐printing characters.  Suppose  you  had
+introduced the non‐printing character ‘‘control‐A’’ into the word
+‘‘illustrate’’ by accidently pressing the CTRL key  while  typing
+‘‘a’’.   This  can  happen on many terminals because the CTRL key
+and the ‘‘A’’ key are beside each other.  If your finger  presses
+between the two keys, control‐A results.  When asked to print the
+contents of the buffer, edit would display
+
+───────────
+†The  numeral  ‘‘one’’  is  the top left‐most key, and
+should not be confused with the letter ‘‘el’’.
+
+
+
+
+
+
+
+
+
+USD:11‐14                                        Edit: A Tutorial
+
+
+          it does illustr^Ate the editor.
+
+To represent the control‐A,  edit  shows  ‘‘^A’’.   The  sequence
+‘‘^’’  followed  by a capital letter stands for the one character
+entered by holding down the CTRL key and typing the letter  which
+appears  after  the  ‘‘^’’.  We’ll soon discuss the commands that
+can be used to correct this typing error.
+
+     In looking over the text we see that ‘‘this’’  is  typed  as
+‘‘thiss’’  in the second line, a deliberate error so we can learn
+to make corrections.  Let’s correct the spelling.
+
+FFiinnddiinngg tthhiinnggss iinn tthhee bbuuffffeerr
+
+     In order to change something in the buffer we first need  to
+find  it.   We  can find ‘‘thiss’’ in the text we have entered by
+looking at a listing  of  the  lines.   Physically  speaking,  we
+search the lines of text looking for ‘‘thiss’’ and stop searching
+when we have found it.  The way to tell edit to search for  some‐
+thing is to type it inside slash marks:
+
+          ://tthhiissss//
+
+By  typing  //tthhiissss//  and  pressing  RETURN,  you instruct edit to
+search for ‘‘thiss’’.  If you ask edit to look for a  pattern  of
+characters  which  it  cannot find in the buffer, it will respond
+‘‘Pattern not found’’.  When edit finds the characters ‘‘thiss’’,
+it will print the line of text for your inspection:
+
+          And thiss is some more text.
+
+Edit is now positioned in the buffer at the line it just printed,
+ready to make a change in the line.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐15
+
+
+TThhee ccuurrrreenntt lliinnee
+
+     Edit keeps track of the line in the buffer where it  is  lo‐
+cated  at  all  times during an editing session.  In general, the
+line that has been most recently printed, entered, or changed  is
+the  current  location  in the buffer.  The editor is prepared to
+make changes at the current location in the  buffer,  unless  you
+direct it to another location.
+
+     In  particular,  when  you bring a file into the buffer, you
+will be located at the last line in the file,  where  the  editor
+left  off copying the lines from the file to the buffer.  If your
+first editing command is ‘‘append’’,  the  lines  you  enter  are
+added  to  the end of the file, after the current line — the last
+line in the file.
+
+     You can refer to your current location in the buffer by  the
+symbol period (.) usually known by the name ‘‘dot’’.  If you type
+‘‘.’’ and carriage return you will be instructing edit  to  print
+the current line:
+
+          :..
+          And thiss is some more text.
+
+
+     If  you want to know the number of the current line, you can
+type ..== and press RETURN, and edit will  respond  with  the  line
+number:
+
+          :..==
+          2
+
+If  you  type  the number of any line and press RETURN, edit will
+position you at that line and print its contents:
+
+          :22
+          And thiss is some more text.
+
+You should experiment with these commands to gain  experience  in
+using them to make changes.
+
+NNuummbbeerriinngg lliinneess ((nnuu))
+
+     The nnuummbbeerr ((nnuu)) command is similar to print, giving both the
+number and the text of each printed line.  To see the number  and
+the text of the current line type
+
+          :nnuu
+               2  And thiss is some more text.
+
+Note  that  the  shortest  abbreviation for the number command is
+‘‘nu’’ (and not ‘‘n’’, which is used for  a  different  command).
+You  may specify a range of lines to be listed by the number com‐
+mand in the same way that lines are  specified  for  print.   For
+
+
+
+
+
+
+
+
+
+USD:11‐16                                        Edit: A Tutorial
+
+
+example,  11,,$$nnuu  lists  all lines in the buffer with their corre‐
+sponding line numbers.
+
+SSuubbssttiittuuttee ccoommmmaanndd ((ss))
+
+     Now that you have found the misspelled word, you can  change
+it  from  ‘‘thiss’’  to  ‘‘this’’.   As far as edit is concerned,
+changing things is a matter of substituting  one  thing  for  an‐
+other.   As  _a  stood for _a_p_p_e_n_d_, so _s stands for _s_u_b_s_t_i_t_u_t_e_.  We
+will use the abbreviation ‘‘s’’ to reduce the chance of mistyping
+the  substitute command.  This command will instruct edit to make
+the change:
+
+          22ss//tthhiissss//tthhiiss//
+
+We first indicate the line to be changed, line 2, and  then  type
+an ‘‘s’’ to indicate we want edit to make a substitution.  Inside
+the first set of slashes are  the  characters  that  we  want  to
+change,  followed  by  the characters to replace them, and then a
+closing slash mark.  To summarize:
+
+          2s/ _w_h_a_t _i_s _t_o _b_e _c_h_a_n_g_e_d / _w_h_a_t _t_o _c_h_a_n_g_e _i_t _t_o /
+
+If edit finds an exact match of the characters to be  changed  it
+will  make the change oonnllyy in the first occurrence of the charac‐
+ters.  If it does not find the characters to be changed, it  will
+respond:
+
+          Substitute pattern match failed
+
+indicating that your instructions could not be carried out.  When
+edit does find the characters that you want to  change,  it  will
+make  the  substitution and automatically print the changed line,
+so that you can check that the correct substitution was made.  In
+the example,
+
+          :22ss//tthhiissss//tthhiiss//
+          And this is some more text.
+
+line  2  (and  line  2  only) will be searched for the characters
+‘‘thiss’’, and when the first exact  match  is  found,  ‘‘thiss’’
+will  be changed to ‘‘this’’.  Strictly speaking, it was not nec‐
+essary above to specify  the number of the line  to  be  changed.
+In
+
+          :ss//tthhiissss//tthhiiss//
+
+edit  will  assume  that  we mean to change the line where we are
+currently located (‘‘.’’).  In this case, the command  without  a
+line  number  would have produced the same result because we were
+already located at the line we wished to change.
+
+     For another illustration of the substitute command,  let  us
+choose the line:
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐17
+
+
+          Text editing is strange, but nice.
+
+You  can  make  this  line  a bit more positive by taking out the
+characters ‘‘strange, but ’’ so the line reads:
+
+          Text editing is nice.
+
+A command that will first position edit at the desired  line  and
+then make the substitution is:
+
+          ://ssttrraannggee//ss//ssttrraannggee,, bbuutt ////
+
+
+What  we  have done here is combine our search with our substitu‐
+tion.  Such combinations are perfectly legal, and speed up  edit‐
+ing  quite  a bit once you get used to them.  That is, you do not
+necessarily have to use line numbers to identify a line to  edit.
+Instead,  you  may identify the line you want to change by asking
+edit to search for a specified pattern of letters that occurs  in
+that line.  The parts of the above command are:
+
+          //ssttrraannggee//          tells edit to find the characters ‘‘strange’’ in the text
+          ss                  tells edit to make a substitution
+          //ssttrraannggee,, bbuutt ////   substitutes nothing at all for the characters ‘‘strange, but ’’
+
+
+     You  should  note the space after ‘‘but’’ in ‘‘/strange, but
+/’’.  If you do not indicate that the space is to be  taken  out,
+your line will read:
+
+          Text editing is  nice.
+
+which  looks  a  little  funny because of the extra space between
+‘‘is’’ and ‘‘nice’’.  Again, we realize from this  that  a  blank
+space  is  a real character to a computer, and in editing text we
+need to be aware of spaces within a line  just  as  we  would  be
+aware of an ‘‘a’’ or a ‘‘4’’.
+
+AAnnootthheerr wwaayy ttoo lliisstt wwhhaatt’’ss iinn tthhee bbuuffffeerr ((zz))
+
+     Although the print command is useful for looking at specific
+lines in the buffer, other commands may be  more  convenient  for
+viewing large sections of text.  You can ask to see a screen full
+of text at a time by using the command zz..  If you type
+
+          :11zz
+
+edit will start with line 1 and continue printing lines, stopping
+either  when the screen of your terminal is full or when the last
+line in the buffer has been printed.  If you  want  to  read  the
+next segment of text, type the command
+
+          :zz
+
+
+
+
+
+
+
+
+
+
+USD:11‐18                                        Edit: A Tutorial
+
+
+If  no  starting line number is given for the z command, printing
+will start at the ‘‘current’’ line, in this case  the  last  line
+printed.   Viewing  lines in the buffer one screen full at a time
+is known as _p_a_g_i_n_g.  Paging can also be used to print  a  section
+of text on a hard‐copy terminal.
+
+SSaavviinngg tthhee mmooddiiffiieedd tteexxtt
+
+     This  seems  to be a good place to pause in our work, and so
+we should end the second session.  If you (in haste)  type  ‘‘q’’
+to quit the session your dialogue with edit will be:
+
+          :qq
+          No write since last change (:quit! overrides)
+          :
+
+This  is  edit’s  warning  that you have not written the modified
+contents of the buffer to disk.  You run the risk of  losing  the
+work  you did during the editing session since you typed the lat‐
+est write command.  Because in this lesson we have not written to
+disk at all, everything we have done would have been lost if edit
+had obeyed the qq command.  If you did not want to save  the  work
+done  during  this editing session, you would have to type ‘‘q!’’
+or (‘‘quit!’’)  to confirm that you indeed wanted to end the ses‐
+sion  immediately,  leaving the file as it was after the most re‐
+cent ‘‘write’’ command.  However, since you want to save what you
+have edited, you need to type:
+
+          :ww
+          "text" 6 lines, 171 characters
+
+and then follow with the commands to quit and logout:
+
+          :qq
+          %% llooggoouutt
+
+and hang up the phone or turn off the terminal when UNIX asks for
+a name.  Terminals connected to the port selector will stop after
+the  logout  command,  and  pressing keys on the keyboard will do
+nothing.
+
+
+     This is the end of the second session on UNIX text editing.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐19
+
+
+                            SSeessssiioonn 33
+
+
+BBrriinnggiinngg tteexxtt iinnttoo tthhee bbuuffffeerr ((ee))
+
+     Login to UNIX and make contact with edit.  You should try to
+login  without  looking at the notes, but if you must then by all
+means do.
+
+     Did you remember to give the name of the file you wanted  to
+edit?  That is, did you type
+
+          % eeddiitt tteexxtt
+
+or simply
+
+          % eeddiitt
+
+Both  ways  get  you in contact with edit, but the first way will
+bring a copy of the file named ‘‘text’’ into the buffer.  If  you
+did  forget  to  tell  edit the name of your file, you can get it
+into the buffer by typing:
+
+          :ee tteexxtt
+          "text" 6 lines, 171 characters
+
+The command eeddiitt,, which may be abbreviated ee, tells edit that you
+want  to  erase  anything that might already be in the buffer and
+bring a copy of the file ‘‘text’’ into the  buffer  for  editing.
+You may also use the edit (e) command to change files in the mid‐
+dle of an editing session, or to give edit the name of a new file
+that  you  want  to  create.  Because the edit command clears the
+buffer, you will receive a warning if you try to edit a new  file
+without  having  saved  a copy of the old file.  This gives you a
+chance to write the contents of the buffer to disk before editing
+the next file.
+
+MMoovviinngg tteexxtt iinn tthhee bbuuffffeerr ((mm))
+
+     Edit  allows  you to move lines of text from one location in
+the buffer to another by means of  the  mmoovvee  (mm)  command.   The
+first  two  examples  are for illustration only, though after you
+have read this Session you are welcome  to  return  to  them  for
+practice.  The command
+
+          :22,,44mm$$
+
+directs  edit  to move lines 2, 3, and 4 to the end of the buffer
+($).  The format for the move command is  that  you  specify  the
+first  line to be moved, the last line to be moved, the move com‐
+mand ‘‘m’’, and the line after which the  moved  text  is  to  be
+placed.  So,
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐20                                        Edit: A Tutorial
+
+
+          :11,,33mm66
+
+would  instruct  edit  to move lines 1 through 3 (inclusive) to a
+location after line 6 in the buffer.  To move only one line, say,
+line  4,  to  a  location in the buffer after line 5, the command
+would be ‘‘4m5’’.
+
+     Let’s move some text using the command:
+
+          :55,,$$mm11
+          2 lines moved
+          it does illustrate the editor.
+
+After executing a command that moves more than one  line  of  the
+buffer,  edit  tells how many lines were affected by the move and
+prints the last moved line for your inspection.  If you  want  to
+see more than just the last line, you can then use the print (p),
+z, or number (nu) command to view more text.  The  buffer  should
+now contain:
+
+          This is some sample text.
+          It doesn’t mean much here, but
+          it does illustrate the editor.
+          And this is some more text.
+          Text editing is nice.
+          This is text added in Session 2.
+
+You can restore the original order by typing:
+
+          :44,,$$mm11
+
+or, combining context searching and the move command:
+
+          ://AAnndd tthhiiss iiss ssoommee//,,//TThhiiss iiss tteexxtt//mm//TThhiiss iiss ssoommee ssaammppllee//
+
+(Do  not  type  both  examples here!)  The problem with combining
+context searching with the move command is that  your  chance  of
+making  a  typing error in such a long command is greater than if
+you type line numbers.
+
+CCooppyyiinngg lliinneess ((ccooppyy))
+
+     The ccooppyy command is used to make a second copy of  specified
+lines,  leaving the original lines where they were.  Copy has the
+same format as the move command, for example:
+
+          :22,,55ccooppyy $$
+
+makes a copy of lines 2 through 5, placing the added lines  after
+the  buffer’s  end ($).  Experiment with the copy command so that
+you can become familiar with how it works.  Note that the  short‐
+est  abbreviation for copy is ccoo (and not the letter ‘‘c’’, which
+has another meaning).
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐21
+
+
+DDeelleettiinngg lliinneess ((dd))
+
+     Suppose you want to delete the line
+
+          This is text added in Session 2.
+
+from the buffer.  If you know  the  number  of  the  line  to  be
+deleted,  you can type that number followed by ddeelleettee or dd.  This
+example deletes line 4, which is ‘‘This is text added in  Session
+2.’’  if you typed the commands suggested so far.
+
+          :44dd
+          It doesn’t mean much here, but
+
+Here  ‘‘4’’  is  the  number  of  the  line  to  be  deleted, and
+‘‘delete’’ or ‘‘d’’ is the command to delete the line.  After ex‐
+ecuting  the delete command, edit prints the line that has become
+the current line (‘‘.’’).
+
+     If you do not happen to know the line number you can  search
+for the line and then delete it using this sequence of commands:
+
+          ://aaddddeedd iinn SSeessssiioonn 22..//
+          This is text added in Session 2.
+          :dd
+          It doesn’t mean much here, but
+
+The  ‘‘/added  in Session 2./’’ asks edit to locate and print the
+line containing the indicated text, starting its  search  at  the
+current  line  and  moving  line by line until it finds the text.
+Once you are sure that you have correctly specified the line  you
+want  to  delete,  you can enter the delete (d) command.  In this
+case it is not necessary to specify  a  line  number  before  the
+‘‘d’’.  If no line number is given, edit deletes the current line
+(‘‘.’’), that is, the line found by our search.  After the  dele‐
+tion, your buffer should contain:
+
+          This is some sample text.
+          And this is some more text.
+          Text editing is nice.
+          It doesn’t mean much here, but
+          it does illustrate the editor.
+          And this is some more text.
+          Text editing is nice.
+          This is text added in Session 2.
+          It doesn’t mean much here, but
+
+To delete both lines 2 and 3:
+
+          And this is some more text.
+          Text editing is nice.
+
+you type
+
+
+
+
+
+
+
+
+
+
+USD:11‐22                                        Edit: A Tutorial
+
+
+          :22,,33dd
+          2 lines deleted
+
+which specifies the range of lines from 2 to 3, and the operation
+on those lines — ‘‘d’’ for delete.  If you delete more  than  one
+line  you  will receive a message telling you the number of lines
+deleted, as indicated in the example above.
+
+     The previous example assumes that you know the line  numbers
+for the lines to be deleted.  If you do not you might combine the
+search command with the delete command:
+
+          ://AAnndd tthhiiss iiss ssoommee//,,//TTeexxtt eeddiittiinngg iiss nniiccee..//dd
+
+
+AA wwoorrdd oorr ttwwoo ooff ccaauuttiioonn
+
+     In using the search function to locate lines to  be  deleted
+you  should be aabbssoolluutteellyy ssuurree the characters you give as the ba‐
+sis for the search will take edit to the line you  want  deleted.
+Edit  will  search  for  the  first  occurrence of the characters
+starting from where you last edited − that is, from the line  you
+see printed if you type dot (.).
+
+     A search based on too few characters may result in the wrong
+lines being deleted, which edit will do as easily as if  you  had
+meant  it.   For  this reason, it is usually safer to specify the
+search and then delete in two separate steps, at least until  you
+become  familiar enough with using the editor that you understand
+how best to specify searches.  For a beginner it  is  not  a  bad
+idea  to double‐check each command before pressing RETURN to send
+the command on its way.
+
+UUnnddoo ((uu)) ttoo tthhee rreessccuuee
+
+     The uunnddoo ((uu)) command has the ability to reverse the  effects
+of  the last command that changed the buffer.  To undo the previ‐
+ous command, type ‘‘u’’ or ‘‘undo’’.  Undo can  rescue  the  con‐
+tents  of  the buffer from many an unfortunate mistake.  However,
+its powers are not unlimited, so it is still wise to  be  reason‐
+ably careful about the commands you give.
+
+     It is possible to undo only commands which have the power to
+change the buffer — for example, delete, append, move, copy, sub‐
+stitute,  and  even undo itself.  The commands write (w) and edit
+(e), which interact with disk files, cannot be  undone,  nor  can
+commands  that do not change the buffer, such as print.  Most im‐
+portantly, the oonnllyy command that can be reversed by undo  is  the
+last  ‘‘undo‐able’’ command you typed.  You can use control‐H and
+@ to change commands while you are typing them, and undo  to  re‐
+verse  the  effect  of the commands after you have typed them and
+pressed RETURN.
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐23
+
+
+     To illustrate, let’s issue an undo command.  Recall that the
+last  buffer‐changing  command we gave deleted the lines formerly
+numbered 2 and 3.  Typing undo at this moment  will  reverse  the
+effects  of  the deletion, causing those two lines to be replaced
+in the buffer.
+
+          :uu
+          2 more lines in file after undo
+          And this is some more text.
+
+Here again, edit informs you if the command affects more than one
+line,  and  prints the text of the line which is now ‘‘dot’’ (the
+current line).
+
+MMoorree aabboouutt tthhee ddoott ((..)) aanndd bbuuffffeerr eenndd (($$))
+
+     The function assumed by the symbol dot depends on  its  con‐
+text.  It can be used:
+
+     1.   to  exit from append mode; we type dot (and only a dot)
+     on a line and press RETURN;
+
+     2.  to refer to the line we are at in the buffer.
+
+Dot can also be combined with the equal sign to get the number of
+the line currently being edited:
+
+          :..==
+
+If  we  type ‘‘..=’’ we are asking for the number of the line, and
+if we type ‘‘..’’ we are asking for the text of the line.
+
+     In this editing session and the last,  we  used  the  dollar
+sign to indicate the end of the buffer in commands such as print,
+copy, and move.  The dollar sign as a command asks edit to  print
+the last line in the buffer.  If the dollar sign is combined with
+the equal sign ($$==) edit will print the line number corresponding
+to the last line in the buffer.
+
+     ‘‘..’’ and ‘‘$’’, then, represent line numbers.  Whenever ap‐
+propriate, these symbols can be used in place of line numbers  in
+commands.  For example
+
+          :..,,$$dd
+
+instructs  edit to delete all lines from the current line (..)  to
+the end of the buffer.
+
+MMoovviinngg aarroouunndd iinn tthhee bbuuffffeerr  ((++ aanndd −−))
+
+     When you are editing you often want to go back and re‐read a
+previous line.  You could specify a context search for a line you
+want to read if you remember some of its text, but if you  simply
+want  to  see  what  was written a few, say 3, lines ago, you can
+
+
+
+
+
+
+
+
+
+USD:11‐24                                        Edit: A Tutorial
+
+
+type
+
+          −3p
+
+This tells edit to move back to a position  3  lines  before  the
+current  line  (.)  and print that line.  You can move forward in
+the buffer similarly:
+
+          +2p
+
+instructs edit to print the line that is 2 ahead of your  current
+position.
+
+     You  may  use  ‘‘+’’ and ‘‘−’’ in any command where edit ac‐
+cepts line numbers.  Line numbers specified with ‘‘+’’  or  ‘‘−’’
+can be combined to print a range of lines.  The command
+
+          :−−11,,++22ccooppyy$$
+
+makes  a  copy of 4 lines:  the current line, the line before it,
+and the two after it.  The copied lines will be placed after  the
+last  line  in the buffer ($), and the original lines referred to
+by ‘‘−1’’ and ‘‘+2’’ remain where they are.
+
+     Try typing only ‘‘−’’; you will move back one line  just  as
+if  you  had typed ‘‘−1p’’.  Typing the command ‘‘+’’ works simi‐
+larly.  You might also try typing a few plus or minus signs in  a
+row  (such  as  ‘‘+++’’)  to  see edit’s response.  Typing RETURN
+alone on a line is the equivalent of typing ‘‘+1p’’; it will move
+you one line ahead in the buffer and print that line.
+
+     If  you  are  at the last line of the buffer and try to move
+further ahead, perhaps by typing a ‘‘+’’  or  a  carriage  return
+alone  on  the line, edit will remind you that you are at the end
+of the buffer:
+
+          At end‐of‐file
+or
+          Not that many lines in buffer
+
+Similarly, if you try to move to  a  position  before  the  first
+line, edit will print one of these messages:
+
+          Nonzero address required on this command
+or
+          Negative address − first buffer line is 1
+
+The  number  associated  with  a  buffer line is the line’s ‘‘ad‐
+dress’’, in that it can be used to locate the line.
+
+CChhaannggiinngg lliinneess ((cc))
+
+     You can also delete certain lines and  insert  new  text  in
+their place.  This can be accomplished easily with the cchhaannggee ((cc))
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐25
+
+
+command.  The change command instructs edit to  delete  specified
+lines  and then switch to text input mode to accept the text that
+will replace them.  Let’s say you want to change  the  first  two
+lines in the buffer:
+
+          This is some sample text.
+          And this is some more text.
+
+to read
+
+          This text was created with the UNIX text editor.
+
+To do so, you type:
+
+          :11,,22cc
+          2 lines changed
+          TThhiiss tteexxtt wwaass ccrreeaatteedd wwiitthh tthhee UUNNIIXX tteexxtt eeddiittoorr..
+          ..
+          :
+
+In  the  command 11,,22cc we specify that we want to change the range
+of lines beginning with 1 and ending with 2 by giving  line  num‐
+bers  as  with  the  print command.  These lines will be deleted.
+After you type RETURN to end the change  command,  edit  notifies
+you  if more than one line will be changed and places you in text
+input mode.  Any text typed on the following lines  will  be  in‐
+serted  into  the position where lines were deleted by the change
+command.  YYoouu wwiillll rreemmaaiinn iinn tteexxtt iinnppuutt mmooddee uunnttiill  yyoouu  eexxiitt  iinn
+tthhee uussuuaall wwaayy,, bbyy ttyyppiinngg aa ppeerriioodd aalloonnee oonn aa lliinnee..  Note that the
+number of lines added to the buffer need not be the same  as  the
+number of lines deleted.
+
+
+     This  is  the  end of the third session on text editing with
+UNIX.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:11‐26                                        Edit: A Tutorial
+
+
+
+                            SSeessssiioonn 44
+
+
+     This lesson covers several topics,  starting  with  commands
+that  apply  throughout the buffer, characters with special mean‐
+ings, and how to issue UNIX commands while in  the  editor.   The
+next  topics  deal  with  files: more on reading and writing, and
+methods of recovering files lost in a crash.  The  final  section
+suggests sources of further information.
+
+MMaakkiinngg ccoommmmaannddss gglloobbaall ((gg))
+
+     One  disadvantage to the commands we have used for searching
+or substituting is that if you have a number of  instances  of  a
+word  to  change it appears that you have to type the command re‐
+peatedly, once for each time the change needs to be made.   Edit,
+however, provides a way to make commands apply to the entire con‐
+tents of the buffer − the gglloobbaall ((gg)) command.
+
+     To print all lines containing a certain sequence of  charac‐
+ters (say, ‘‘text’’) the command is:
+
+          :gg//tteexxtt//pp
+
+The ‘‘g’’ instructs edit to make a global search for all lines in
+the buffer containing the characters  ‘‘text’’.  The ‘‘p’’ prints
+the lines found.
+
+     To  issue a global command, start by typing a ‘‘g’’ and then
+a search pattern identifying the lines to be affected.  Then,  on
+the same line, type the command to be executed for the identified
+lines.  Global substitutions are frequently useful.  For example,
+to  change all instances of the word ‘‘text’’ to the word ‘‘mate‐
+rial’’ the command would be a combination of  the  global  search
+and the substitute command:
+
+          :gg//tteexxtt//ss//tteexxtt//mmaatteerriiaall//gg
+
+Note  the ‘‘g’’ at the end of the global command, which instructs
+edit to change each and every instance  of  ‘‘text’’  to  ‘‘mate‐
+rial’’.   If  you do not type the ‘‘g’’ at the end of the command
+only the _f_i_r_s_t instance of ‘‘text’’ _i_n _e_a_c_h _l_i_n_e will be  changed
+(the  normal result of the substitute command).  The ‘‘g’’ at the
+end of the command is independent of the ‘‘g’’ at the  beginning.
+You may give a command such as:
+
+          :55ss//tteexxtt//mmaatteerriiaall//gg
+
+to  change  every instance of ‘‘text’’ in line 5 alone.  Further,
+neither command will change ‘‘text’’ to ‘‘material’’ if  ‘‘Text’’
+begins with a capital rather than a lower‐case _t_.
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐27
+
+
+     Edit  does  not  automatically print the lines modified by a
+global command.  If you want the lines  to  be  printed,  type  a
+‘‘p’’ at the end of the global command:
+
+          :gg//tteexxtt//ss//tteexxtt//mmaatteerriiaall//ggpp
+
+You  should be careful about using the global command in combina‐
+tion with any other − in essence, be sure of what you are telling
+edit to do to the entire buffer.  For example,
+
+          :gg// //dd
+          72 less lines in file after global
+
+will  delete  every line containing a blank anywhere in it.  This
+could adversely affect your document, since most lines have  spa‐
+ces between words and thus would be deleted.  After executing the
+global command, edit will print a warning if the command added or
+deleted  more  than  one line.  Fortunately, the undo command can
+reverse the effects of a global command.  You  should  experiment
+with  the  global  command on a small file of text to see what it
+can do for you.
+
+MMoorree aabboouutt sseeaarrcchhiinngg aanndd ssuubbssttiittuuttiinngg
+
+     In using slashes to identify a character string that we want
+to search for or change, we have always specified the exact char‐
+acters.  There is a less tedious way to repeat the same string of
+characters.  To change ‘‘text’’ to ‘‘texts’’ we may type either
+
+          ://tteexxtt//ss//tteexxtt//tteexxttss//
+
+as we have done in the past, or a somewhat abbreviated command:
+
+          ://tteexxtt//ss////tteexxttss//
+
+In this example, the characters to be changed are not specified −
+there are no characters, not even a space, between the two  slash
+marks  that indicate what is to be changed.  This lack of charac‐
+ters between the slashes is taken by the editor to mean ‘‘use the
+characters   we  last  searched  for  as  the  characters  to  be
+changed.’’
+
+     Similarly, the last context search may be repeated by typing
+a pair of slashes with nothing between them:
+
+          ://ddooeess//
+          It doesn’t mean much here, but
+          :////
+          it does illustrate the editor.
+
+(You  should  note  that  the search command found the characters
+‘‘does’’ in the word ‘‘doesn’t’’ in the  first  search  request.)
+Because  no  characters  are specified for the second search, the
+editor scans the buffer for the next occurrence of the characters
+
+
+
+
+
+
+
+
+
+USD:11‐28                                        Edit: A Tutorial
+
+
+‘‘does’’.
+
+     Edit  normally searches forward through the buffer, wrapping
+around from the end of the buffer to  the  beginning,  until  the
+specified  character  string  is found.  If you want to search in
+the reverse direction, use question marks (?) instead of  slashes
+to surround the characters you are searching for.
+
+     It  is also possible to repeat the last substitution without
+having to retype the entire command.  An ampersand (&) used as  a
+command  repeats  the  most  recent substitute command, using the
+same search and replacement patterns.  After altering the current
+line by typing
+
+          :ss//tteexxtt//tteexxttss//
+
+you type
+
+          ://tteexxtt//&&
+
+or simply
+
+          :////&&
+
+to make the same change on the next line in the buffer containing
+the characters ‘‘text’’.
+
+SSppeecciiaall cchhaarraacctteerrss
+
+     Two characters have special meanings when used in specifying
+searches:  ‘‘$’’ and ‘‘^’’.  ‘‘$’’ is taken by the editor to mean
+‘‘end of the line’’ and is used to identify strings that occur at
+the end of a line.
+
+          :gg//tteexxtt..$$//ss////mmaatteerriiaall..//pp
+
+tells  the  editor  to  search  for all lines ending in ‘‘text.’’
+(and nothing else, not even a blank space), to change each  final
+‘‘text.’’ to ‘‘material.’’, and print the changed lines.
+
+     The symbol ‘‘^’’ indicates the beginning of a line.  Thus,
+
+          :ss//^^//11.. //
+
+instructs  the  editor to insert ‘‘1.’’ and a space at the begin‐
+ning of the current line.
+
+     The characters ‘‘$’’ and ‘‘^’’ have special meanings only in
+the  context  of  searching.   At  other times, they are ordinary
+characters.  If you ever need to search for a character that  has
+a  special  meaning,  you  must indicate that the character is to
+lose temporarily its special significance by typing another  spe‐
+cial character, the backslash (\), before it.
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐29
+
+
+          :ss//\\\\$$//ddoollllaarr//
+
+looks for the character ‘‘$’’ in the current line and replaces it
+by the word ‘‘dollar’’.  Were it not for the backslash, the ‘‘$’’
+would  have  represented  ‘‘the  end of the line’’ in your search
+rather than the character ‘‘$’’.  The backslash retains its  spe‐
+cial significance unless it is preceded by another backslash.
+
+IIssssuuiinngg UUNNIIXX ccoommmmaannddss ffrroomm tthhee eeddiittoorr
+
+     After  creating  several files with the editor, you may want
+to delete files no longer useful to you or ask for a list of your
+files.   Removing and listing files are not functions of the edi‐
+tor, and so they require the use of UNIX  system  commands  (also
+referred  to  as  ‘‘shell’’ commands, as ‘‘shell’’ is the name of
+the program that processes UNIX commands).  You do  not  need  to
+quit the editor to execute a UNIX command as long as you indicate
+that it is to be sent to the shell for  execution.   To  use  the
+UNIX command rrmm to remove the file named ‘‘junk’’ type:
+
+          :!!rrmm jjuunnkk
+          !
+          :
+
+The  exclamation mark (!)  indicates that the rest of the line is
+to be processed as a shell command.  If the buffer contents  have
+not been written since the last change, a warning will be printed
+before the command is executed:
+
+          [No write since last change]
+
+The editor prints a ‘‘!’’ when the command is  completed.   Other
+tutorials describe useful features of the system, of which an ed‐
+itor is only one part.
+
+FFiilleennaammeess aanndd ffiillee mmaanniippuullaattiioonn
+
+     Throughout each editing session, edit  keeps  track  of  the
+name  of the file being edited as the _c_u_r_r_e_n_t _f_i_l_e_n_a_m_e_.  Edit re‐
+members as the current filename the name given when  you  entered
+the  editor.   The current filename changes whenever the edit (e)
+command is used to specify a new file.  Once edit has recorded  a
+current  filename,  it inserts that name into any command where a
+filename has been omitted.  If a write command does not specify a
+file,  edit,  as we have seen, supplies the current filename.  If
+you are editing a file named ‘‘draft3’’ having 283 lines  in  it,
+you  can have the editor write onto a different file by including
+its name in the write command:
+
+          :ww cchhaapptteerr33
+          "chapter3" [new file] 283 lines, 8698 characters
+
+The current filename remembered by the editor _w_i_l_l _n_o_t _b_e _c_h_a_n_g_e_d
+_a_s  _a  _r_e_s_u_l_t  _o_f  _t_h_e  _w_r_i_t_e  _c_o_m_m_a_n_d_.   Thus, if the next write
+
+
+
+
+
+
+
+
+
+USD:11‐30                                        Edit: A Tutorial
+
+
+command does not specify a name, edit will write onto the current
+file (‘‘draft3’’) and not onto the file ‘‘chapter3’’.
+
+TThhee ffiillee ((ff)) ccoommmmaanndd
+
+     To  ask  for the current filename, type ffiillee (or ff).  In re‐
+sponse, the editor provides current information about the buffer,
+including  the  filename,  your  current  position, the number of
+lines in the buffer, and the percent of the distance through  the
+file your current location is.
+
+          :ff
+          "text" [Modified] line 3 of 4 ‐‐75%‐‐
+
+If  the  contents  of the buffer have changed since the last time
+the file was written, the editor will tell you that the file  has
+been  ‘‘[Modified]’’.  After you save the changes by writing onto
+a disk file, the buffer will no longer be considered modified:
+
+          :ww
+          "text" 4 lines, 88 characters
+          :ff
+          "text" line 3 of 4 ‐‐75%‐‐
+
+
+RReeaaddiinngg aaddddiittiioonnaall ffiilleess ((rr))
+
+     The rreeaadd ((rr)) command allows you to add  the  contents  of  a
+file  to  the buffer at a specified location, essentially copying
+new lines between two existing lines.  To  use  it,  specify  the
+line  after  which the new text will be placed, the rreeaadd ((rr)) com‐
+mand, and then the name of the file.  If you have  a  file  named
+‘‘example’’, the command
+
+          :$$rr eexxaammppllee
+          "example" 18 lines, 473 characters
+
+reads  the  file  ‘‘example’’ and adds it to the buffer after the
+last line.  The current filename is not changed by the read  com‐
+mand.
+
+WWrriittiinngg ppaarrttss ooff tthhee bbuuffffeerr
+
+     The wwrriittee ((ww)) command can write all or part of the buffer to
+a file you specify.  We are already familiar with writing the en‐
+tire  contents  of the buffer to a disk file.  To write only part
+of the buffer onto a file,  indicate  the  beginning  and  ending
+lines before the write command, for example
+
+          :4455,,$$ww eennddiinngg
+
+Here  all lines from 45 through the end of the buffer are written
+onto the file named _e_n_d_i_n_g_.  The lines remain in  the  buffer  as
+part  of  the  document  you are editing, and you may continue to
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐31
+
+
+edit the entire buffer.  Your original file is unaffected by your
+command  to write part of the buffer to another file.  Edit still
+remembers whether you have saved changes to the  buffer  in  your
+original file or not.
+
+RReeccoovveerriinngg ffiilleess
+
+     Although it does not happen very often, there are times UNIX
+stops working because of some  malfunction.   This  situation  is
+known  as a _c_r_a_s_h.  Under most circumstances, edit’s crash recov‐
+ery feature is able to save work to within a few lines of changes
+before a crash (or an accidental phone hang up).  If you lose the
+contents of an editing buffer in a system crash,  you  will  nor‐
+mally  receive mail when you login that gives the name of the re‐
+covered file.  To recover the file, enter the editor and type the
+command  rreeccoovveerr  (rreecc),  followed  by the name of the lost file.
+For example, to recover the buffer for an edit session  involving
+the file ‘‘chap6’’, the command is:
+
+          :rreeccoovveerr cchhaapp66
+
+Recover  is  sometimes  unable to save the entire buffer success‐
+fully, so always check the contents of the saved buffer carefully
+before writing it back onto the original file.  For best results,
+write the buffer to a new file temporarily so you can examine  it
+without risk to the original file.  Unfortunately, you cannot use
+the recover command to retrieve a  file  you  removed  using  the
+shell command rrmm.
+
+OOtthheerr rreeccoovveerryy tteecchhnniiqquueess
+
+     If  something  goes  wrong when you are using the editor, it
+may be possible to save your work by using the  command  pprreesseerrvvee
+(pprree),  which  saves the buffer as if the system had crashed.  If
+you are writing a file  and  you  get  the  message  ‘‘Quota  ex‐
+ceeded’’,  you have tried to use more disk storage than is allot‐
+ted to your account.  _P_r_o_c_e_e_d _w_i_t_h _c_a_u_t_i_o_n because it  is  likely
+that  only  a  part  of the editor’s buffer is now present in the
+file you tried to write.  In this case you should use  the  shell
+escape  from  the editor (!)  to remove some files you don’t need
+and try to write the file again.  If this is not possible and you
+cannot find someone to help you, enter the command
+
+          :pprreesseerrvvee
+
+and wait for the reply,
+
+          File preserved.
+
+If  you do not receive this reply, seek help immediately.  Do not
+simply leave the editor.  If you do, the buffer will be lost, and
+you  may  not  be able to save your file.  If the reply is ‘‘File
+preserved.’’  you can leave the editor (or logout) to remedy  the
+situation.   After  a  preserve,  you can use the recover command
+
+
+
+
+
+
+
+
+
+USD:11‐32                                        Edit: A Tutorial
+
+
+once the problem has been corrected, or the −−rr option of the edit
+command if you leave the editor and want to return.
+
+     If  you  make an undesirable change to the buffer and type a
+write command before discovering your mistake, the modified  ver‐
+sion  will  replace any previous version of the file.  Should you
+ever lose a good version of a document in this way, do not  panic
+and  leave  the  editor.   As long as you stay in the editor, the
+contents of the buffer remain accessible.  Depending on  the  na‐
+ture  of the problem, it may be possible to restore the buffer to
+a more complete state with the undo command.   After  fixing  the
+damaged buffer, you can again write the file to disk.
+
+FFuurrtthheerr rreeaaddiinngg aanndd ootthheerr iinnffoorrmmaattiioonn
+
+     Edit  is  an editor designed for beginning and casual users.
+It is actually a version of a more  powerful  editor  called  _e_x_.
+These lessons are intended to introduce you to the editor and its
+more commonly‐used commands.  We have not covered all of the edi‐
+tor’s commands, but a selection of commands that should be suffi‐
+cient to accomplish most of your editing tasks.  You can find out
+more about the editor in the _E_x _R_e_f_e_r_e_n_c_e _M_a_n_u_a_l_, which is appli‐
+cable to both _e_x and _e_d_i_t_.  One way to become familiar  with  the
+manual  is  to  begin by reading the description of commands that
+you already know.
+
+UUssiinngg _e_e_x_x
+
+     As you become more experienced with using  the  editor,  you
+may  still find that edit continues to meet your needs.  However,
+should you become interested in using _e_x_, it is easy  to  switch.
+To begin an editing session with _e_x_, use the name eexx in your com‐
+mand instead of eeddiitt..
+
+     Edit commands also work in _e_x_, but the  editing  environment
+is  somewhat different.  You should be aware of a few differences
+between _e_x and _e_d_i_t_.  In edit, only the characters ‘‘^’’,  ‘‘$’’,
+and  ‘‘\’’ have special meanings in searching the buffer or indi‐
+cating characters to be changed by a substitute command.  Several
+additional  characters  have special meanings in ex, as described
+in the _E_x _R_e_f_e_r_e_n_c_e _M_a_n_u_a_l_.  Another feature of the edit environ‐
+ment  prevents  users  from  accidently  entering two alternative
+modes of editing, _o_p_e_n and _v_i_s_u_a_l_, in which  the  editor  behaves
+quite  differently from normal command mode.  If you are using ex
+and you encounter strange behavior, you may have  accidently  en‐
+tered  open  mode  by  typing ‘‘o’’.  Type the ESC key and then a
+‘‘Q’’ to get out of open or visual mode and back into the regular
+editor  command  mode.   The  document _A_n _I_n_t_r_o_d_u_c_t_i_o_n _t_o _D_i_s_p_l_a_y
+_E_d_i_t_i_n_g _w_i_t_h _V_i provide full details of visual mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Edit: A Tutorial                                        USD:11‐33
+
+
+
+                              IInnddeexx
+
+
+
+
+addressing, _s_e_e line numbers         +, 17
+ampersand, 20                        −, 17
+append mode, 6‐7                     //, 12, 20
+append (a) command, 6, 7, 9          ??, 20
+‘‘At end of file’’ (message), 18     ., 11, 17
+backslash (\), 21                    .=, 11, 17
+buffer, 3                          entering text, 3, 6‐7
+caret (^), 10, 20                  erasing
+change (c) command, 18               characters (^H), 7
+command mode, 5‐6                    lines (@), 7
+‘‘Command not found’’ (message), 6 error corrections, 7, 16
+context search, 10‐12, 19‐21       ex (text editor), 23
+control characters (‘‘^’’ notation),_E_x10_R_e_f_e_r_e_n_c_e _M_a_n_u_a_l, 23
+control‐H, 7                       exclamation (!), 21
+copy (co) command, 15              file, 3
+corrections, 7, 16                 file (f) command, 21‐22
+current filename, 21               file recovery, 22‐23
+current line (.), 11, 17           filename, 3, 21
+delete (d) command, 15‐16          global (g) command, 19
+dial‐up, 5                         input mode, 6‐7
+disk, 3                            Interrupt (message), 9
+documentation, 3, 23               line numbers, _s_e_e _a_l_s_o current line
+dollar ($), 10, 11, 17, 20‐21        dollar sign ($), 10, 11, 17
+dot (..) 11, 17                       dot (.), 11, 17
+edit (text editor), 3, 5, 23         relative (+ and −), 17
+edit (e) command, 5, 9, 14         list, 10
+editing commands:                  logging in, 4‐6
+  append (a), 6, 7, 9              logging out, 8
+  change (c), 18                   ‘‘Login incorrect’’ (message), 5
+  copy (co), 15                    minus (−), 17
+  delete (d), 15‐16                move (m) command, 14‐15
+  edit (text editor), 3, 5, 23     ‘‘Negative address—first buffer line is 1’’ (message), 18
+  edit (e), 5, 9, 14               ‘‘No current filename’’ (message), 8
+  file (f), 21‐22                  ‘‘No such file or directory’’ (message), 5, 6
+  global (g), 19                   ‘‘No write since last change’’ (message), 21
+  move (m), 14‐15                  non‐printing characters, 10
+  number (nu), 11                  ‘‘Nonzero address required’’ (message), 18
+  preserve (pre), 22‐23            ‘‘Not an editor command’’ (message), 6
+  print (p), 10                    ‘‘Not that many lines in buffer’’ (message), 18
+  quit (q), 8, 13                  number (nu) command, 11
+  read (r), 22                     password, 5
+  recover (rec), 22, 23            period (.), 11, 17
+  substitute (s), 11‐12, 19, 20    plus (+), 17
+  undo (u), 16‐17, 23              preserve (pre) command, 22‐23
+  write (w), 8, 13, 21, 22         print (p) command, 10
+  z, 12‐13                         program, 3
+  ! (shell escape), 21             prompts
+  $=, 17                             % (UNIX), 5
+
+
+
+
+
+
+
+
+
+USD:11‐34                                        Edit: A Tutorial
+
+
+  : (edit), 5, 6, 7
+    (append), 7
+question (?), 20
+quit (q) command, 8, 13
+read (r) command, 22
+recover (rec) command, 22, 23
+recovery, _s_e_e file recovery
+references, 3, 23
+remove (rm) command, 21, 22
+reverse command effects (undo), 16‐17, 23
+searching, 10‐12, 19‐21
+shell, 21
+shell escape (!), 21
+slash (/), 11‐12, 20
+special characters (^, $, \), 10, 11, 17, 20‐21
+substitute (s) command, 11‐12, 19, 20
+terminals, 4‐5
+text input mode, 7
+undo (u) command, 16‐17, 23
+UNIX, 3
+write (w) command, 8, 13, 21, 22
+z command, 12‐13
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

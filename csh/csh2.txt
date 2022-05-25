@@ -1,0 +1,4620 @@
+
+
+
+
+
+
+
+
+
+               AAnn IInnttrroodduuccttiioonn ttoo tthhee CC sshheellll
+
+
+                        _W_i_l_l_i_a_m _J_o_y
+            _(_r_e_v_i_s_e_d _f_o_r _4_._3_B_S_D _b_y _M_a_r_k _S_e_i_d_e_n_)
+                 Computer Science Division
+ Department of Electrical Engineering and Computer Science
+             University of California, Berkeley
+                 Berkeley, California 94720
+
+
+                          _A_B_S_T_R_A_C_T
+
+          _C_s_h is a new command language interpreter for
+     UNIX® systems.  It incorporates good  features  of
+     other  shells  and  a _h_i_s_t_o_r_y mechanism similar to
+     the _r_e_d_o of INTERLISP.  While  incorporating  many
+     features  of other shells which make writing shell
+     programs (shell scripts) easier, most of the  fea‐
+     tures  unique to _c_s_h are designed more for the in‐
+     teractive UNIX user.
+
+          UNIX users who have read a general  introduc‐
+     tion  to the system will find a valuable basic ex‐
+     planation of the shell here.  Simple terminal  in‐
+     teraction  with _c_s_h is possible after reading just
+     the first section of this  document.   The  second
+     section  describes  the shell’s capabilities which
+     you can explore after you have begun to become ac‐
+     quainted with the shell.  Later sections introduce
+     features which are useful, but not  necessary  for
+     all users of the shell.
+
+          Additional  information  includes an appendix
+     listing special characters  of  the  shell  and  a
+     glossary  of terms and commands introduced in this
+     manual.
+
+
+IInnttrroodduuccttiioonn
+
+     A _s_h_e_l_l is a command language interpreter.  _C_s_h is  the
+name  of  one  particular  command interpreter on UNIX.  The
+primary purpose of _c_s_h is to translate command  lines  typed
+at  a  terminal  into  system actions, such as invocation of
+other programs.  _C_s_h is a user program  just  like  any  you
+might  write.   Hopefully, _c_s_h will be a very useful program
+for you in interacting with the UNIX system.
+
+     In addition to this document, you will want to refer to
+a   copy  of  the  UNIX  User  Reference  Manual.   The  _c_s_h
+
+
+
+
+
+
+
+
+
+USD:4‐2                       An Introduction to the C shell
+
+
+documentation in section 1 of the manual provides a full de‐
+scription of all features of the shell and is the definitive
+reference for questions about the shell.
+
+     Many words in  this  document  are  shown  in  _i_t_a_l_i_c_s_.
+These  are  important  words;  names  of commands, and words
+which have special meaning in discussing the shell and UNIX.
+Many  of  the  words are defined in a glossary at the end of
+this document.  If you don’t know what is meant by  a  word,
+you should look for it in the glossary.
+
+AAcckknnoowwlleeddggeemmeennttss
+
+     Numerous people have provided good input about previous
+versions of _c_s_h and aided in its debugging and in the debug‐
+ging of its documentation.  I would especially like to thank
+Michael Ubell who made the crucial observation that  history
+commands could be done well over the word structure of input
+text, and implemented a prototype history  mechanism  in  an
+older version of the shell.  Eric Allman has also provided a
+large number of useful comments on  the  shell,  helping  to
+unify  those  concepts which are present and to identify and
+eliminate useless  and  marginally  useful  features.   Mike
+O’Brien  suggested  the  pathname  hashing  mechanism  which
+speeds command execution.  Jim Kulp added  the  job  control
+and directory stack primitives and added their documentation
+to this introduction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐3
+
+
+11..  TTeerrmmiinnaall uussaaggee ooff tthhee sshheellll
+
+11..11..  TThhee bbaassiicc nnoottiioonn ooff ccoommmmaannddss
+
+     A _s_h_e_l_l in UNIX acts mostly as a medium  through  which
+other  _p_r_o_g_r_a_m_s  are invoked.  While it has a set of _b_u_i_l_t_i_n
+functions which it performs directly,  most  commands  cause
+execution  of  programs  that  are, in fact, external to the
+shell.  The shell is thus distinguished from the command in‐
+terpreters of other systems both by the fact that it is just
+a user program, and by the fact that it is used  almost  ex‐
+clusively as a mechanism for invoking other programs.
+
+     _C_o_m_m_a_n_d_s  in  the  UNIX  system  consist  of  a list of
+strings or _w_o_r_d_s interpreted as a _c_o_m_m_a_n_d _n_a_m_e  followed  by
+_a_r_g_u_m_e_n_t_s_.  Thus the command
+
+     mail bill
+
+consists  of  two words.  The first word _m_a_i_l names the com‐
+mand to be executed, in this case  the  mail  program  which
+sends  messages  to other users.  The shell uses the name of
+the command in attempting to execute it for  you.   It  will
+look  in  a  number  of _d_i_r_e_c_t_o_r_i_e_s for a file with the name
+_m_a_i_l which is expected to contain the mail program.
+
+     The rest of the words of the command are given as _a_r_g_u_‐
+_m_e_n_t_s  to  the  command itself when it is executed.  In this
+case we specified also the argument  _b_i_l_l  which  is  inter‐
+preted  by the _m_a_i_l program to be the name of a user to whom
+mail is to be sent.  In normal terminal usage we  might  use
+the _m_a_i_l command as follows.
+
+     % mail bill
+     I have a question about the csh documentation.
+     My document seems to be missing page 5.
+     Does a page five exist?
+          Bill
+     EOT
+     %
+
+
+     Here  we typed a message to send to _b_i_l_l and ended this
+message with a ^D which sent an end‐of‐file to the mail pro‐
+gram.   (Here  and  throughout  this  document, the notation
+‘‘^_x’’ is to be read ‘‘control‐_x’’ and represents the strik‐
+ing  of  the _x key while the control key is held down.)  The
+mail program then echoed the characters ‘EOT’ and  transmit‐
+ted  our  message.   The characters ‘% ’ were printed before
+and after the mail command by the shell to indicate that in‐
+put was needed.
+
+     After typing the ‘% ’ prompt the shell was reading com‐
+mand input from our terminal.  We typed a  complete  command
+
+
+
+
+
+
+
+
+
+USD:4‐4                       An Introduction to the C shell
+
+
+‘mail  bill’.  The shell then executed the _m_a_i_l program with
+argument _b_i_l_l and went dormant waiting for it  to  complete.
+The  mail program then read input from our terminal until we
+signalled an end‐of‐file via typing a  ^D  after  which  the
+shell  noticed  that mail had completed and signaled us that
+it was ready to read from the terminal again by printing an‐
+other ‘% ’ prompt.
+
+     This  is  the essential pattern of all interaction with
+UNIX through the shell.  A complete command is typed at  the
+terminal,  the shell executes the command and when this exe‐
+cution completes, it prompts for a new command.  If you  run
+the  editor  for  an hour, the shell will patiently wait for
+you to finish editing and obediently prompt you again  when‐
+ever you finish editing.
+
+     An  example  of a useful command you can execute now is
+the _t_s_e_t command, which sets  the  default  _e_r_a_s_e  and  _k_i_l_l
+characters on your terminal − the erase character erases the
+last character you typed and the kill character  erases  the
+entire  line you have entered so far.  By default, the erase
+character is the delete key (equivalent to  ‘^?’)   and  the
+kill  character  is  ‘^U’.   Some  people prefer to make the
+erase character the backspace key (equivalent to ‘^H’).  You
+can make this be true by typing
+
+     tset −e
+
+which  tells  the program _t_s_e_t to set the erase character to
+tset’s default setting for this character (a backspace).
+
+11..22..  FFllaagg aarrgguummeennttss
+
+     A useful notion in UNIX is that  of  a  _f_l_a_g  argument.
+While  many arguments to commands specify file names or user
+names, some arguments rather specify an optional  capability
+of  the  command  which  you wish to invoke.  By convention,
+such arguments begin with the character ‘−’ (hyphen).   Thus
+the command
+
+     ls
+
+will  produce a list of the files in the current _w_o_r_k_i_n_g _d_i_‐
+_r_e_c_t_o_r_y.  The option _−_s is the size option, and
+
+     ls −s
+
+causes _l_s to also give, for each file the size of  the  file
+in  blocks  of  512 characters.  The manual section for each
+command in the UNIX reference manual gives the available op‐
+tions  for  each command.  The _l_s command has a large number
+of useful and interesting options.  Most other commands have
+either no options or only one or two options.  It is hard to
+remember  options  of  commands  which  are  not  used  very
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐5
+
+
+frequently,  so  most UNIX utilities perform only one or two
+functions rather than having a large number of hard  to  re‐
+member options.
+
+11..33..  OOuuttppuutt ttoo ffiilleess
+
+     Commands  that  normally  read input or write output on
+the terminal can also be executed  with  this  input  and/or
+output done to a file.
+
+     Thus suppose we wish to save the current date in a file
+called ‘now’.  The command
+
+     date
+
+will print the current date on our terminal.   This  is  be‐
+cause  our  terminal  is the default _s_t_a_n_d_a_r_d _o_u_t_p_u_t for the
+date command and the date command prints  the  date  on  its
+standard  output.   The  shell lets us _r_e_d_i_r_e_c_t the _s_t_a_n_d_a_r_d
+_o_u_t_p_u_t of a command through a notation using the _m_e_t_a_c_h_a_r_a_c_‐
+_t_e_r  ‘>’  and  the  name  of  the file where output is to be
+placed.  Thus the command
+
+     date > now
+
+runs the _d_a_t_e command such that its standard output  is  the
+file  ‘now’  rather  than  the  terminal.  Thus this command
+places the current date and time into the file ‘now’.  It is
+important to know that the _d_a_t_e command was unaware that its
+output was going to a file rather than to the terminal.  The
+shell  performed  this  _r_e_d_i_r_e_c_t_i_o_n before the command began
+executing.
+
+     One other thing to note here is  that  the  file  ‘now’
+need  not have existed before the _d_a_t_e command was executed;
+the shell would have created the file if it did  not  exist.
+And  if  the  file  did exist?  If it had existed previously
+these previous contents would have been discarded!  A  shell
+option _n_o_c_l_o_b_b_e_r exists to prevent this from happening acci‐
+dentally; it is discussed in section 2.2.
+
+     The system normally keeps files which you  create  with
+‘>’  and  all other files.  Thus the default is for files to
+be permanent.  If you wish to create a file  which  will  be
+removed  automatically,  you  can  begin its name with a ‘#’
+character, this ‘scratch’ character denotes  the  fact  that
+the file will be a scratch file.*  The  system  will  remove
+───────────
+*Note  that  if your erase character is a ‘#’, you
+will have to precede the ‘#’ with a ‘\’.  The fact
+that  the ‘#’ character is the old (pre‐CRT) stan‐
+dard erase character means that it seldom  appears
+in  a  file name, and allows this convention to be
+used for scratch files.  If you are using  a  CRT,
+
+
+
+
+
+
+
+
+
+USD:4‐6                       An Introduction to the C shell
+
+
+such  files  after a couple of days, or sooner if file space
+becomes very tight.   Thus,  in  running  the  _d_a_t_e  command
+above,  we  don’t really want to save the output forever, so
+we would more likely do
+
+     date > #now
+
+
+11..44..  MMeettaacchhaarraacctteerrss iinn tthhee sshheellll
+
+     The shell has a  large  number  of  special  characters
+(like  ‘>’)  which  indicate special functions.  We say that
+these notations have _s_y_n_t_a_c_t_i_c and _s_e_m_a_n_t_i_c meaning  to  the
+shell.   In  general, most characters which are neither let‐
+ters nor digits have special meaning to the shell.  We shall
+shortly  learn  a  means of _q_u_o_t_a_t_i_o_n which allows us to use
+_m_e_t_a_c_h_a_r_a_c_t_e_r_s without the shell treating them in  any  spe‐
+cial way.
+
+     Metacharacters normally have effect only when the shell
+is reading our input.  We need not worry about placing shell
+metacharacters  in a letter we are sending via _m_a_i_l_, or when
+we are typing in text or data to some other  program.   Note
+that  the  shell  is only reading input when it has prompted
+with ‘% ’ (although we can type our  input  even  before  it
+prompts).
+
+11..55..  IInnppuutt ffrroomm ffiilleess;; ppiippeelliinneess
+
+     We learned above how to _r_e_d_i_r_e_c_t the _s_t_a_n_d_a_r_d _o_u_t_p_u_t of
+a command to a file.  It is also possible  to  redirect  the
+_s_t_a_n_d_a_r_d  _i_n_p_u_t of a command from a file.  This is not often
+necessary since most commands will read from  a  file  whose
+name is given as an argument.  We can give the command
+
+     sort < data
+
+to  run the _s_o_r_t command with standard input, where the com‐
+mand normally reads its input, from  the  file  ‘data’.   We
+would more likely say
+
+     sort data
+
+letting  the _s_o_r_t command open the file ‘data’ for input it‐
+self since this is less to type.
+
+     We should note that if we just typed
+
+     sort
+
+then the sort program would sort  lines  from  its  _s_t_a_n_d_a_r_d
+───────────
+your  erase character should be a ^H, as we demon‐
+strated in section 1.1 how this could be set up.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐7
+
+
+_i_n_p_u_t_.   Since  we  did  not _r_e_d_i_r_e_c_t the standard input, it
+would sort lines as we typed them on the terminal  until  we
+typed a ^D to indicate an end‐of‐file.
+
+     A  most useful capability is the ability to combine the
+standard output of one command with the  standard  input  of
+another,  i.e.  to run the commands in a sequence known as a
+_p_i_p_e_l_i_n_e_.  For instance the command
+
+     ls −s
+
+normally produces a list of the files in our directory  with
+the size of each in blocks of 512 characters.  If we are in‐
+terested in learning which of our files is  largest  we  may
+wish  to have this sorted by size rather than by name, which
+is the default way in which _l_s sorts.  We could look at  the
+many  options of _l_s to see if there was an option to do this
+but would eventually discover that there is not.  Instead we
+can use a couple of simple options of the _s_o_r_t command, com‐
+bining it with _l_s to get what we want.
+
+     The _−_n option of sort specifies a numeric  sort  rather
+than an alphabetic sort.  Thus
+
+     ls −s | sort −n
+
+specifies that the output of the _l_s command run with the op‐
+tion _−_s is to be _p_i_p_e_d to the command _s_o_r_t run with the  nu‐
+meric  sort option.  This would give us a sorted list of our
+files by size, but with the smallest first.  We  could  then
+use  the _−_r reverse sort option and the _h_e_a_d command in com‐
+bination with the previous command doing
+
+     ls −s | sort −n −r | head −5
+
+Here we have taken a list of  our  files  sorted  alphabeti‐
+cally,  each  with  the size in blocks.  We have run this to
+the standard input of the _s_o_r_t command asking it to sort nu‐
+merically in reverse order (largest first).  This output has
+then been run into the command _h_e_a_d which gives us the first
+few  lines.  In this case we have asked _h_e_a_d for the first 5
+lines.  Thus this command gives us the names  and  sizes  of
+our 5 largest files.
+
+     The notation introduced above is called the _p_i_p_e mecha‐
+nism.  Commands separated by ‘|’  characters  are  connected
+together by the shell and the standard output of each is run
+into the standard input of the next.  The  leftmost  command
+in a pipeline will normally take its standard input from the
+terminal and the rightmost will place its standard output on
+the  terminal.   Other  examples  of pipelines will be given
+later when we discuss the history mechanism;  one  important
+use of pipes which is illustrated there is in the routing of
+information to the line printer.
+
+
+
+
+
+
+
+
+
+USD:4‐8                       An Introduction to the C shell
+
+
+11..66..  FFiilleennaammeess
+
+     Many commands to be executed will  need  the  names  of
+files  as  arguments.  UNIX _p_a_t_h_n_a_m_e_s consist of a number of
+_c_o_m_p_o_n_e_n_t_s separated by ‘/’.  Each component except the last
+names  a  directory  in which the next component resides, in
+effect specifying the _p_a_t_h of directories to follow to reach
+the file.  Thus the pathname
+
+     /etc/motd
+
+specifies a file in the directory ‘etc’ which is a subdirec‐
+tory of the _r_o_o_t directory ‘/’.  Within this  directory  the
+file  named is ‘motd’ which stands for ‘message of the day’.
+A _p_a_t_h_n_a_m_e that begins with a slash is said to be  an  _a_b_s_o_‐
+_l_u_t_e pathname since it is specified from the absolute top of
+the entire directory hierarchy of  the  system  (the  _r_o_o_t).
+_P_a_t_h_n_a_m_e_s  which  do  not  begin with ‘/’ are interpreted as
+starting in the current _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y, which is, by  de‐
+fault, your _h_o_m_e directory and can be changed dynamically by
+the _c_d change directory command.  Such pathnames are said to
+be _r_e_l_a_t_i_v_e to the working directory since they are found by
+starting in the working directory and  descending  to  lower
+levels  of  directories  for each _c_o_m_p_o_n_e_n_t of the pathname.
+If the pathname contains no slashes at all then the file  is
+contained  in  the working directory itself and the pathname
+is merely the name of the file in this directory.   Absolute
+pathnames have no relation to the working directory.
+
+     Most  filenames  consist  of  a  number of alphanumeric
+characters and ‘.’s (periods).  In fact, all printing  char‐
+acters  except  ‘/’  (slash) may appear in filenames.  It is
+inconvenient to have most non‐alphabetic characters in file‐
+names  because  many  of  these  have special meaning to the
+shell.  The character ‘.’ (period) is not a  shell‐metachar‐
+acter  and is often used to separate the _e_x_t_e_n_s_i_o_n of a file
+name from the base of the name.  Thus
+
+     prog.c prog.o prog.errs prog.output
+
+are four related files.  They share a _b_a_s_e portion of a name
+(a  base  portion  being  that part of the name that is left
+when a trailing ‘.’ and following characters which  are  not
+‘.’  are  stripped  off).   The  file  ‘prog.c’ might be the
+source for a C program, the file ‘prog.o’ the  corresponding
+object  file, the file ‘prog.errs’ the errors resulting from
+a compilation of the program and the file ‘prog.output’  the
+output of a run of the program.
+
+     If  we  wished to refer to all four of these files in a
+command, we could use the notation
+
+     prog.*
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐9
+
+
+This expression is expanded by the shell, before the command
+to which it is an argument is executed, into a list of names
+which begin with ‘prog.’.  The character  ‘*’  here  matches
+any sequence (including the empty sequence) of characters in
+a file name.   The  names  which  match  are  alphabetically
+sorted and placed in the _a_r_g_u_m_e_n_t _l_i_s_t of the command.  Thus
+the command
+
+     echo prog.*
+
+will echo the names
+
+     prog.c prog.errs prog.o prog.output
+
+Note that the names are in sorted order here, and a  differ‐
+ent  order  than we listed them above.  The _e_c_h_o command re‐
+ceives four words as arguments, even though  we  only  typed
+one  word as an argument directly.  The four words were gen‐
+erated by _f_i_l_e_n_a_m_e _e_x_p_a_n_s_i_o_n of the one input word.
+
+     Other notations for _f_i_l_e_n_a_m_e _e_x_p_a_n_s_i_o_n are also  avail‐
+able.   The  character ‘?’ matches any single character in a
+filename.  Thus
+
+     echo ? ?? ???
+
+will echo a line of filenames; first those with one  charac‐
+ter  names, then those with two character names, and finally
+those with three character names.  The names of each  length
+will be independently sorted.
+
+     Another  mechanism consists of a sequence of characters
+between ‘[’ and ‘]’.  This metasequence matches  any  single
+character from the enclosed set.  Thus
+
+     prog.[co]
+
+will match
+
+     prog.c prog.o
+
+in  the  example  above.   We  can also place two characters
+around a ‘−’ in this notation to denote a range.  Thus
+
+     chap.[1−5]
+
+might match files
+
+     chap.1 chap.2 chap.3 chap.4 chap.5
+
+if they existed.  This is shorthand for
+
+     chap.[12345]
+
+
+
+
+
+
+
+
+
+
+USD:4‐10                      An Introduction to the C shell
+
+
+and otherwise equivalent.
+
+     An important point to note is that if a list  of  argu‐
+ment words to a command (an _a_r_g_u_m_e_n_t _l_i_s_t_) contains filename
+expansion syntax, and  if  this  filename  expansion  syntax
+fails  to match any existing file names, then the shell con‐
+siders this to be an error and prints a diagnostic
+
+     No match.
+
+and does not execute the command.
+
+     Another very important point is  that  files  with  the
+character  ‘.’ at the beginning are treated specially.  Nei‐
+ther ‘*’ or ‘?’ or the ‘[’  ‘]’  mechanism  will  match  it.
+This  prevents  accidental matching of the filenames ‘.’ and
+‘..’  in the working directory which have special meaning to
+the  system, as well as other files such as _._c_s_h_r_c which are
+not normally visible.  We will discuss the special  role  of
+the file _._c_s_h_r_c later.
+
+     Another  filename  expansion  mechanism gives access to
+the pathname of the _h_o_m_e directory of other users.  This no‐
+tation consists of the character ‘~’ (tilde) followed by an‐
+other user’s login name.   For  instance  the  word  ‘~bill’
+would  map to the pathname ‘/usr/bill’ if the home directory
+for ‘bill’ was ‘/usr/bill’.  Since, on large systems,  users
+may  have  login  directories  scattered over many different
+disk volumes with different prefix directory names, this no‐
+tation  provides  a convenient way of accessing the files of
+other users.
+
+     A special case of  this  notation  consists  of  a  ‘~’
+alone,  e.g.  ‘~/mbox’.   This  notation  is expanded by the
+shell into the file ‘mbox’ in your _h_o_m_e directory, i.e. into
+‘/usr/bill/mbox’  for  me  on Ernie Co‐vax, the UCB Computer
+Science Department VAX machine, where this document was pre‐
+pared.   This  can  be  very  useful  if you have used _c_d to
+change to another directory and have found a file  you  wish
+to copy using _c_p_.  If I give the command
+
+     cp thatfile ~
+
+the shell will expand this command to
+
+     cp thatfile /usr/bill
+
+since my home directory is /usr/bill.
+
+     There  also exists a mechanism using the characters ‘{’
+and ‘}’ for abbreviating a set of words  which  have  common
+parts  but cannot be abbreviated by the above mechanisms be‐
+cause they are not files, are the names of  files  which  do
+not  yet  exist,  are not thus conveniently described.  This
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐11
+
+
+mechanism will be described much later, in section  4.2,  as
+it is used less frequently.
+
+11..77..  QQuuoottaattiioonn
+
+     We have already seen a number of metacharacters used by
+the shell.  These metacharacters pose a problem in  that  we
+cannot  use  them directly as parts of words.  Thus the com‐
+mand
+
+     echo *
+
+will not echo the character ‘*’.   It  will  either  echo  a
+sorted  list  of filenames in the current _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y_,
+or print the message ‘No match’ if there are no files in the
+working directory.
+
+     The  recommended mechanism for placing characters which
+are neither numbers, digits, ‘/’, ‘.’ or ‘−’ in an  argument
+word  to  a  command  is to enclose it with single quotation
+characters ‘´’, i.e.
+
+     echo ´*´
+
+There is one special character ‘!’ which is used by the _h_i_s_‐
+_t_o_r_y  mechanism  of the shell and which cannot be _e_s_c_a_p_e_d by
+placing it within ‘´’ characters.  It and the character  ‘´’
+itself can be preceded by a single ‘\’ to prevent their spe‐
+cial meaning.  Thus
+
+     echo \´\!
+
+prints
+
+     ´!
+
+These two mechanisms suffice to place any printing character
+into  a  word which is an argument to a shell command.  They
+can be combined, as in
+
+     echo \´´*´
+
+which prints
+
+     ´*
+
+since the first ‘\’ escaped the first ‘´’ and  the  ‘*’  was
+enclosed between ‘´’ characters.
+
+11..88..  TTeerrmmiinnaattiinngg ccoommmmaannddss
+
+     When you are executing a command and the shell is wait‐
+ing for it to complete there are several ways to force it to
+stop.  For instance if you type the command
+
+
+
+
+
+
+
+
+
+USD:4‐12                      An Introduction to the C shell
+
+
+     cat /etc/passwd
+
+the  system  will print a copy of a list of all users of the
+system on your terminal.  This is  likely  to  continue  for
+several  minutes unless you stop it.  You can send an INTER‐
+RUPT _s_i_g_n_a_l to the _c_a_t command by typing ^C on  your  termi‐
+nal.*   Since  _c_a_t does not take any precautions to avoid or
+otherwise handle this signal the INTERRUPT will cause it  to
+terminate.   The  shell  notices that _c_a_t has terminated and
+prompts you again with ‘% ’.  If you  hit  INTERRUPT  again,
+the  shell  will just repeat its prompt since it handles IN‐
+TERRUPT signals and chooses to continue to execute  commands
+rather  than  terminating like _c_a_t did, which would have the
+effect of logging you out.
+
+     Another way in which many programs  terminate  is  when
+they get an end‐of‐file from their standard input.  Thus the
+_m_a_i_l program in the first example above was terminated  when
+we  typed a ^D which generates an end‐of‐file from the stan‐
+dard input.  The shell also terminates when it gets an  end‐
+of‐file  printing  ‘logout’; UNIX then logs you off the sys‐
+tem.  Since this means that typing too many ^D’s  can  acci‐
+dentally  log us off, the shell has a mechanism for prevent‐
+ing this.  This _i_g_n_o_r_e_e_o_f option will be discussed  in  sec‐
+tion 2.2.
+
+     If  a  command has its standard input redirected from a
+file, then it will normally terminate when  it  reaches  the
+end of this file.  Thus if we execute
+
+     mail bill < prepared.text
+
+the  mail  command  will  terminate without our typing a ^D.
+This is because it read to the end‐of‐file of our file ‘pre‐
+pared.text’  in which we placed a message for ‘bill’ with an
+editor program.  We could also have done
+
+     cat prepared.text | mail bill
+
+since the _c_a_t command  would  then  have  written  the  text
+through  the pipe to the standard input of the mail command.
+When the _c_a_t command completed  it  would  have  terminated,
+closing  down  the  pipeline and the _m_a_i_l command would have
+received an end‐of‐file from it  and  terminated.   Using  a
+pipe  here  is more complicated than redirecting input so we
+would more likely use the first form.  These commands  could
+also have been stopped by sending an INTERRUPT.
+
+     Another  possibility  for stopping a command is to sus‐
+pend its execution  temporarily,  with  the  possibility  of
+───────────
+*On  some older Unix systems the DEL or RUBOUT key
+has the same effect. "stty all" will tell you  the
+INTR key value.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐13
+
+
+continuing  execution later.  This is done by sending a STOP
+signal via typing a ^Z.  This  signal  causes  all  commands
+running  on the terminal (usually one but more if a pipeline
+is executing) to become suspended.  The shell  notices  that
+the command(s) have been suspended, types ‘Stopped’ and then
+prompts for a new command.  The previously executing command
+has  been  suspended,  but  otherwise unaffected by the STOP
+signal.  Any other commands can be executed while the origi‐
+nal command remains suspended.  The suspended command can be
+continued using the _f_g command with no arguments.  The shell
+will  then retype the command to remind you which command is
+being continued, and cause the command to resume  execution.
+Unless  any input files in use by the suspended command have
+been changed in the meantime, the suspension has  no  effect
+whatsoever  on  the  execution of the command.  This feature
+can be very useful during editing, when you need to look  at
+another  file before continuing.  An example of command sus‐
+pension follows.
+
+     % mail harold
+     Someone just copied a big file into my directory and its name is
+     ^Z
+     Stopped
+     % ls
+     funnyfile
+     prog.c
+     prog.o
+     % jobs
+     [1]  + Stopped   mail harold
+     % fg
+     mail harold
+     funnyfile. Do you know who did it?
+     EOT
+     %
+
+In this example someone was sending a message to Harold  and
+forgot  the name of the file he wanted to mention.  The mail
+command was suspended by typing ^Z.  When the shell  noticed
+that  the mail program was suspended, it typed ‘Stopped’ and
+prompted for a new command.  Then the _l_s command  was  typed
+to  find out the name of the file.  The _j_o_b_s command was run
+to find out which command was suspended.  At this  time  the
+_f_g  command was typed to continue execution of the mail pro‐
+gram.  Input to the mail  program  was  then  continued  and
+ended  with  a  ^D which indicated the end of the message at
+which time the mail program typed  EOT.   The  _j_o_b_s  command
+will  show which commands are suspended.  The ^Z should only
+be typed at the beginning of a line since  everything  typed
+on  the current line is discarded when a signal is sent from
+the keyboard.  This also happens on INTERRUPT, and QUIT sig‐
+nals.   More  information on suspending jobs and controlling
+them is given in section 2.6.
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐14                      An Introduction to the C shell
+
+
+     If you write or run programs which are  not  fully  de‐
+bugged  then  it  may be necessary to stop them somewhat un‐
+gracefully.  This can be done by sending them a QUIT signal,
+sent by typing a ^\.  This will usually provoke the shell to
+produce a message like:
+
+     Quit (Core dumped)
+
+indicating that a file ‘core’ has  been  created  containing
+information about the running program’s state when it termi‐
+nated due to the QUIT signal.  You  can  examine  this  file
+yourself,  or  forward  information to the maintainer of the
+program telling him/her where the _c_o_r_e _f_i_l_e is.
+
+     If you run background commands (as explained in section
+2.6) then these commands will ignore INTERRUPT and QUIT sig‐
+nals at the terminal.  To stop them you must  use  the  _k_i_l_l
+command.  See section 2.6 for an example.
+
+     If  you want to examine the output of a command without
+having it move off the screen as the output of the
+
+     cat /etc/passwd
+
+command will, you can use the command
+
+     more /etc/passwd
+
+The _m_o_r_e program pauses after each  complete  screenful  and
+types  ‘−−More−−’  at which point you can hit a space to get
+another screenful, a return to get another line,  a  ‘?’  to
+get  some  help  on other commands, or a ‘q’ to end the _m_o_r_e
+program.  You can also use more as a filter, i.e.
+
+     cat /etc/passwd | more
+
+works just like the more simple more command above.
+
+     For stopping output of commands not involving _m_o_r_e  you
+can  use  the  ^S key to stop the typeout.  The typeout will
+resume when you hit ^Q or any other key, but ^Q is  normally
+used because it only restarts the output and does not become
+input to the program which is running.  This works  well  on
+low‐speed  terminals, but at 9600 baud it is hard to type ^S
+and ^Q fast enough to paginate the output nicely, and a pro‐
+gram like _m_o_r_e is usually used.
+
+     An additional possibility is to use the ^O flush output
+character; when this character is typed, all output from the
+current  command is thrown away (quickly) until the next in‐
+put read occurs or until the next shell prompt.  This can be
+used to allow a command to complete without having to suffer
+through the output on a slow terminal; ^O is  a  toggle,  so
+flushing  can  be turned off by typing ^O again while output
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐15
+
+
+is being flushed.
+
+11..99..  WWhhaatt nnooww??
+
+     We have so far seen a number of mechanisms of the shell
+and  learned  a lot about the way in which it operates.  The
+remaining sections will go yet further into the internals of
+the  shell,  but you will surely want to try using the shell
+before you go any further.  To try it you can log in to UNIX
+and type the following command to the system:
+
+     chsh myname /bin/csh
+
+Here  ‘myname’  should  be replaced by the name you typed to
+the system prompt of ‘login:’ to get onto the system.   Thus
+I  would use ‘chsh bill /bin/csh’.  YYoouu oonnllyy hhaavvee ttoo ddoo tthhiiss
+oonnccee;; iitt ttaakkeess eeffffeecctt aatt nneexxtt llooggiinn..  You are now  ready  to
+try using _c_s_h_.
+
+     Before you do the ‘chsh’ command, the shell you are us‐
+ing when you log into the system  is  ‘/bin/sh’.   In  fact,
+much  of  the  above  discussion is applicable to ‘/bin/sh’.
+The next section will introduce many features particular  to
+_c_s_h  so you should change your shell to _c_s_h before you begin
+reading it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐16                      An Introduction to the C shell
+
+
+22..  DDeettaaiillss oonn tthhee sshheellll ffoorr tteerrmmiinnaall uusseerrss
+
+22..11..  SShheellll ssttaarrttuupp aanndd tteerrmmiinnaattiioonn
+
+     When you login, the shell is started by the  system  in
+your  _h_o_m_e  directory  and begins by reading commands from a
+file _._c_s_h_r_c in this directory.  All  shells  which  you  may
+start during your terminal session will read from this file.
+We will later see what kinds of commands are usefully placed
+there.   For  now  we  need not have this file and the shell
+does not complain about its absence.
+
+     A _l_o_g_i_n _s_h_e_l_l, executed after you login to the  system,
+will,  after  it  reads  commands from _._c_s_h_r_c_, read commands
+from a file _._l_o_g_i_n also in your home directory.   This  file
+contains  commands  which you wish to do each time you login
+to the UNIX system.  My _._l_o_g_i_n file looks something like:
+
+     set ignoreeof
+     set mail=(/usr/spool/mail/bill)
+     echo "${prompt}users" ; users
+     alias ts \
+          ´set noglob ; eval `tset −s −m dialup:c100rv4pna −m plugboard:?hp2621nl *`´;
+     ts; stty intr ^C kill ^U crt
+     set time=15 history=10
+     msgs −f
+     if (−e $mail) then
+          echo "${prompt}mail"
+          mail
+     endif
+
+
+     This file contains several commands to be  executed  by
+UNIX each time I login.  The first is a _s_e_t command which is
+interpreted directly by the shell.  It sets the shell  vari‐
+able _i_g_n_o_r_e_e_o_f which causes the shell to not log me off if I
+hit ^D.  Rather, I use the _l_o_g_o_u_t command to log off of  the
+system.   By  setting  the _m_a_i_l variable, I ask the shell to
+watch for incoming mail to me.  Every 5  minutes  the  shell
+looks  for  this  file and tells me if more mail has arrived
+there.  An alternative to this is to put the command
+
+     biff y
+
+in place of this _s_e_t_; this will cause me to be notified  im‐
+mediately  when  mail arrives, and to be shown the first few
+lines of the new message.
+
+     Next I set the shell variable ‘time’  to  ‘15’  causing
+the  shell  to  automatically print out statistics lines for
+commands which execute for at least 15 seconds of CPU  time.
+The  variable  ‘history’ is set to 10 indicating that I want
+the shell to remember the last 10 commands  I  type  in  its
+_h_i_s_t_o_r_y _l_i_s_t, (described later).
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐17
+
+
+     I  create an _a_l_i_a_s ‘‘ts’’ which executes a _t_s_e_t(1) com‐
+mand setting up the modes of the terminal.   The  parameters
+to  _t_s_e_t  indicate the kinds of terminal which I usually use
+when not on a hardwired port.  I  then  execute  ‘‘ts’’  and
+also  use the _s_t_t_y command to change the interrupt character
+to ^C and the line kill character to ^U.
+
+     I then run the ‘msgs’ program, which provides  me  with
+any  system  messages which I have not seen before; the ‘−f’
+option here prevents it from telling me  anything  if  there
+are  no  new  messages.  Finally, if my mailbox file exists,
+then I run the ‘mail’ program to process my mail.
+
+     When the ‘mail’ and ‘msgs’ programs finish,  the  shell
+will finish processing my _._l_o_g_i_n file and begin reading com‐
+mands from the terminal, prompting for each with ‘% ’.  When
+I  log  off  (by  giving  the _l_o_g_o_u_t command) the shell will
+print ‘logout’ and execute commands from the file  ‘.logout’
+if  it  exists  in  my home directory.  After that the shell
+will terminate and UNIX will log me off the system.  If  the
+system  is  not  going down, I will receive a new login mes‐
+sage.  In any case, after the ‘logout’ message the shell  is
+committed to terminating and will take no further input from
+my terminal.
+
+22..22..  SShheellll vvaarriiaabblleess
+
+     The shell maintains a set of _v_a_r_i_a_b_l_e_s_.  We  saw  above
+the  variables  _h_i_s_t_o_r_y  and  _t_i_m_e which had values ‘10’ and
+‘15’.  In fact, each shell variable has as value an array of
+zero  or more _s_t_r_i_n_g_s_.  Shell variables may be assigned val‐
+ues by the set command.  It has several forms, the most use‐
+ful of which was given above and is
+
+     set name=value
+
+
+     Shell  variables  may be used to store values which are
+to be used in commands later through a  substitution  mecha‐
+nism.   The  shell  variables  most commonly referenced are,
+however, those which the shell itself refers to.  By  chang‐
+ing  the  values  of these variables one can directly affect
+the behavior of the shell.
+
+     One of the most important  variables  is  the  variable
+_p_a_t_h_.   This variable contains a sequence of directory names
+where the shell searches for commands.  The _s_e_t command with
+no  arguments shows the value of all variables currently de‐
+fined (we usually say _s_e_t_) in the shell.  The default  value
+for path will be shown by _s_e_t to be
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐18                      An Introduction to the C shell
+
+
+     % set
+     argv   ()
+     cwd    /usr/bill
+     home   /usr/bill
+     path   (. /usr/ucb /bin /usr/bin)
+     prompt %
+     shell  /bin/csh
+     status 0
+     term   c100rv4pna
+     user   bill
+     %
+
+This  output  indicates that the variable path points to the
+current  directory  ‘.’  and  then  ‘/usr/ucb’,  ‘/bin’  and
+‘/usr/bin’.   Commands  which  you may write might be in ‘.’
+(usually one of your directories).   Commands  developed  at
+Berkeley,  live  in  ‘/usr/ucb’  while commands developed at
+Bell Laboratories live in ‘/bin’ and ‘/usr/bin’.
+
+     A number of locally developed programs  on  the  system
+live  in  the  directory  ‘/usr/local’.  If we wish that all
+shells which we invoke to have access to these new  programs
+we can place the command
+
+     set path=(. /usr/ucb /bin /usr/bin /usr/local)
+
+in  our  file  _._c_s_h_r_c in our home directory.  Try doing this
+and then logging out and back in and do
+
+     set
+
+again to see that the value assigned to _p_a_t_h has changed.
+
+     One thing you should be aware of is that the shell  ex‐
+amines  each  directory  which you insert into your path and
+determines which commands are contained there.   Except  for
+the current directory ‘.’, which the shell treats specially,
+this means that if commands are added to a directory in your
+search  path after you have started the shell, they will not
+necessarily be found by the shell.  If you  wish  to  use  a
+command  which  has  been added in this way, you should give
+the command
+
+     rehash
+
+to the shell, which will cause it to recompute its  internal
+table  of  command locations, so that it will find the newly
+added command.  Since the shell has to look in  the  current
+directory  ‘.’ on each command, placing it at the end of the
+path specification usually works  equivalently  and  reduces
+───────────
+  † Another directory that might interest  you  is
+/usr/new, which contains many useful user‐contrib‐
+uted programs provided with Berkeley Unix.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐19
+
+
+overhead.
+
+     Other  useful  built in variables are the variable _h_o_m_e
+which shows your home directory,  _c_w_d  which  contains  your
+current  working directory, the variable _i_g_n_o_r_e_e_o_f which can
+be set in your _._l_o_g_i_n file to tell the  shell  not  to  exit
+when  it  receives  an  end‐of‐file  from a terminal (as de‐
+scribed above).  The variable ‘ignoreeof’ is one of  several
+variables  which the shell does not care about the value of,
+only whether they are _s_e_t or _u_n_s_e_t_.  Thus to set this  vari‐
+able you simply do
+
+     set ignoreeof
+
+and to unset it do
+
+     unset ignoreeof
+
+These  give  the  variable ‘ignoreeof’ no value, but none is
+desired or required.
+
+     Finally, some other built‐in shell variables of use are
+the variables _n_o_c_l_o_b_b_e_r and _m_a_i_l_.  The metasyntax
+
+     > filename
+
+which  redirects the standard output of a command will over‐
+write and destroy the previous contents of the  named  file.
+In  this  way you may accidentally overwrite a file which is
+valuable.  If you would prefer that the shell not  overwrite
+files in this way you can
+
+     set noclobber
+
+in your _._l_o_g_i_n file.  Then trying to do
+
+     date > now
+
+would  cause  a  diagnostic  if  ‘now’ existed already.  You
+could type
+
+     date >!  now
+
+if you really wanted to overwrite  the  contents  of  ‘now’.
+The  ‘>!’ is a special metasyntax indicating that clobbering
+the file is ok.†
+
+
+
+───────────
+†The space between the ‘!’ and the word  ‘now’  is
+critical here, as ‘!now’ would be an invocation of
+the _h_i_s_t_o_r_y mechanism, and have a totally  differ‐
+ent effect.
+
+
+
+
+
+
+
+
+
+USD:4‐20                      An Introduction to the C shell
+
+
+22..33..  TThhee sshheellll’’ss hhiissttoorryy lliisstt
+
+     The  shell  can  maintain  a _h_i_s_t_o_r_y _l_i_s_t into which it
+places the words of previous commands.  It  is  possible  to
+use  a  notation to reuse commands or words from commands in
+forming new commands.  This mechanism can be used to  repeat
+previous  commands  or  to  correct minor typing mistakes in
+commands.
+
+     The following figure gives a sample  session  involving
+typical  usage  of  the  history mechanism of the shell.  In
+this example we have a very simple C program which has a bug
+(or  two)  in  it in the file ‘bug.c’, which we ‘cat’ out on
+our terminal.  We then try to run the C compiler on it,  re‐
+ferring to the file again as ‘!$’, meaning the last argument
+to the previous command.  Here the ‘!’ is the history mecha‐
+nism  invocation  metacharacter,  and the ‘$’ stands for the
+last argument, by analogy to ‘$’ in the editor which  stands
+for  the  end of the line.  The shell echoed the command, as
+it would have been typed without use of the  history  mecha‐
+nism,  and  then executed it.  The compilation yielded error
+diagnostics so we now run the editor on  the  file  we  were
+trying  to  compile,  fix  the  bug,  and run the C compiler
+again, this time referring to this command simply  as  ‘!c’,
+which repeats the last command which started with the letter
+‘c’.  If there were other commands starting  with  ‘c’  done
+recently  we  could  have  said  ‘!cc’ or even ‘!cc:p’ which
+would have printed the last command starting with ‘cc’ with‐
+out executing it.
+
+     After  this recompilation, we ran the resulting ‘a.out’
+file, and then noting that there still was a  bug,  ran  the
+editor  again.   After  fixing the program we ran the C com‐
+piler again, but tacked onto the command an extra  ‘−o  bug’
+telling  the  compiler  to place the resultant binary in the
+file ‘bug’ rather than ‘a.out’.   In  general,  the  history
+mechanisms may be used anywhere in the formation of new com‐
+mands and other characters may be placed  before  and  after
+the substituted commands.
+
+     We then ran the ‘size’ command to see how large the bi‐
+nary program images we have created were, and  then  an  ‘ls
+−l’  command with the same argument list, denoting the argu‐
+ment list ‘*’.  Finally we ran the program ‘bug’ to see that
+its output is indeed correct.
+
+     To  make  a  numbered listing of the program we ran the
+‘num’ command on the file ‘bug.c’.  In order to compress out
+blank lines in the output of ‘num’ we ran the output through
+the filter ‘ssp’, but misspelled it as spp.  To correct this
+we  used  a  shell  substitute, placing the old text and new
+text between ‘^’ characters.  This is similar to the substi‐
+tute  command  in the editor.  Finally, we repeated the same
+command with ‘!!’, but sent its output to the line printer.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐21
+
+
+
+     % cat bug.c
+     main()
+
+     {
+          printf("hello);
+     }
+     % cc !$
+     cc bug.c
+     "bug.c", line 4: newline in string or char constant
+     "bug.c", line 5: syntax error
+     % ed !$
+     ed bug.c
+     29
+     4s/);/"&/p
+             printf("hello");
+     w
+     30
+     q
+     % !c
+     cc bug.c
+     % a.out
+     hello% !e
+     ed bug.c
+     30
+     4s/lo/lo\\n/p
+             printf("hello\n");
+     w
+     32
+     q
+     % !c −o bug
+     cc bug.c −o bug
+     % size a.out bug
+     a.out: 2784+364+1028 = 4176b = 0x1050b
+     bug: 2784+364+1028 = 4176b = 0x1050b
+     % ls −l !*
+     ls −l a.out bug
+     −rwxr−xr−x 1 bill       3932 Dec 19 09:41 a.out
+     −rwxr−xr−x 1 bill       3932 Dec 19 09:42 bug
+     % bug
+     hello
+     % num bug.c | spp
+     spp: Command not found.
+     % ^spp^ssp
+     num bug.c | ssp
+         1     main()
+         3     {
+         4          printf("hello\n");
+         5     }
+     % !! | lpr
+     num bug.c | ssp | lpr
+     %
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐22                      An Introduction to the C shell
+
+
+     There are other mechanisms available for repeating com‐
+mands.   The _h_i_s_t_o_r_y command prints out a number of previous
+commands with numbers  by  which  they  can  be  referenced.
+There  is  a way to refer to a previous command by searching
+for a string which appeared in it, and there are other, less
+useful,  ways  to  select arguments to include in a new com‐
+mand.  A complete description of  all  these  mechanisms  is
+given  in  the C shell manual pages in the UNIX Programmer’s
+Manual.
+
+22..44..  AAlliiaasseess
+
+     The shell has an _a_l_i_a_s mechanism which can be  used  to
+make  transformations on input commands.  This mechanism can
+be used to simplify the commands you type, to supply default
+arguments to commands, or to perform transformations on com‐
+mands and their arguments.  The alias facility is similar to
+a macro facility.  Some of the features obtained by aliasing
+can be obtained also using shell command  files,  but  these
+take  place  in another instance of the shell and cannot di‐
+rectly affect the current shells environment or involve com‐
+mands such as _c_d which must be done in the current shell.
+
+     As  an  example, suppose that there is a new version of
+the mail program on the system called ‘newmail’ you wish  to
+use,  rather  than the standard mail program which is called
+‘mail’.  If you place the shell command
+
+     alias mail newmail
+
+in your _._c_s_h_r_c file, the shell will transform an input  line
+of the form
+
+     mail bill
+
+into  a  call on ‘newmail’.  More generally, suppose we wish
+the command ‘ls’ to always show sizes of files, that  is  to
+always do ‘−s’.  We can do
+
+     alias ls ls −s
+
+or even
+
+     alias dir ls −s
+
+creating  a  new command syntax ‘dir’ which does an ‘ls −s’.
+If we say
+
+     dir ~bill
+
+then the shell will translate this to
+
+     ls −s /mnt/bill
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐23
+
+
+     Thus the _a_l_i_a_s mechanism can be used to  provide  short
+names for commands, to provide default arguments, and to de‐
+fine new short commands in terms of other commands.   It  is
+also  possible to define aliases which contain multiple com‐
+mands or pipelines, showing where the arguments to the orig‐
+inal  command  are to be substituted using the facilities of
+the history mechanism.  Thus the definition
+
+     alias cd ´cd \!* ; ls ´
+
+would do an _l_s command after each change directory  _c_d  com‐
+mand.   We enclosed the entire alias definition in ‘´’ char‐
+acters to prevent most substitutions from occurring and  the
+character ‘;’ from being recognized as a metacharacter.  The
+‘!’ here is escaped with a ‘\’ to prevent it from being  in‐
+terpreted  when  the  alias  command is typed in.  The ‘\!*’
+here substitutes the entire argument list to the  pre‐alias‐
+ing _c_d command, without giving an error if there were no ar‐
+guments.  The ‘;’ separating commands is used here to  indi‐
+cate that one command is to be done and then the next.  Sim‐
+ilarly the definition
+
+     alias whois ´grep \!^ /etc/passwd´
+
+defines a command which looks up its first argument  in  the
+password file.
+
+     WWaarrnniinngg:: The shell currently reads the _._c_s_h_r_c file each
+time it starts up.  If you place a large number of  commands
+there,  shells  will  tend to start slowly.  A mechanism for
+saving the shell environment after reading the  _._c_s_h_r_c  file
+and  quickly  restoring it is under development, but for now
+you should try to limit the number of aliases you have to  a
+reasonable  number...  10 or 15 is reasonable, 50 or 60 will
+cause a noticeable delay in starting up shells, and make the
+system  seem  sluggish when you execute commands from within
+the editor and other programs.
+
+22..55..  MMoorree rreeddiirreeccttiioonn;; >>>> aanndd >>&&
+
+     There are a few more notations useful to  the  terminal
+user which have not been introduced yet.
+
+     In  addition to the standard output, commands also have
+a _d_i_a_g_n_o_s_t_i_c _o_u_t_p_u_t which is normally directed to the termi‐
+nal even when the standard output is redirected to a file or
+a pipe.  It is occasionally desirable to direct the diagnos‐
+tic  output along with the standard output.  For instance if
+you want to redirect the output of a  long  running  command
+into  a file and wish to have a record of any error diagnos‐
+tic it produces you can do
+
+     command >& file
+
+
+
+
+
+
+
+
+
+
+USD:4‐24                      An Introduction to the C shell
+
+
+The ‘>&’ here tells the shell to route both  the  diagnostic
+output  and  the standard output into ‘file’.  Similarly you
+can give the command
+
+     command |& lpr
+
+to route both standard and  diagnostic  output  through  the
+pipe to the line printer daemon _l_p_r_._‡
+
+     Finally, it is possible to use the form
+
+     command >> file
+
+to place output at the end of an existing file.†
+
+22..66..  JJoobbss;; BBaacckkggrroouunndd,, FFoorreeggrroouunndd,, oorr SSuussppeennddeedd
+
+     When one or more commands are typed together as a pipe‐
+line or as a sequence of commands separated by semicolons, a
+single  _j_o_b is created by the shell consisting of these com‐
+mands together as a unit.  Single commands without pipes  or
+semicolons  create  the  simplest jobs.  Usually, every line
+typed to the shell creates a job.  Some  lines  that  create
+jobs (one per line) are
+
+     sort < data
+     ls −s | sort −n | head −5
+     mail harold
+
+
+     If  the  metacharacter  ‘&’  is typed at the end of the
+commands, then the job is started as a _b_a_c_k_g_r_o_u_n_d job.  This
+means  that  the  shell does not wait for it to complete but
+immediately prompts and is ready for another  command.   The
+job  runs  _i_n  _t_h_e  _b_a_c_k_g_r_o_u_n_d  at the same time that normal
+jobs, called _f_o_r_e_g_r_o_u_n_d jobs, continue to be read  and  exe‐
+cuted by the shell one at a time.  Thus
+
+     du > usage &
+
+would run the _d_u program, which reports on the disk usage of
+your working directory (as well  as  any  directories  below
+it),  put  the  output  into  the  file  ‘usage’  and return
+───────────
+‡ A command of the form
+     command >&! file
+exists, and is used when _n_o_c_l_o_b_b_e_r is set and _f_i_l_e
+already exists.
+† If _n_o_c_l_o_b_b_e_r is set, then an error  will  result
+if  _f_i_l_e  does not exist, otherwise the shell will
+create _f_i_l_e if it doesn’t exist.  A form
+     command >>! file
+makes it not be an error for  file  to  not  exist
+when _n_o_c_l_o_b_b_e_r is set.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐25
+
+
+immediately with a prompt for the next command  without  out
+waiting for _d_u to finish.  The _d_u program would continue ex‐
+ecuting in the background until it finished, even though you
+can type and execute more commands in the mean time.  When a
+background job terminates, a message is typed by  the  shell
+just  before  the  next  prompt telling you that the job has
+completed.  In the following example  the  _d_u  job  finishes
+sometime  during  the  execution of the _m_a_i_l command and its
+completion is reported just before the prompt after the _m_a_i_l
+job is finished.
+
+     % du > usage &
+     [1] 503
+     % mail bill
+     How do you know when a background job is finished?
+     EOT
+     [1] − Done       du > usage
+     %
+
+If  the  job  did  not terminate normally the ‘Done’ message
+might say something else like ‘Killed’.   If  you  want  the
+terminations  of  background jobs to be reported at the time
+they occur (possibly interrupting the output of other  fore‐
+ground  jobs), you can set the _n_o_t_i_f_y variable.  In the pre‐
+vious example this would mean that the ‘Done’ message  might
+have come right in the middle of the message to Bill.  Back‐
+ground jobs are unaffected by any signals from the  keyboard
+like the STOP, INTERRUPT, or QUIT signals mentioned earlier.
+
+     Jobs  are  recorded  in  a table inside the shell until
+they terminate.  In this table, the shell remembers the com‐
+mand  names,  arguments  and the _p_r_o_c_e_s_s _n_u_m_b_e_r_s of all com‐
+mands in the job as well as the working directory where  the
+job was started.  Each job in the table is either running _i_n
+_t_h_e _f_o_r_e_g_r_o_u_n_d with the shell waiting for it  to  terminate,
+running  _i_n  _t_h_e _b_a_c_k_g_r_o_u_n_d_, or _s_u_s_p_e_n_d_e_d_.  Only one job can
+be running in the foreground at one time, but  several  jobs
+can  be  suspended or running in the background at once.  As
+each job is started, it is assigned a small identifying num‐
+ber  called  the _j_o_b _n_u_m_b_e_r which can be used later to refer
+to the job in the commands described below.  Job numbers re‐
+main the same until the job terminates and then are re‐used.
+
+     When  a job is started in the background using ‘&’, its
+number, as well as the  process  numbers  of  all  its  (top
+level)  commands, is typed by the shell before prompting you
+for another command.  For example,
+
+     % ls −s | sort −n > usage &
+     [2] 2034 2035
+     %
+
+runs the ‘ls’ program with the ‘−s’ options, pipes this out‐
+put  into the ‘sort’ program with the ‘−n’ option which puts
+
+
+
+
+
+
+
+
+
+USD:4‐26                      An Introduction to the C shell
+
+
+its output into the file ‘usage’.  Since the ‘&’ was at  the
+end of the line, these two programs were started together as
+a background job.  After starting the job, the shell  prints
+the  job number in brackets (2 in this case) followed by the
+process number of each program started in the job.  Then the
+shell  immediates prompts for a new command, leaving the job
+running simultaneously.
+
+     As mentioned in section  1.8,  foreground  jobs  become
+_s_u_s_p_e_n_d_e_d by typing ^Z which sends a STOP signal to the cur‐
+rently running foreground job.  A background job can  become
+suspended  by  using the _s_t_o_p command described below.  When
+jobs are suspended they merely stop any further progress un‐
+til  started  again,  either  in the foreground or the back‐
+ground.  The shell notices when a job  becomes  stopped  and
+reports  this  fact, much like it reports the termination of
+background jobs.  For foreground jobs this looks like
+
+     % du > usage
+     ^Z
+     Stopped
+     %
+
+‘Stopped’ message is typed by the shell when it notices that
+the _d_u program stopped.  For background jobs, using the _s_t_o_p
+command, it is
+
+     % sort usage &
+     [1] 2345
+     % stop %1
+     [1] + Stopped (signal)sort usage
+     %
+
+Suspending foreground jobs can be very useful when you  need
+to temporarily change what you are doing (execute other com‐
+mands) and then return to the suspended  job.   Also,  fore‐
+ground  jobs  can  be  suspended and then continued as back‐
+ground jobs using the _b_g command, allowing you  to  continue
+other  work  and stop waiting for the foreground job to fin‐
+ish.  Thus
+
+     % du > usage
+     ^Z
+     Stopped
+     % bg
+     [1] du > usage &
+     %
+
+starts ‘du’ in the foreground, stops it before it  finishes,
+then continues it in the background allowing more foreground
+commands to be executed.  This is especially helpful when  a
+foreground  job  ends up taking longer than you expected and
+you wish you had started it in the background in the  begin‐
+ning.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐27
+
+
+     All  _j_o_b  _c_o_n_t_r_o_l  commands  can  take an argument that
+identifies a particular job.  All job name  arguments  begin
+with  the  character ‘%’, since some of the job control com‐
+mands also accept process numbers (printed by  the  _p_s  com‐
+mand.)   The  default  job  (when  no  argument is given) is
+called the _c_u_r_r_e_n_t job and is identified by  a  ‘+’  in  the
+output  of  the _j_o_b_s command, which shows you which jobs you
+have.  When only one job is stopped or running in the  back‐
+ground (the usual case) it is always the current job thus no
+argument is needed.  If a job is stopped  while  running  in
+the  foreground  it becomes the _c_u_r_r_e_n_t job and the existing
+current job becomes the _p_r_e_v_i_o_u_s job − identified by  a  ‘−’
+in the output of _j_o_b_s_.  When the current job terminates, the
+previous job becomes the current job.  When given, the argu‐
+ment  is  either  ‘%−’  (indicating the previous job); ‘%#’,
+where # is the job number; ‘%pref’ where pref is some unique
+prefix of the command name and arguments of one of the jobs;
+or ‘%?’ followed by some string found in  only  one  of  the
+jobs.
+
+     The  _j_o_b_s  command  types the table of jobs, giving the
+job number, commands and status (‘Stopped’ or ‘Running’)  of
+each  background or suspended job.  With the ‘−l’ option the
+process numbers are also typed.
+
+     % du > usage &
+     [1] 3398
+     % ls −s | sort −n > myfile &
+     [2] 3405
+     % mail bill
+     ^Z
+     Stopped
+     % jobs
+     [1] − Running    du > usage
+     [2]    Running   ls −s | sort −n > myfile
+     [3] + Stopped    mail bill
+     % fg %ls
+     ls −s | sort −n > myfile
+     % more myfile
+
+
+     The _f_g command runs a suspended or  background  job  in
+the  foreground.   It  is  used to restart a previously sus‐
+pended job or change a background job to run  in  the  fore‐
+ground  (allowing  signals  or input from the terminal).  In
+the above example we used _f_g to change the ‘ls’ job from the
+background  to the foreground since we wanted to wait for it
+to finish before looking at its output file.  The _b_g command
+runs  a suspended job in the background.  It is usually used
+after stopping the currently running foreground job with the
+STOP  signal.  The combination of the STOP signal and the _b_g
+command changes a foreground job into a background job.  The
+_s_t_o_p command suspends a background job.
+
+
+
+
+
+
+
+
+
+
+USD:4‐28                      An Introduction to the C shell
+
+
+     The  _k_i_l_l  command terminates a background or suspended
+job immediately.  In addition  to  jobs,  it  may  be  given
+process  numbers  as  arguments, as printed by _p_s_.  Thus, in
+the example above, the running _d_u command  could  have  been
+terminated by the command
+
+     % kill %1
+     [1]  Terminated  du > usage
+     %
+
+
+     The _n_o_t_i_f_y command (not the variable mentioned earlier)
+indicates that the termination of a specific job  should  be
+reported  at the time it finishes instead of waiting for the
+next prompt.
+
+     If a job running in the background tries to read  input
+from  the terminal it is automatically stopped.  When such a
+job is then run in the foreground, input can be given to the
+job.  If desired, the job can be run in the background again
+until it requests input again.  This is illustrated  in  the
+following  sequence where the ‘s’ command in the text editor
+might take a long time.
+
+     % ed bigfile
+     120000
+     1,$s/thisword/thatword/
+     ^Z
+     Stopped
+     % bg
+     [1] ed bigfile &
+     %
+      . . .  some foreground commands
+     [1] Stopped (tty input)ed bigfile
+     % fg
+     ed bigfile
+     w
+     120000
+     q
+     %
+
+So after the ‘s’  command  was  issued,  the  ‘ed’  job  was
+stopped  with  ^Z  and  then put in the background using _b_g_.
+Some time later when the ‘s’ command was finished, _e_d  tried
+to  read another command and was stopped because jobs in the
+background cannot read from the terminal.   The  _f_g  command
+returned  the ‘ed’ job to the foreground where it could once
+again accept commands from the terminal.
+
+     The command
+
+     stty tostop
+
+causes all background jobs run on your terminal to stop when
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐29
+
+
+they  are  about to write output to the terminal.  This pre‐
+vents messages from background jobs from interrupting  fore‐
+ground  job  output and allows you to run a job in the back‐
+ground without losing terminal output.  It also can be  used
+for  interactive  programs  that sometimes have long periods
+without interaction.  Thus each time it outputs a prompt for
+more  input  it will stop before the prompt.  It can then be
+run in the foreground using _f_g_, more input can be given and,
+if  necessary  stopped and returned to the background.  This
+_s_t_t_y command might be a good thing to  put  in  your  _._l_o_g_i_n
+file  if  you do not like output from background jobs inter‐
+rupting your work.  It also can reduce the  need  for  redi‐
+recting  the  output of background jobs if the output is not
+very big:
+
+     % stty tostop
+     % wc hugefile &
+     [1] 10387
+     % ed text
+     . . . some time later
+     q
+     [1] Stopped (tty output)wc hugefile
+     % fg wc
+     wc hugefile
+        13371   30123   302577
+     % stty −tostop
+
+Thus after some time the  ‘wc’  command,  which  counts  the
+lines,  words and characters in a file, had one line of out‐
+put.  When it  tried  to  write  this  to  the  terminal  it
+stopped.   By  restarting it in the foreground we allowed it
+to write on the terminal exactly when we were ready to  look
+at its output.  Programs which attempt to change the mode of
+the terminal will also block, whether or not _t_o_s_t_o_p is  set,
+when they are not in the foreground, as it would be very un‐
+pleasant to have a background job change the  state  of  the
+terminal.
+
+     Since  the _j_o_b_s command only prints jobs started in the
+currently executing shell, it knows nothing about background
+jobs  started in other login sessions or within shell files.
+The _p_s can be used in this case to find out about background
+jobs not started in the current shell.
+
+22..77..  WWoorrkkiinngg DDiirreeccttoorriieess
+
+     As  mentioned  in section 1.6, the shell is always in a
+particular _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y_.  The ‘change  directory’  com‐
+mand  _c_h_d_i_r (its short form _c_d may also be used) changes the
+working directory of the shell, that is, changes the  direc‐
+tory you are located in.
+
+     It  is  useful to make a directory for each project you
+wish to work on and to  place  all  files  related  to  that
+
+
+
+
+
+
+
+
+
+USD:4‐30                      An Introduction to the C shell
+
+
+project  in  that  directory.  The ‘make directory’ command,
+_m_k_d_i_r_, creates a new directory.  The _p_w_d (‘print working di‐
+rectory’) command reports the absolute pathname of the work‐
+ing directory of the shell, that is, the directory  you  are
+located in.  Thus in the example below:
+
+     % pwd
+     /usr/bill
+     % mkdir newpaper
+     % chdir newpaper
+     % pwd
+     /usr/bill/newpaper
+     %
+
+the  user  has  created and moved to the directory _n_e_w_p_a_p_e_r_.
+where, for example, he might place a group of related files.
+
+     No matter where you have moved to in a directory  hier‐
+archy,  you can return to your ‘home’ login directory by do‐
+ing just
+
+     cd
+
+with no arguments.  The name ‘..’ always means the directory
+above the current one in the hierarchy, thus
+
+     cd ..
+
+changes  the  shell’s  working directory to the one directly
+above the current one.  The name ‘..’ can  be  used  in  any
+pathname, thus,
+
+     cd ../programs
+
+means  change  to  the directory ‘programs’ contained in the
+directory above the current one.  If you have several direc‐
+tories  for  different projects under, say, your home direc‐
+tory, this shorthand notation permits you to  switch  easily
+between them.
+
+     The  shell always remembers the pathname of its current
+working directory in the variable _c_w_d_.  The shell  can  also
+be  requested  to  remember  the previous directory when you
+change to a new working directory.  If the ‘push  directory’
+command  _p_u_s_h_d is used in place of the _c_d command, the shell
+saves the name of the current working directory on a  _d_i_r_e_c_‐
+_t_o_r_y _s_t_a_c_k before changing to the new one.  You can see this
+list at any time by typing the ‘directories’ command _d_i_r_s_.
+
+     % pushd newpaper/references
+     ~/newpaper/references  ~
+     % pushd /usr/lib/tmac
+     /usr/lib/tmac  ~/newpaper/references  ~
+     % dirs
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐31
+
+
+     /usr/lib/tmac  ~/newpaper/references  ~
+     % popd
+     ~/newpaper/references  ~
+     % popd
+     ~
+     %
+
+The list is printed in a horizontal line,  reading  left  to
+right,  with  a  tilde (~) as shorthand for your home direc‐
+tory—in this  case  ‘/usr/bill’.   The  directory  stack  is
+printed  whenever  there is more than one entry on it and it
+changes.  It is also printed by a  _d_i_r_s  command.   _D_i_r_s  is
+usually  faster and more informative than _p_w_d since it shows
+the current working directory as well as any other  directo‐
+ries remembered in the stack.
+
+     The  _p_u_s_h_d command with no argument alternates the cur‐
+rent directory with the first directory in  the  list.   The
+‘pop directory’ _p_o_p_d command without an argument returns you
+to the directory you were in prior to the current one,  dis‐
+carding  the previous current directory from the stack (for‐
+getting it).  Typing _p_o_p_d several times in  a  series  takes
+you  backward  through  the  directories  you  had  been  in
+(changed to) by _p_u_s_h_d command.  There are other  options  to
+_p_u_s_h_d  and  _p_o_p_d to manipulate the contents of the directory
+stack and to change to directories not at  the  top  of  the
+stack; see the _c_s_h manual page for details.
+
+     Since  the  shell  remembers  the  working directory in
+which each job was started, it warns you when you  might  be
+confused  by  restarting a job in the foreground which has a
+different working directory than the current working  direc‐
+tory of the shell.  Thus if you start a background job, then
+change the shell’s working  directory  and  then  cause  the
+background job to run in the foreground, the shell warns you
+that the working directory of the  currently  running  fore‐
+ground job is different from that of the shell.
+
+     % dirs −l
+     /mnt/bill
+     % cd myproject
+     % dirs
+     ~/myproject
+     % ed prog.c
+     1143
+     ^Z
+     Stopped
+     % cd ..
+     % ls
+     myproject
+     textfile
+     % fg
+     ed prog.c (wd: ~/myproject)
+
+
+
+
+
+
+
+
+
+
+USD:4‐32                      An Introduction to the C shell
+
+
+This way the shell warns you when there is an implied change
+of working directory, even though no cd command was  issued.
+In   the   above   example   the   ‘ed’  job  was  still  in
+‘/mnt/bill/project’ even though the  shell  had  changed  to
+‘/mnt/bill’.   A  similar warning is given when such a fore‐
+ground job terminates or is suspended (using the  STOP  sig‐
+nal) since the return to the shell again implies a change of
+working directory.
+
+     % fg
+     ed prog.c (wd: ~/myproject)
+      . . . after some editing
+     q
+     (wd now: ~)
+     %
+
+These messages are sometimes confusing if you  use  programs
+that  change  their own working directories, since the shell
+only remembers which directory a job is started in, and  as‐
+sumes it stays there.  The ‘−l’ option of _j_o_b_s will type the
+working directory of suspended or background jobs when it is
+different from the current working directory of the shell.
+
+22..88..  UUsseeffuull bbuuiilltt‐‐iinn ccoommmmaannddss
+
+     We  now  give  a few of the useful built‐in commands of
+the shell describing how they are used.
+
+     The _a_l_i_a_s command described above is used to assign new
+aliases and to show the existing aliases.  With no arguments
+it prints the current aliases.  It may also  be  given  only
+one argument such as
+
+     alias ls
+
+to show the current alias for, e.g., ‘ls’.
+
+     The  _e_c_h_o  command  prints  its arguments.  It is often
+used in _s_h_e_l_l _s_c_r_i_p_t_s or as an interactive  command  to  see
+what filename expansions will produce.
+
+     The  _h_i_s_t_o_r_y command will show the contents of the his‐
+tory list.  The numbers given with the history events can be
+used  to  reference  previous  events which are difficult to
+reference using the contextual mechanisms introduced  above.
+There  is also a shell variable called _p_r_o_m_p_t_.  By placing a
+‘!’ character in its value the shell will  there  substitute
+the  number of the current command in the history list.  You
+can use this number to refer to this command  in  a  history
+substitution.  Thus you could
+
+     set prompt=´\! % ´
+
+Note  that  the  ‘!’  character  had to be _e_s_c_a_p_e_d here even
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐33
+
+
+within ‘´’ characters.
+
+     The _l_i_m_i_t command is used to restrict use of resources.
+With no arguments it prints the current limitations:
+
+     cputime   unlimited
+     filesize  unlimited
+     datasize  5616 kbytes
+     stacksize 512 kbytes
+     coredumpsizeunlimited
+
+Limits can be set, e.g.:
+
+     limit coredumpsize 128k
+
+Most  reasonable  units abbreviations will work; see the _c_s_h
+manual page for more details.
+
+     The _l_o_g_o_u_t command can be used  to  terminate  a  login
+shell which has _i_g_n_o_r_e_e_o_f set.
+
+     The  _r_e_h_a_s_h command causes the shell to recompute a ta‐
+ble of where commands are located.  This is necessary if you
+add  a  command to a directory in the current shell’s search
+path and wish the shell to  find  it,  since  otherwise  the
+hashing algorithm may tell the shell that the command wasn’t
+in that directory when the hash table was computed.
+
+     The _r_e_p_e_a_t command can be used to repeat a command sev‐
+eral  times.   Thus  to make 5 copies of the file _o_n_e in the
+file _f_i_v_e you could do
+
+     repeat 5 cat one >> five
+
+
+     The _s_e_t_e_n_v command can be used to set variables in  the
+environment.  Thus
+
+     setenv TERM adm3a
+
+will  set  the  value  of  the  environment variable TERM to
+‘adm3a’.  A user program _p_r_i_n_t_e_n_v exists  which  will  print
+out the environment.  It might then show:
+
+     % printenv
+     HOME=/usr/bill
+     SHELL=/bin/csh
+     PATH=:/usr/ucb:/bin:/usr/bin:/usr/local
+     TERM=adm3a
+     USER=bill
+     %
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐34                      An Introduction to the C shell
+
+
+     The  _s_o_u_r_c_e  command  can  be used to force the current
+shell to read commands from a file.  Thus
+
+     source .cshrc
+
+can be used after editing in a change  to  the  _._c_s_h_r_c  file
+which you wish to take effect right away.
+
+     The  _t_i_m_e  command can be used to cause a command to be
+timed no matter how much CPU time it takes.  Thus
+
+     % time cp /etc/rc /usr/bill/rc
+     0.0u 0.1s 0:01 8% 2+1k 3+2io 1pf+0w
+     % time wc /etc/rc /usr/bill/rc
+          52    178   1347 /etc/rc
+          52    178   1347 /usr/bill/rc
+         104    356   2694 total
+     0.1u 0.1s 0:00 13% 3+3k 5+3io 7pf+0w
+     %
+
+indicates that the _c_p command used a  negligible  amount  of
+user  time  (u)  and  about 1/10th of a system time (s); the
+elapsed time was 1 second (0:01), there was an average  mem‐
+ory  usage of 2k bytes of program space and 1k bytes of data
+space over the cpu time involved  (2+1k);  the  program  did
+three  disk  reads and two disk writes (3+2io), and took one
+page fault and was not swapped  (1pf+0w).   The  word  count
+command  _w_c  on the other hand used 0.1 seconds of user time
+and 0.1 seconds of system time in  less  than  a  second  of
+elapsed  time.  The percentage ‘13%’ indicates that over the
+period when it was active the command ‘wc’ used  an  average
+of 13 percent of the available CPU cycles of the machine.
+
+     The  _u_n_a_l_i_a_s  and  _u_n_s_e_t commands can be used to remove
+aliases and variable definitions from  the  shell,  and  _u_n_‐
+_s_e_t_e_n_v removes variables from the environment.
+
+22..99..  WWhhaatt eellssee??
+
+     This  concludes  the  basic discussion of the shell for
+terminal users.  There are more features of the shell to  be
+discussed  here, and all features of the shell are discussed
+in its manual pages.  One useful feature which is  discussed
+later  is  the _f_o_r_e_a_c_h built‐in command which can be used to
+run the same command sequence with a number of different ar‐
+guments.
+
+     If you intend to use UNIX a lot you should look through
+the rest of this document and the  csh  manual  pages  (sec‐
+tion1)  to  become  familiar with the other facilities which
+are available to you.
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐35
+
+
+33..  SShheellll ccoonnttrrooll ssttrruuccttuurreess aanndd ccoommmmaanndd ssccrriippttss
+
+33..11..  IInnttrroodduuccttiioonn
+
+     It is possible to place commands in files and to  cause
+shells to be invoked to read and execute commands from these
+files, which are called _s_h_e_l_l _s_c_r_i_p_t_s_.  We here detail those
+features of the shell useful to the writers of such scripts.
+
+33..22..  MMaakkee
+
+     It  is  important  to first note what shell scripts are
+_n_o_t useful for.  There is a program  called  _m_a_k_e  which  is
+very useful for maintaining a group of related files or per‐
+forming sets of operations on related files.  For instance a
+large  program  consisting of one or more files can have its
+dependencies described in a _m_a_k_e_f_i_l_e which contains  defini‐
+tions  of  the commands used to create these different files
+when changes occur.  Definitions of the means  for  printing
+listings,  cleaning  up the directory in which the files re‐
+side, and installing the resultant programs are easily,  and
+most  appropriately placed in this _m_a_k_e_f_i_l_e_.  This format is
+superior and preferable to maintaining a group of shell pro‐
+cedures to maintain these files.
+
+     Similarly  when working on a document a _m_a_k_e_f_i_l_e may be
+created which defines how different versions of the document
+are  to  be  created and which options of _n_r_o_f_f or _t_r_o_f_f are
+appropriate.
+
+33..33..  IInnvvooccaattiioonn aanndd tthhee aarrggvv vvaarriiaabbllee
+
+     A _c_s_h command script may be interpreted by saying
+
+     % csh script ...
+
+where _s_c_r_i_p_t is the name of the file containing a  group  of
+_c_s_h  commands  and  ‘...’ is replaced by a sequence of argu‐
+ments.  The shell places these  arguments  in  the  variable
+_a_r_g_v  and  then  begins  to  read  commands from the script.
+These parameters are then available through the same  mecha‐
+nisms which are used to reference any other shell variables.
+
+     If you make the file ‘script’ executable by doing
+
+     chmod 755 script
+
+and  place  a  shell  comment  at the beginning of the shell
+script (i.e. begin the file with a  ‘#’  character)  then  a
+‘/bin/csh’ will automatically be invoked to execute ‘script’
+when you type
+
+     script
+
+
+
+
+
+
+
+
+
+
+USD:4‐36                      An Introduction to the C shell
+
+
+If the file does not begin with  a  ‘#’  then  the  standard
+shell ‘/bin/sh’ will be used to execute it.  This allows you
+to convert your older shell scripts to use _c_s_h at your  con‐
+venience.
+
+33..44..  VVaarriiaabbllee ssuubbssttiittuuttiioonn
+
+     After  each input line is broken into words and history
+substitutions are done on it, the input line is parsed  into
+distinct commands.  Before each command is executed a mecha‐
+nism know as _v_a_r_i_a_b_l_e _s_u_b_s_t_i_t_u_t_i_o_n is done on  these  words.
+Keyed  by  the  character ‘$’ this substitution replaces the
+names of variables by their values.  Thus
+
+     echo $argv
+
+when placed in a command  script  would  cause  the  current
+value of the variable _a_r_g_v to be echoed to the output of the
+shell script.  It is an error for _a_r_g_v to be unset  at  this
+point.
+
+     A number of notations are provided for accessing compo‐
+nents and attributes of variables.  The notation
+
+     $?name
+
+expands to ‘1’ if name is _s_e_t or to ‘0’ if name is not  _s_e_t_.
+It  is  the  fundamental mechanism used for checking whether
+particular variables have been assigned values.   All  other
+forms of reference to undefined variables cause errors.
+
+     The notation
+
+     $#name
+
+expands  to  the  number  of  elements in the variable _n_a_m_e_.
+Thus
+
+     % set argv=(a b c)
+     % echo $?argv
+     1
+     % echo $#argv
+     3
+     % unset argv
+     % echo $?argv
+     0
+     % echo $argv
+     Undefined variable: argv.
+     %
+
+
+     It is also possible to access the components of a vari‐
+able which has several values.  Thus
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐37
+
+
+     $argv[1]
+
+gives  the  first  component of _a_r_g_v or in the example above
+‘a’.  Similarly
+
+     $argv[$#argv]
+
+would give ‘c’, and
+
+     $argv[1−2]
+
+would give ‘a b’. Other notations useful  in  shell  scripts
+are
+
+     $_n
+
+where _n is an integer as a shorthand for
+
+     $argv[_n]
+
+the _n_t_h parameter and
+
+     $*
+
+which is a shorthand for
+
+     $argv
+
+The form
+
+     $$
+
+expands  to  the process number of the current shell.  Since
+this process number is unique in the system it can  be  used
+in generation of unique temporary file names.  The form
+
+     $<
+
+is  quite  special and is replaced by the next line of input
+read from the shell’s standard input (not the script  it  is
+reading).  This is useful for writing shell scripts that are
+interactive, reading commands from  the  terminal,  or  even
+writing  a shell script that acts as a filter, reading lines
+from its input file.  Thus the sequence
+
+     echo ’yes or no?\c’
+     set a=($<)
+
+would write out the prompt ‘yes or no?’  without  a  newline
+and  then  read  the  answer into the variable ‘a’.  In this
+case ‘$#a’ would be ‘0’ if either a blank  line  or  end‐of‐
+file (^D) was typed.
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐38                      An Introduction to the C shell
+
+
+     One minor difference between ‘$_n’ and ‘$argv[_n]’ should
+be noted here.  The form ‘$argv[_n]’ will yield an error if _n
+is  not  in the range ‘1−$#argv’ while ‘$n’ will never yield
+an out of range subscript error.  This is for  compatibility
+with the way older shells handled parameters.
+
+     Another important point is that it is never an error to
+give a subrange of the form ‘n−’; if there are less  than  _n
+components  of  the given variable then no words are substi‐
+tuted.  A range of the form ‘m−n’ likewise returns an  empty
+vector  without giving an error when _m exceeds the number of
+elements of the given variable, provided the subscript _n  is
+in range.
+
+33..55..  EExxpprreessssiioonnss
+
+     In  order for interesting shell scripts to be construc‐
+ted it must be possible to evaluate expressions in the shell
+based  on  the values of variables.  In fact, all the arith‐
+metic operations of the language  C  are  available  in  the
+shell with the same precedence that they have in C.  In par‐
+ticular, the operations ‘==’ and ‘!=’  compare  strings  and
+the operators ‘&&’ and ‘||’ implement the boolean and/or op‐
+erations.  The special operators ‘=~’ and ‘!~’  are  similar
+to  ‘==’  and  ‘!=’ except that the string on the right side
+can have pattern matching characters (like *, ? or  [])  and
+the  test is whether the string on the left matches the pat‐
+tern on the right.
+
+     The shell also allows file enquiries of the form
+
+     −? filename
+
+where ‘?’ is replace by a number of single characters.   For
+instance the expression primitive
+
+     −e filename
+
+tell  whether  the file ‘filename’ exists.  Other primitives
+test for read, write and execute access to the file, whether
+it is a directory, or has non‐zero length.
+
+     It  is  possible  to  test whether a command terminates
+normally, by a primitive of the form ‘{ command }’ which re‐
+turns  true,  i.e.  ‘1’ if the command succeeds exiting nor‐
+mally with exit status 0, or ‘0’ if the  command  terminates
+abnormally  or  with exit status non‐zero.  If more detailed
+information about the execution status of a command  is  re‐
+quired,  it can be executed and the variable ‘$status’ exam‐
+ined in the next command.  Since ‘$status’ is set  by  every
+command, it is very transient.  It can be saved if it is in‐
+convenient to use it only in the single immediately  follow‐
+ing command.
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐39
+
+
+     For  a full list of expression components available see
+the manual section for the shell.
+
+33..66..  SSaammppllee sshheellll ssccrriipptt
+
+     A sample shell script which makes use of the expression
+mechanism  of  the  shell  and some of its control structure
+follows:
+
+     % cat copyc
+     #
+     # Copyc copies those C programs in the specified list
+     # to the directory ~/backup if they differ from the files
+     # already in ~/backup
+     #
+     set noglob
+     foreach i ($argv)
+
+             if ($i !~ *.c) continue  # not a .c file so do nothing
+
+             if (! −r ~/backup/$i:t) then
+                     echo $i:t not in backup... not cp\´ed
+                     continue
+             endif
+
+             cmp −s $i ~/backup/$i:t # to set $status
+
+             if ($status != 0) then
+                     echo new backup of $i
+                     cp $i ~/backup/$i:t
+             endif
+     end
+
+
+     This script makes use of  the  _f_o_r_e_a_c_h  command,  which
+causes the shell to execute the commands between the _f_o_r_e_a_c_h
+and the matching _e_n_d for each of the  values  given  between
+‘(’ and ‘)’ with the named variable, in this case ‘i’ set to
+successive values in the list.  Within this loop we may  use
+the command _b_r_e_a_k to stop executing the loop and _c_o_n_t_i_n_u_e to
+prematurely terminate one iteration and begin the next.  Af‐
+ter the _f_o_r_e_a_c_h loop the iteration variable (_i in this case)
+has the value at the last iteration.
+
+     We set the variable _n_o_g_l_o_b here to prevent filename ex‐
+pansion  of  the  members  of _a_r_g_v_.  This is a good idea, in
+general, if the arguments to a shell  script  are  filenames
+which  have  already  been  expanded or if the arguments may
+contain filename expansion metacharacters.  It is also  pos‐
+sible  to  quote  each  use of a ‘$’ variable expansion, but
+this is harder and less reliable.
+
+     The other control construct used here is a statement of
+the form
+
+
+
+
+
+
+
+
+
+USD:4‐40                      An Introduction to the C shell
+
+
+     iiff ( expression ) tthheenn
+          command
+          ...
+     eennddiiff
+
+The  placement  of  the keywords here is nnoott flexible due to
+the current implementation of the shell.†
+
+     The shell does have another form of the if statement of
+the form
+
+     iiff ( expression ) ccoommmmaanndd
+
+which can be written
+
+     iiff ( expression ) \
+          command
+
+Here we have escaped the newline for the sake of appearance.
+The command must not involve ‘|’, ‘&’ or ‘;’ and must not be
+another control command.  The second form requires the final
+‘\’ to iimmmmeeddiiaatteellyy precede the end‐of‐line.
+
+     The  more  general _i_f statements above also admit a se‐
+quence of _e_l_s_e_−_i_f pairs followed by a single _e_l_s_e and an _e_n_‐
+_d_i_f_, e.g.:
+
+     iiff ( expression ) tthheenn
+          commands
+     eellssee iiff (expression ) tthheenn
+          commands
+     ...
+
+     eellssee
+          commands
+     eennddiiff
+
+
+     Another  important  mechanism  used in shell scripts is
+the ‘:’ modifier.  We can use the modifier ‘:r’ here to  ex‐
+tract a root of a filename or ‘:e’ to extract the _e_x_t_e_n_s_i_o_n_.
+───────────
+†The following two formats are not  currently  ac‐
+ceptable to the shell:
+
+     iiff ( expression )        # WWoonn’’tt wwoorrkk!!
+     tthheenn
+          command
+          ...
+     eennddiiff
+
+and
+
+     iiff ( expression ) tthheenn command eennddiiff         # WWoonn’’tt wwoorrkk
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐41
+
+
+Thus if the variable _i has the value ‘/mnt/foo.bar’ then
+
+     % echo $i $i:r $i:e
+     /mnt/foo.bar /mnt/foo bar
+     %
+
+shows how the ‘:r’ modifier strips off the  trailing  ‘.bar’
+and the the ‘:e’ modifier leaves only the ‘bar’.  Other mod‐
+ifiers will take off the last component of a pathname  leav‐
+ing  the  head ‘:h’ or all but the last component of a path‐
+name leaving the tail ‘:t’.  These modifiers are  fully  de‐
+scribed in the _c_s_h manual pages in the User’s Reference Man‐
+ual.  It is also possible to use  the  _c_o_m_m_a_n_d  _s_u_b_s_t_i_t_u_t_i_o_n
+mechanism  described  in  the  next major section to perform
+modifications on strings to then reenter the  shell’s  envi‐
+ronment.   Since  each  usage of this mechanism involves the
+creation of a new process, it is much more expensive to  use
+than  the ‘:’ modification mechanism.‡ Finally, we note that
+the character ‘#’ lexically introduces a  shell  comment  in
+shell  scripts  (but not from the terminal).  All subsequent
+characters on the input line after a ‘#’  are  discarded  by
+the shell.  This character can be quoted using ‘´’ or ‘\’ to
+place it in an argument word.
+
+33..77..  OOtthheerr ccoonnttrrooll ssttrruuccttuurreess
+
+     The shell also has control structures _w_h_i_l_e and  _s_w_i_t_c_h
+similar to those of C.  These take the forms
+
+     wwhhiillee ( expression )
+          commands
+     eenndd
+
+and
+
+
+
+
+
+
+
+
+
+
+───────────
+‡  It  is  also important to note that the current
+implementation of the shell limits the  number  of
+‘:’ modifiers on a ‘$’ substitution to 1.  Thus
+
+     % echo $i $i:h:t
+     /a/b/c /a/b:t
+     %
+
+does not do what one would expect.
+
+
+
+
+
+
+
+
+
+USD:4‐42                      An Introduction to the C shell
+
+
+     sswwiittcchh ( word )
+
+     ccaassee str1:
+          commands
+          bbrreeaakkssww
+
+      ...
+
+     ccaassee strn:
+          commands
+          bbrreeaakkssww
+
+     ddeeffaauulltt::
+          commands
+          bbrreeaakkssww
+
+     eennddssww
+
+For  details  see the manual section for _c_s_h_.  C programmers
+should note that we use _b_r_e_a_k_s_w to exit from a _s_w_i_t_c_h  while
+_b_r_e_a_k  exits  a  _w_h_i_l_e or _f_o_r_e_a_c_h loop.  A common mistake to
+make in _c_s_h scripts is to use _b_r_e_a_k rather than  _b_r_e_a_k_s_w  in
+switches.
+
+     Finally, _c_s_h allows a _g_o_t_o statement, with labels look‐
+ing like they do in C, i.e.:
+
+     loop:
+          commands
+          ggoottoo loop
+
+
+33..88..  SSuuppppllyyiinngg iinnppuutt ttoo ccoommmmaannddss
+
+     Commands run from shell scripts receive by default  the
+standard  input  of  the  shell which is running the script.
+This is different from previous shells running  under  UNIX.
+It  allows  shell scripts to fully participate in pipelines,
+but mandates extra notation for commands which are  to  take
+inline data.
+
+     Thus  we  need a metanotation for supplying inline data
+to commands in shell scripts.  As an example, consider  this
+script  which  runs the editor to delete leading blanks from
+the lines in each argument file:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐43
+
+
+     % cat deblank
+     # deblank −− remove leading blanks
+     foreach i ($argv)
+     ed − $i << ´EOF´
+     1,$s/^[ ]*//
+     w
+     q
+     ´EOF´
+     end
+     %
+
+The notation ‘<< ´EOF´’ means that the  standard  input  for
+the  _e_d command is to come from the text in the shell script
+file up to the next line consisting of exactly ‘´EOF´’.  The
+fact  that  the  ‘EOF’  is  enclosed in ‘´’ characters, i.e.
+quoted, causes the shell to not perform  variable  substitu‐
+tion  on  the intervening lines.  In general, if any part of
+the word following the ‘<<’ which the shell uses  to  termi‐
+nate  the  text  to  be  given to the command is quoted then
+these substitutions will not be  performed.   In  this  case
+since  we used the form ‘1,$’ in our editor script we needed
+to insure that this ‘$’ was not  variable  substituted.   We
+could  also have insured this by preceding the ‘$’ here with
+a ‘\’, i.e.:
+
+     1,\$s/^[ ]*//
+
+but quoting the ‘EOF’ terminator is a more reliable  way  of
+achieving the same thing.
+
+33..99..  CCaattcchhiinngg iinntteerrrruuppttss
+
+     If  our  shell  script  creates temporary files, we may
+wish to catch interruptions of the shell script so  that  we
+can clean up these files.  We can then do
+
+     onintr label
+
+where  _l_a_b_e_l  is a label in our program.  If an interrupt is
+received the shell will do a ‘goto label’ and we can  remove
+the  temporary  files  and then do an _e_x_i_t command (which is
+built in to the shell) to exit from the shell script.  If we
+wish to exit with a non‐zero status we can do
+
+     exit(1)
+
+e.g. to exit with status ‘1’.
+
+33..1100..  WWhhaatt eellssee??
+
+     There are other features of the shell useful to writers
+of shell procedures.  The _v_e_r_b_o_s_e and _e_c_h_o options  and  the
+related  _−_v  and _−_x command line options can be used to help
+trace the actions of the shell.  The _−_n  option  causes  the
+
+
+
+
+
+
+
+
+
+USD:4‐44                      An Introduction to the C shell
+
+
+shell  only to read commands and not to execute them and may
+sometimes be of use.
+
+     One other thing to note is that _c_s_h  will  not  execute
+shell  scripts  which  do  not begin with the character ‘#’,
+that is shell scripts that do  not  begin  with  a  comment.
+Similarly,  the  ‘/bin/sh’  on your system may well defer to
+‘csh’ to interpret shell scripts which begin with ‘#’.  This
+allows shell scripts for both shells to live in harmony.
+
+     There  is  also  another  quotation mechanism using ‘"’
+which allows only some of the expansion mechanisms  we  have
+so far discussed to occur on the quoted string and serves to
+make this string into a single word as ‘´’ does.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐45
+
+
+44..  OOtthheerr,, lleessss ccoommmmoonnllyy uusseedd,, sshheellll ffeeaattuurreess
+
+44..11..  LLooooppss aatt tthhee tteerrmmiinnaall;; vvaarriiaabblleess aass vveeccttoorrss
+
+     It is occasionally useful to use  the  _f_o_r_e_a_c_h  control
+structure  at  the terminal to aid in performing a number of
+similar commands.  For instance, there  were  at  one  point
+three  shells  in  use on the Cory UNIX system at Cory Hall,
+‘/bin/sh’, ‘/bin/nsh’, and ‘/bin/csh’.  To count the  number
+of  persons  using each shell one could have issued the com‐
+mands
+
+     % grep −c csh$ /etc/passwd
+     27
+     % grep −c nsh$ /etc/passwd
+     128
+     % grep −c −v sh$ /etc/passwd
+     430
+     %
+
+Since these commands are very similar we can use _f_o_r_e_a_c_h  to
+do this more easily.
+
+     % foreach i (´sh$´ ´csh$´ ´−v sh$´)
+     ? grep −c $i /etc/passwd
+     ? end
+     27
+     128
+     430
+     %
+
+Note  here  that  the shell prompts for input with ‘? ’ when
+reading the body of the loop.
+
+     Very useful with  loops  are  variables  which  contain
+lists of filenames or other words.  You can, for example, do
+
+     % set a=(`ls`)
+     % echo $a
+     csh.n csh.rm
+     % ls
+     csh.n
+     csh.rm
+     % echo $#a
+     2
+     %
+
+The  _s_e_t  command here gave the variable _a a list of all the
+filenames in the current directory as value.   We  can  then
+iterate over these names to perform any chosen function.
+
+     The  output  of a command within ‘`’ characters is con‐
+verted by the shell to a list of words.  You can also  place
+the  ‘`’  quoted  string  within ‘"’ characters to take each
+
+
+
+
+
+
+
+
+
+USD:4‐46                      An Introduction to the C shell
+
+
+(non‐empty) line as a component of the variable;  preventing
+the lines from being split into words at blanks and tabs.  A
+modifier ‘:x’ exists which can be used later to expand  each
+component of the variable into another variable splitting it
+into separate words
+
+44..22..  BBrraacceess {{ ...... }} iinn aarrgguummeenntt eexxppaannssiioonn
+
+     Another form of filename expansion, alluded  to  before
+involves the characters ‘{’ and ‘}’.  These characters spec‐
+ify that the contained strings, separated by ‘,’ are  to  be
+consecutively substituted into the containing characters and
+the results expanded left to right.  Thus
+
+     A{str1,str2,...strn}B
+
+expands to
+
+     Astr1B Astr2B ... AstrnB
+
+This expansion occurs before the other filename  expansions,
+and  may  be applied recursively (i.e. nested).  The results
+of each expanded string are sorted separately, left to right
+order  being preserved.  The resulting filenames are not re‐
+quired to exist if no other expansion mechanisms  are  used.
+This means that this mechanism can be used to generate argu‐
+ments which are not filenames, but which have common parts.
+
+     A typical use of this would be
+
+     mkdir ~/{hdrs,retrofit,csh}
+
+to make subdirectories ‘hdrs’, ‘retrofit’ and ‘csh’ in  your
+home directory.  This mechanism is most useful when the com‐
+mon prefix is longer than in this example, i.e.
+
+     chown root /usr/{ucb/{ex,edit},lib/{ex?.?*,how_ex}}
+
+
+44..33..  CCoommmmaanndd ssuubbssttiittuuttiioonn
+
+     A command enclosed in ‘`’ characters is replaced,  just
+before  filenames are expanded, by the output from that com‐
+mand.  Thus it is possible to do
+
+     set pwd=`pwd`
+
+to save the current directory in the variable _p_w_d or to do
+
+     ex `grep −l TRACE *.c`
+
+to run the editor _e_x  supplying  as  arguments  those  files
+whose  names  end  in  ‘.c’ which have the string ‘TRACE’ in
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐47
+
+
+them.*
+
+44..44..  OOtthheerr ddeettaaiillss nnoott ccoovveerreedd hheerree
+
+     In particular circumstances it may be necessary to know
+the  exact  nature and order of different substitutions per‐
+formed by the shell.  The exact meaning of certain  combina‐
+tions  of  quotations is also occasionally important.  These
+are detailed fully in its manual section.
+
+     The shell has a number of  command  line  option  flags
+mostly  of use in writing UNIX programs, and debugging shell
+scripts.  See the csh(1) manual section for a list of  these
+options.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+───────────
+*Command expansion also occurs in input redirected
+with ‘<<’ and within ‘"’ quotations.  Refer to the
+shell manual section for full details.
+
+
+
+
+
+
+
+
+
+USD:4‐48                      An Introduction to the C shell
+
+
+AAppppeennddiixx −− SSppeecciiaall cchhaarraacctteerrss
+
+The  following table lists the special characters of _c_s_h and
+the UNIX system, giving for each the section(s) in which  it
+is  discussed.   A number of these characters also have spe‐
+cial meaning in expressions.  See the _c_s_h manual section for
+a complete list.
+
+Syntactic metacharacters
+
+     ;    2.4  separates commands to be executed sequentially
+     |    1.5  separates commands in a pipeline
+     ( )  2.2,3.6   brackets expressions and variable values
+     &    2.5  follows commands to be executed without waiting for completion
+
+
+Filename metacharacters
+
+     /    1.6  separates components of a file’s pathname
+     .    1.6  separates root parts of a file name from extensions
+     ?    1.6  expansion character matching any single character
+     *    1.6  expansion character matching any sequence of characters
+     [ ]  1.6  expansion sequence matching any single character from a set
+     ~    1.6  used at the beginning of a filename to indicate home directories
+     { }  4.2  used to specify groups of arguments with common parts
+
+
+Quotation metacharacters
+
+     \    1.7  prevents meta‐meaning of following single character
+     ´    1.7  prevents meta‐meaning of a group of characters
+     "    4.3  like ´, but allows variable and command expansion
+
+
+Input/output metacharacters
+
+     <    1.5  indicates redirected input
+     >    1.3  indicates redirected output
+
+
+Expansion/substitution metacharacters
+
+     $    3.4  indicates variable substitution
+     !    2.3  indicates history substitution
+     :    3.6  precedes substitution modifiers
+     ^    2.3  used in special forms of history substitution
+     `    4.3  indicates command substitution
+
+
+Other metacharacters
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐49
+
+
+     #    1.3,3.6   begins scratch file names; indicates shell comments
+     −    1.2  prefixes option (flag) arguments to commands
+     %    2.6  prefixes job name specifications
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐50                      An Introduction to the C shell
+
+
+GGlloossssaarryy
+
+     This glossary lists the most important terms introduced
+in the introduction to the shell  and  gives  references  to
+sections of the shell document for further information about
+them.  References of the form ‘pr  (1)’  indicate  that  the
+command  _p_r  is in the UNIX User Reference manual in section
+1.  You can look at an online copy of its manual page by do‐
+ing
+
+     man 1 pr
+
+References  of the form (2.5) indicate that more information
+can be found in section 2.5 of this manual.
+
+..              Your current directory has the  name  ‘.’  as
+               well  as the name printed by the command _p_w_d_;
+               see also _d_i_r_s_.  The current directory ‘.’  is
+               usually  the  first  _c_o_m_p_o_n_e_n_t  of the search
+               path contained in  the  variable  _p_a_t_h,  thus
+               commands  which  are  in  ‘.’ are found first
+               (2.2).  The character ‘.’  is  also  used  in
+               separating  _c_o_m_p_o_n_e_n_t_s  of  filenames  (1.6).
+               The character ‘.’ at the beginning of a  _c_o_m_‐
+               _p_o_n_e_n_t of a _p_a_t_h_n_a_m_e is treated specially and
+               not  matched  by   the   _f_i_l_e_n_a_m_e   _e_x_p_a_n_s_i_o_n
+               metacharacters  ‘?’,  ‘*’,  and ‘[’ ‘]’ pairs
+               (1.6).
+
+....             Each directory has a file ‘..’ in it which is
+               a  reference  to its parent directory.  After
+               changing into the directory with _c_h_d_i_r, i.e.
+
+                    chdir paper
+
+               you can return to the parent directory by do‐
+               ing
+
+                    chdir ..
+
+               The  current  directory  is  printed  by  _p_w_d
+               (2.7).
+
+a.out          Compilers which create executable images cre‐
+               ate them, by default, in the file _a_._o_u_t_.  for
+               historical reasons (2.3).
+
+absolute pathname
+               A _p_a_t_h_n_a_m_e which begins with a ‘/’  is  _a_b_s_o_‐
+               _l_u_t_e  since it specifies the _p_a_t_h of directo‐
+               ries from the beginning of the entire  direc‐
+               tory  system  −  called  the  _r_o_o_t directory.
+               _P_a_t_h_n_a_m_es which are not _a_b_s_o_l_u_t_e  are  called
+               _r_e_l_a_t_i_v_e    (see   definition   of   _r_e_l_a_t_i_v_e
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐51
+
+
+               _p_a_t_h_n_a_m_e) (1.6).
+
+alias          An _a_l_i_a_s specifies  a  shorter  or  different
+               name  for a UNIX command, or a transformation
+               on a command to be performed  in  the  shell.
+               The  shell  has  a command _a_l_i_a_s which estab‐
+               lishes _a_l_i_a_s_e_s and can  print  their  current
+               values.   The  command _u_n_a_l_i_a_s is used to re‐
+               move _a_l_i_a_s_e_s (2.4).
+
+argument       Commands in UNIX receive a list  of  _a_r_g_u_m_e_n_t
+               words.  Thus the command
+
+                    echo a b c
+
+               consists of the _c_o_m_m_a_n_d _n_a_m_e ‘echo’ and three
+               _a_r_g_u_m_e_n_t words ‘a’, ‘b’ and ‘c’.  The set  of
+               _a_r_g_u_m_e_n_t_s  after  the _c_o_m_m_a_n_d _n_a_m_e is said to
+               be the _a_r_g_u_m_e_n_t _l_i_s_t of the command (1.1).
+
+argv           The list of arguments to a command written in
+               the  shell  language (a shell script or shell
+               procedure) is stored  in  a  variable  called
+               _a_r_g_v  within  the  shell.  This name is taken
+               from the conventional name in the C  program‐
+               ming language (3.4).
+
+background     Commands  started without waiting for them to
+               complete  are  called   _b_a_c_k_g_r_o_u_n_d   commands
+               (2.6).
+
+base           A  filename  is  sometimes thought of as con‐
+               sisting of a _b_a_s_e part, before any ‘.’  char‐
+               acter,  and an _e_x_t_e_n_s_i_o_n − the part after the
+               ‘.’.  See _f_i_l_e_n_a_m_e and  _e_x_t_e_n_s_i_o_n  (1.6)  and
+               basename (1).
+
+bg             The _b_g command causes a _s_u_s_p_e_n_d_e_d job to con‐
+               tinue execution in the _b_a_c_k_g_r_o_u_n_d (2.6).
+
+bin            A directory containing binaries  of  programs
+               and shell scripts to be executed is typically
+               called a _b_i_n directory.  The standard  system
+               _b_i_n  directories  are  ‘/bin’  containing the
+               most heavily  used  commands  and  ‘/usr/bin’
+               which  contains  most  other  user  programs.
+               Programs developed at  UC  Berkeley  live  in
+               ‘/usr/ucb’,  while  locally  written programs
+               live in ‘/usr/local’.  Games are kept in  the
+               directory  ‘/usr/games’.  You can place bina‐
+               ries in any directory.  If you wish  to  exe‐
+               cute  them often, the name of the directories
+               should be a _c_o_m_p_o_n_e_n_t of the variable _p_a_t_h.
+
+
+
+
+
+
+
+
+
+
+USD:4‐52                      An Introduction to the C shell
+
+
+break          _B_r_e_a_k is a builtin command used to exit  from
+               loops  within  the  control  structure of the
+               shell (3.7).
+
+breaksw        The _b_r_e_a_k_s_w builtin command is used  to  exit
+               from a _s_w_i_t_c_h control structure, like a _b_r_e_a_k
+               exits from loops (3.7).
+
+builtin        A command executed directly by the  shell  is
+               called  a  _b_u_i_l_t_i_n command.  Most commands in
+               UNIX are not built into the shell, but rather
+               exist  as  files  in  _b_i_n directories.  These
+               commands are accessible because the  directo‐
+               ries  in  which  they reside are named in the
+               _p_a_t_h variable.
+
+case           A _c_a_s_e command is used as a label in a _s_w_i_t_c_h
+               statement  in  the shell’s control structure,
+               similar to that of the language  C.   Details
+               are  given  in  the  shell documentation ‘csh
+               (1)’ (3.7).
+
+cat            The _c_a_t program catenates a list of specified
+               files  on the _s_t_a_n_d_a_r_d _o_u_t_p_u_t.  It is usually
+               used to look at the contents of a single file
+               on the terminal, to ‘cat a file’ (1.8, 2.3).
+
+cd             The  _c_d command is used to change the _w_o_r_k_i_n_g
+               _d_i_r_e_c_t_o_r_y.  With  no  arguments,  _c_d  changes
+               your _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y to be your _h_o_m_e direc‐
+               tory (2.4, 2.7).
+
+chdir          The _c_h_d_i_r command is a synonym for _c_d.  _C_d is
+               usually used because it is easier to type.
+
+chsh           The  _c_h_s_h command is used to change the shell
+               which you use on UNIX.  By default, you use a
+               different  version of the shell which resides
+               in ‘/bin/sh’.  You can change your  shell  to
+               ‘/bin/csh’ by doing
+
+                    chsh your‐login‐name /bin/csh
+
+               Thus I would do
+
+                    chsh bill /bin/csh
+
+               It  is  only  necessary to do this once.  The
+               next time you log in to UNIX after doing this
+               command,  you  will  be using _c_s_h rather than
+               the shell in ‘/bin/sh’ (1.9).
+
+cmp            _C_m_p is a program which compares files.  It is
+               usually  used  on  binary files, or to see if
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐53
+
+
+               two files are identical (3.6).  For comparing
+               text  files  the  program  _d_i_f_f, described in
+               ‘diff (1)’ is used.
+
+command        A function performed by the system, either by
+               the shell (a builtin _c_o_m_m_a_n_d) or by a program
+               residing in a file in a directory within  the
+               UNIX system, is called a _c_o_m_m_a_n_d (1.1).
+
+command name
+               When  a  command  is issued, it consists of a
+               _c_o_m_m_a_n_d _n_a_m_e, which is the first word of  the
+               command,  followed by arguments.  The conven‐
+               tion on UNIX is that the first word of a com‐
+               mand  names  the  function  to  be  performed
+               (1.1).
+
+command substitution
+               The replacement of a command enclosed in  ‘`’
+               characters by the text output by that command
+               is called _c_o_m_m_a_n_d _s_u_b_s_t_i_t_u_t_i_o_n (4.3).
+
+component      A part of a _p_a_t_h_n_a_m_e between  ‘/’  characters
+               is  called  a  _c_o_m_p_o_n_e_n_t of that _p_a_t_h_n_a_m_e.  A
+               variable which has multiple strings as  value
+               is  said  to  have  several  _c_o_m_p_o_n_e_n_ts; each
+               string is a _c_o_m_p_o_n_e_n_t of the variable.
+
+continue       A builtin command which causes  execution  of
+               the  enclosing _f_o_r_e_a_c_h or _w_h_i_l_e loop to cycle
+               prematurely.  Similar to the _c_o_n_t_i_n_u_e command
+               in the programming language C (3.6).
+
+control‐       Certain  special  characters,  called _c_o_n_t_r_o_l
+               characters, are produced by holding down  the
+               CONTROL  key  on your terminal and simultane‐
+               ously pressing another character,  much  like
+               the  SHIFT  key is used to produce upper case
+               characters. Thus  _c_o_n_t_r_o_l_‐c  is  produced  by
+               holding  down  the CONTROL key while pressing
+               the ‘c’ key.  Usually UNIX prints a caret (^)
+               followed by the corresponding letter when you
+               type a _c_o_n_t_r_o_l character (e.g. ‘^C’ for  _c_o_n_‐
+               _t_r_o_l_‐c (1.8).
+
+core dump      When  a  program  terminates  abnormally, the
+               system places an image of its  current  state
+               in  a  file named ‘core’.  This _c_o_r_e _d_u_m_p can
+               be examined with  the  system  debugger  ‘adb
+               (1)’  or ‘sdb (1)’ in order to determine what
+               went wrong with the program  (1.8).   If  the
+               shell produces a message of the form
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐54                      An Introduction to the C shell
+
+
+                    Illegal instruction (core dumped)
+
+               (where  ‘Illegal  instruction’ is only one of
+               several possible messages), you should report
+               this to the author of the program or a system
+               administrator, saving the ‘core’ file.
+
+cp             The _c_p (copy) program is  used  to  copy  the
+               contents  of  one file into another file.  It
+               is one of the most commonly  used  UNIX  com‐
+               mands (1.6).
+
+csh            The name of the shell program that this docu‐
+               ment describes.
+
+.cshrc         The file _._c_s_h_r_c in  your  _h_o_m_e  directory  is
+               read  by  each  shell as it begins execution.
+               It is usually used to change the  setting  of
+               the variable _p_a_t_h and to set _a_l_i_a_s parameters
+               which are to take effect globally (2.1).
+
+cwd            The _c_w_d variable in the shell holds the _a_b_s_o_‐
+               _l_u_t_e  _p_a_t_h_n_a_m_e  of the current _w_o_r_k_i_n_g _d_i_r_e_c_‐
+               _t_o_r_y.  It is changed by  the  shell  whenever
+               your  current  _w_o_r_k_i_n_g  _d_i_r_e_c_t_o_r_y changes and
+               should not be changed otherwise (2.2).
+
+date           The _d_a_t_e command prints the current date  and
+               time (1.3).
+
+debugging      _D_e_b_u_g_g_i_n_g  is  the process of correcting mis‐
+               takes in programs  and  shell  scripts.   The
+               shell has several options and variables which
+               may be used to aid in shell _d_e_b_u_g_g_i_n_g (4.4).
+
+default:       The  label  _d_e_f_a_u_l_t_:  is  used  within  shell
+               _s_w_i_t_c_h statements, as it is in the C language
+               to label the code to be executed if  none  of
+               the _c_a_s_e labels matches the value switched on
+               (3.7).
+
+DELETE         The DELETE or RUBOUT key on the terminal nor‐
+               mally  causes  an interrupt to be sent to the
+               current job.  Many users change the interrupt
+               character to be ^C.
+
+detached       A command that continues running in the _b_a_c_k_‐
+               _g_r_o_u_n_d after you logout is  said  to  be  _d_e_‐
+               _t_a_c_h_e_d.
+
+diagnostic     An error message produced by a program is of‐
+               ten referred to as a _d_i_a_g_n_o_s_t_i_c.  Most  error
+               messages are not written to the _s_t_a_n_d_a_r_d _o_u_t_‐
+               _p_u_t, since that is often directed  away  from
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐55
+
+
+               the terminal (1.3, 1.5).  Error messsages are
+               instead  written  to  the  _d_i_a_g_n_o_s_t_i_c  _o_u_t_p_u_t
+               which may be directed away from the terminal,
+               but usually is not.   Thus  _d_i_a_g_n_o_s_t_i_c_s  will
+               usually appear on the terminal (2.5).
+
+directory      A  structure  which  contains  files.  At any
+               time you  are  in  one  particular  _d_i_r_e_c_t_o_r_y
+               whose  names  can  be  printed by the command
+               _p_w_d.  The _c_h_d_i_r command will  change  you  to
+               another _d_i_r_e_c_t_o_r_y, and make the files in that
+               _d_i_r_e_c_t_o_r_y visible. The _d_i_r_e_c_t_o_r_y in which you
+               are  when you first login is your _h_o_m_e direc‐
+               tory (1.1, 2.7).
+
+directory stack
+               The shell saves the names of previous _w_o_r_k_i_n_g
+               _d_i_r_e_c_t_o_r_i_e_s  in  the _d_i_r_e_c_t_o_r_y _s_t_a_c_k when you
+               change your current _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y via the
+               _p_u_s_h_d  command.   The  _d_i_r_e_c_t_o_r_y _s_t_a_c_k can be
+               printed by using the _d_i_r_s command, which  in‐
+               cludes  your current _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y as the
+               first directory name on the left (2.7).
+
+dirs           The _d_i_r_s command prints the shell’s _d_i_r_e_c_t_o_r_y
+               _s_t_a_c_k (2.7).
+
+du             The _d_u command is a program (described in ‘du
+               (1)’) which prints the number of disk  blocks
+               is  all  directories below and including your
+               current _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y (2.6).
+
+echo           The _e_c_h_o command prints its  arguments  (1.6,
+               3.6).
+
+else           The  _e_l_s_e  command  is  part of the ‘if‐then‐
+               else‐endif’ control command construct (3.6).
+
+endif          If an _i_f statement is  ended  with  the  word
+               _t_h_e_n, all lines following the _i_f up to a line
+               starting with the word _e_n_d_i_f or _e_l_s_e are exe‐
+               cuted  if  the  condition between parentheses
+               after the _i_f is true (3.6).
+
+EOF            An _e_n_d‐_o_f‐_f_i_l_e is generated by  the  terminal
+               by  a control‐d, and whenever a command reads
+               to the end of a file which it has been  given
+               as  input.   Commands  receiving input from a
+               _p_i_p_e receive an _e_n_d‐_o_f‐_f_i_l_e when the  command
+               sending  them input completes.  Most commands
+               terminate when they receive  an  _e_n_d‐_o_f‐_f_i_l_e.
+               The shell has an option to ignore _e_n_d‐_o_f‐_f_i_l_e
+               from a terminal input which may help you keep
+               from  logging  out accidentally by typing too
+
+
+
+
+
+
+
+
+
+USD:4‐56                      An Introduction to the C shell
+
+
+               many control‐d’s (1.1, 1.8, 3.8).
+
+escape         A character ‘\’ used to prevent  the  special
+               meaning  of a metacharacter is said to _e_s_c_a_p_e
+               the character from its special meaning.  Thus
+
+                    echo \*
+
+               will echo the character ‘*’ while just
+
+                    echo *
+
+               will echo the names of the file in  the  cur‐
+               rent  directory.   In this example, \ _e_s_c_a_p_es
+               ‘*’ (1.7).   There  is  also  a  non‐printing
+               character called _e_s_c_a_p_e, usually labelled ESC
+               or ALTMODE on terminal keyboards.  Some older
+               UNIX  systems  use this character to indicate
+               that output is to be _s_u_s_p_e_n_d_e_d.  Most systems
+               use control‐s to stop the output and control‐
+               q to start it.
+
+/etc/passwd    This file contains information about the  ac‐
+               counts  currently on the system.  It consists
+               of a line for each account with fields  sepa‐
+               rated  by ‘:’ characters (1.8).  You can look
+               at this file by saying
+
+                    cat /etc/passwd
+
+               The commands _f_i_n_g_e_r and _g_r_e_p are  often  used
+               to  search for information in this file.  See
+               ‘finger (1)’, ‘passwd(5)’, and ‘grep (1)’ for
+               more details.
+
+exit           The _e_x_i_t command is used to force termination
+               of a shell script,  and  is  built  into  the
+               shell (3.9).
+
+exit status    A  command  which discovers a problem may re‐
+               flect this back to the  command  (such  as  a
+               shell)  which invoked (executed) it.  It does
+               this by returning a non‐zero  number  as  its
+               _e_x_i_t  _s_t_a_t_u_s,  a status of zero being consid‐
+               ered ‘normal termination’.  The _e_x_i_t  command
+               can  be  used to force a shell command script
+               to give a non‐zero _e_x_i_t _s_t_a_t_u_s (3.6).
+
+expansion      The replacement of strings in the shell input
+               which contain metacharacters by other strings
+               is referred to as the process  of  _e_x_p_a_n_s_i_o_n.
+               Thus  the  replacement  of  the word ‘*’ by a
+               sorted list of files in the current directory
+               is  a  ‘filename  expansion’.   Similarly the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐57
+
+
+               replacement of the  characters  ‘!!’  by  the
+               text of the last command is a ‘history expan‐
+               sion’.  _E_x_p_a_n_s_i_o_n_s are also  referred  to  as
+               _s_u_b_s_t_i_t_u_t_i_o_n_s (1.6, 3.4, 4.2).
+
+expressions    _E_x_p_r_e_s_s_i_o_n_s  are used in the shell to control
+               the conditional structures used in the  writ‐
+               ing  of shell scripts and in calculating val‐
+               ues for these scripts.  The operators  avail‐
+               able  in  shell  _e_x_p_r_e_s_s_i_o_n_s are those of the
+               language C (3.5).
+
+extension      Filenames often consist of a _b_a_s_e name and an
+               _e_x_t_e_n_s_i_o_n separated by the character ‘.’.  By
+               convention, groups  of  related  files  often
+               share  the  same _r_o_o_t name.  Thus if ‘prog.c’
+               were a C program, then the  object  file  for
+               this  program  would  be  stored in ‘prog.o’.
+               Similarly a  paper  written  with  the  ‘−me’
+               nroff  macro  package might be stored in ‘pa‐
+               per.me’ while a formatted version of this pa‐
+               per  might  be kept in ‘paper.out’ and a list
+               of spelling errors in ‘paper.errs’ (1.6).
+
+fg             The _j_o_b _c_o_n_t_r_o_l command _f_g is used to  run  a
+               _b_a_c_k_g_r_o_u_n_d or _s_u_s_p_e_n_d_e_d job in the _f_o_r_e_g_r_o_u_n_d
+               (1.8, 2.6).
+
+filename       Each file in UNIX has a name consisting of up
+               to  14 characters and not including the char‐
+               acter ‘/’ which is used in _p_a_t_h_n_a_m_e building.
+               Most  _f_i_l_e_n_a_m_e_s do not begin with the charac‐
+               ter ‘.’, and contain only letters and  digits
+               with  perhaps  a ‘.’ separating the _b_a_s_e por‐
+               tion of the _f_i_l_e_n_a_m_e from an _e_x_t_e_n_s_i_o_n (1.6).
+
+filename expansion
+               _F_i_l_e_n_a_m_e _e_x_p_a_n_s_i_o_n  uses  the  metacharacters
+               ‘*’,  ‘?’ and ‘[’ and ‘]’ to provide a conve‐
+               nient  mechanism  for  naming  files.   Using
+               _f_i_l_e_n_a_m_e _e_x_p_a_n_s_i_o_n it is easy to name all the
+               files in the current directory, or all  files
+               which have a common _r_o_o_t name. Other _f_i_l_e_n_a_m_e
+               _e_x_p_a_n_s_i_o_n mechanisms  use  the  metacharacter
+               ‘~’  and allow files in other users’ directo‐
+               ries to be named easily (1.6, 4.2).
+
+flag           Many UNIX commands accept arguments which are
+               not the names of files or other users but are
+               used to modify the action  of  the  commands.
+               These are referred to as _f_l_a_g options, and by
+               convention consist of  one  or  more  letters
+               preceded  by  the  character ‘−’ (1.2).  Thus
+               the _l_s (list files)  command  has  an  option
+
+
+
+
+
+
+
+
+
+USD:4‐58                      An Introduction to the C shell
+
+
+               ‘−s’  to  list  the  sizes of files.  This is
+               specified
+
+                    ls −s
+
+
+foreach        The _f_o_r_e_a_c_h command is used in shell  scripts
+               and  at the terminal to specify repetition of
+               a sequence of commands while the value  of  a
+               certain shell variable ranges through a spec‐
+               ified list (3.6, 4.1).
+
+foreground     When commands are executing in the normal way
+               such  that  the  shell is waiting for them to
+               finish before prompting for  another  command
+               they  are  said to be _f_o_r_e_g_r_o_u_n_d _j_o_b_s or _r_u_n_‐
+               _n_i_n_g _i_n _t_h_e _f_o_r_e_g_r_o_u_n_d.  This is  as  opposed
+               to   _b_a_c_k_g_r_o_u_n_d.    _F_o_r_e_g_r_o_u_n_d  jobs  can  be
+               stopped by signals from the  terminal  caused
+               by typing different control characters at the
+               keyboard (1.8, 2.6).
+
+goto           The shell has a command _g_o_t_o  used  in  shell
+               scripts  to transfer control to a given label
+               (3.7).
+
+grep           The _g_r_e_p command searches through a  list  of
+               argument files for a specified string.  Thus
+
+                    grep bill /etc/passwd
+
+               will  print each line in the file _/_e_t_c_/_p_a_s_s_w_d
+               which contains the string ‘bill’.   Actually,
+               _g_r_e_p  scans  for  _r_e_g_u_l_a_r  _e_x_p_r_e_s_s_i_o_n_s in the
+               sense of the editors ‘ed (1)’ and  ‘ex  (1)’.
+               _G_r_e_p  stands  for  ‘globally find _r_e_g_u_l_a_r _e_x_‐
+               _p_r_e_s_s_i_o_n and print’ (2.4).
+
+head           The _h_e_a_d command prints the first  few  lines
+               of one or more files.  If you have a bunch of
+               files containing text which you are wondering
+               about it is sometimes useful to run _h_e_a_d with
+               these files as arguments.  This will  usually
+               show  enough of what is in these files to let
+               you decide which you are interested in (1.5).
+               _H_e_a_d is also used to describe the part  of  a
+               _p_a_t_h_n_a_m_e  before  and  including the last ‘/’
+               character.  The _t_a_i_l of  a  _p_a_t_h_n_a_m_e  is  the
+               part  after  the last ‘/’.  The ‘:h’ and ‘:t’
+               modifiers allow the _h_e_a_d or _t_a_i_l of  a  _p_a_t_h_‐
+               _n_a_m_e  stored  in  a shell variable to be used
+               (3.6).
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐59
+
+
+history        The _h_i_s_t_o_r_y mechanism  of  the  shell  allows
+               previous  commands  to  be repeated, possibly
+               after modification to correct typing mistakes
+               or to change the meaning of the command.  The
+               shell has a _h_i_s_t_o_r_y _l_i_s_t where these commands
+               are  kept,  and a _h_i_s_t_o_r_y variable which con‐
+               trols how large this list is (2.3).
+
+home directory
+               Each user has  a  _h_o_m_e  _d_i_r_e_c_t_o_r_y,  which  is
+               given  in  your  entry  in the password file,
+               _/_e_t_c_/_p_a_s_s_w_d.  This is the directory which you
+               are  placed  in when you first login.  The _c_d
+               or _c_h_d_i_r command with no arguments takes  you
+               back   to   this  directory,  whose  name  is
+               recorded in the shell variable _h_o_m_e.  You can
+               also  access  the  _h_o_m_e  _d_i_r_e_c_t_o_r_i_e_s of other
+               users in forming filenames using  a  _f_i_l_e_n_a_m_e
+               _e_x_p_a_n_s_i_o_n  notation  and  the  character  ‘~’
+               (1.6).
+
+if             A conditional command within the  shell,  the
+               _i_f  command  is used in shell command scripts
+               to make decisions about what course of action
+               to take next (3.6).
+
+ignoreeof      Normally, your shell will exit, printing ‘lo‐
+               gout’ if you type a control‐d at a prompt  of
+               ‘%  ’.   This  is the way you usually log off
+               the system.  You can _s_e_t the _i_g_n_o_r_e_e_o_f  vari‐
+               able if you wish in your _._l_o_g_i_n file and then
+               use the command _l_o_g_o_u_t to  logout.   This  is
+               useful if you sometimes accidentally type too
+               many control‐d characters,  logging  yourself
+               off (2.2).
+
+input          Many  commands  on UNIX take information from
+               the terminal or from files  which  they  then
+               act  on.   This  information is called _i_n_p_u_t.
+               Commands normally read for _i_n_p_u_t  from  their
+               _s_t_a_n_d_a_r_d _i_n_p_u_t which is, by default, the ter‐
+               minal.  This _s_t_a_n_d_a_r_d _i_n_p_u_t can be redirected
+               from  a  file using a shell metanotation with
+               the character ‘<’.  Many commands  will  also
+               read from a file specified as argument.  Com‐
+               mands placed in _p_i_p_e_l_i_n_e_s will read from  the
+               output  of  the previous command in the _p_i_p_e_‐
+               _l_i_n_e.  The leftmost  command  in  a  _p_i_p_e_l_i_n_e
+               reads  from the terminal if you neither redi‐
+               rect its _i_n_p_u_t nor give it a filename to  use
+               as  _s_t_a_n_d_a_r_d _i_n_p_u_t.  Special mechanisms exist
+               for supplying  input  to  commands  in  shell
+               scripts (1.5, 3.8).
+
+
+
+
+
+
+
+
+
+
+USD:4‐60                      An Introduction to the C shell
+
+
+interrupt      An _i_n_t_e_r_r_u_p_t is a signal to a program that is
+               generated by typing ^C. (On older versions of
+               UNIX  the  RUBOUT or DELETE key were used for
+               this purpose.)  It causes  most  programs  to
+               stop  execution.   Certain  programs, such as
+               the shell and the editors, handle  an  _i_n_t_e_r_‐
+               _r_u_p_t  in  special  ways,  usually by stopping
+               what they are doing and prompting for another
+               command.   While  the  shell is executing an‐
+               other command and waiting for it  to  finish,
+               the shell does not listen to _i_n_t_e_r_r_u_p_t_s_.  The
+               shell often wakes up when you  hit  _i_n_t_e_r_r_u_p_t
+               because  many  commands die when they receive
+               an _i_n_t_e_r_r_u_p_t (1.8, 3.9).
+
+job            One or more commands typed on the same  input
+               line  separated  by ‘|’ or ‘;’ characters are
+               run together and are called  a  _j_o_b.   Simple
+               commands run by themselves without any ‘|’ or
+               ‘;’ characters are the simplest  _j_o_b_s_.   _J_o_b_s
+               are  classified as _f_o_r_e_g_r_o_u_n_d, _b_a_c_k_g_r_o_u_n_d, or
+               _s_u_s_p_e_n_d_e_d (2.6).
+
+job control    The builtin functions that control the execu‐
+               tion of jobs are called _j_o_b _c_o_n_t_r_o_l commands.
+               These are _b_g_, _f_g_, _s_t_o_p_, _k_i_l_l (2.6).
+
+job number     When each job is started  it  is  assigned  a
+               small  number  called  a  _j_o_b _n_u_m_b_e_r which is
+               printed next to the job in the output of  the
+               _j_o_b_s command.  This number, preceded by a ‘%’
+               character, can be used as an argument to  _j_o_b
+               _c_o_n_t_r_o_l  commands  to indicate a specific job
+               (2.6).
+
+jobs           The _j_o_b_s command prints a table showing  jobs
+               that  are either running in the _b_a_c_k_g_r_o_u_n_d or
+               are _s_u_s_p_e_n_d_e_d (2.6).
+
+kill           A command which sends a signal to a job caus‐
+               ing it to terminate (2.6).
+
+.login         The  file  _._l_o_g_i_n  in  your _h_o_m_e directory is
+               read by the shell each time you login to UNIX
+               and  the  commands there are executed.  There
+               are a number of commands which  are  usefully
+               placed  here,  especially _s_e_t commands to the
+               shell itself (2.1).
+
+login shell    The shell that is started  on  your  terminal
+               when  you  login  is called your _l_o_g_i_n _s_h_e_l_l.
+               It is different from other shells  which  you
+               may  run  (e.g.  on shell scripts) in that it
+               reads the _._l_o_g_i_n file before reading commands
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐61
+
+
+               from  the  terminal  and it reads the _._l_o_g_o_u_t
+               file after you logout (2.1).
+
+logout         The _l_o_g_o_u_t command causes a  login  shell  to
+               exit.  Normally, a login shell will exit when
+               you hit control‐d generating an  _e_n_d‐_o_f‐_f_i_l_e_,
+               but  if  you have set _i_g_n_o_r_e_e_o_f in you _._l_o_g_i_n
+               file then this will not work and you must use
+               _l_o_g_o_u_t to log off the UNIX system (2.8).
+
+.logout        When  you log off of UNIX the shell will exe‐
+               cute commands from the file _._l_o_g_o_u_t  in  your
+               _h_o_m_e directory after it prints ‘logout’.
+
+lpr            The  command  _l_p_r is the line printer daemon.
+               The standard input of _l_p_r spooled and printed
+               on  the UNIX line printer.  You can also give
+               _l_p_r a list of filenames as  arguments  to  be
+               printed.  It is most common to use _l_p_r as the
+               last component of a _p_i_p_e_l_i_n_e (2.3).
+
+ls             The _l_s (list files) command  is  one  of  the
+               most  commonly  used  UNIX commands.  With no
+               argument filenames it prints the names of the
+               files  in  the  current  directory.  It has a
+               number of useful _f_l_a_g arguments, and can also
+               be  given  the  names of directories as argu‐
+               ments, in which case it lists  the  names  of
+               the files in these directories (1.2).
+
+mail           The  _m_a_i_l program is used to send and receive
+               messages from other UNIX  users  (1.1,  2.1),
+               whether they are logged on or not.
+
+make           The  _m_a_k_e  command is used to maintain one or
+               more related files and to organize  functions
+               to be performed on these files.  In many ways
+               _m_a_k_e is easier to use, and more helpful  than
+               shell command scripts (3.2).
+
+makefile       The  file  containing  commands  for  _m_a_k_e is
+               called _m_a_k_e_f_i_l_e or _M_a_k_e_f_i_l_e (3.2).
+
+manual         The _m_a_n_u_a_l often referred  to  is  the  ‘UNIX
+               manual’.   It  contains  8  numbered sections
+               with a description of each UNIX program (sec‐
+               tion  1), system call (section 2), subroutine
+               (section 3), device (section 4), special data
+               structure (section 5), game (section 6), mis‐
+               cellaneous item (section 7) and system admin‐
+               istration  program  (section  8).   There are
+               also supplementary documents  (tutorials  and
+               reference  guides)  for  individual  programs
+               which require explanation in more detail.  An
+
+
+
+
+
+
+
+
+
+USD:4‐62                      An Introduction to the C shell
+
+
+               online  version  of  the _m_a_n_u_a_l is accessible
+               through the _m_a_n command.   Its  documentation
+               can be obtained online via
+
+                    man man
+
+               If  you can’t decide what manual page to look
+               in, try the _a_p_r_o_p_o_s(1) command.  The  supple‐
+               mentary  documents  are  in subdirectories of
+               /usr/doc.
+
+metacharacter
+               Many characters which are neither letters nor
+               digits  have  special  meaning  either to the
+               shell  or  to  UNIX.   These  characters  are
+               called _m_e_t_a_c_h_a_r_a_c_t_e_r_s.  If it is necessary to
+               place these characters in arguments  to  com‐
+               mands without them having their special mean‐
+               ing then they must be _q_u_o_t_e_d.  An example  of
+               a _m_e_t_a_c_h_a_r_a_c_t_e_r is the character ‘>’ which is
+               used to indicate placement of output  into  a
+               file.  For the purposes of the _h_i_s_t_o_r_y mecha‐
+               nism, most unquoted _m_e_t_a_c_h_a_r_a_c_t_e_r_s form sepa‐
+               rate  words  (1.4).   The  appendix  to  this
+               user’s manual  lists  the  _m_e_t_a_c_h_a_r_a_c_t_e_r_s  in
+               groups by their function.
+
+mkdir          The _m_k_d_i_r command is used to create a new di‐
+               rectory.
+
+modifier       Substitutions  with  the  _h_i_s_t_o_r_y  mechanism,
+               keyed  by  the character ‘!’  or of variables
+               using the metacharacter ‘$’, are  often  sub‐
+               jected to modifications, indicated by placing
+               the character ‘:’ after the substitution  and
+               following this with the _m_o_d_i_f_i_e_r itself.  The
+               _c_o_m_m_a_n_d _s_u_b_s_t_i_t_u_t_i_o_n mechanism  can  also  be
+               used  to  perform  modification  in a similar
+               way, but this notation is less clear (3.6).
+
+more           The program _m_o_r_e writes a file on your termi‐
+               nal  allowing you to control how much text is
+               displayed at a time.  _M_o_r_e can  move  through
+               the  file  screenful  by  screenful,  line by
+               line, search forward for a string,  or  start
+               again  at  the  beginning of the file.  It is
+               generally the easiest way of viewing  a  file
+               (1.8).
+
+noclobber      The  shell has a variable _n_o_c_l_o_b_b_e_r which may
+               be set in the file _._l_o_g_i_n to prevent acciden‐
+               tal  destruction  of  files by the ‘>’ output
+               redirection metasyntax  of  the  shell  (2.2,
+               2.5).
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐63
+
+
+noglob         The  shell variable _n_o_g_l_o_b is set to suppress
+               the _f_i_l_e_n_a_m_e _e_x_p_a_n_s_i_o_n of arguments  contain‐
+               ing the metacharacters ‘~’, ‘*’, ‘?’, ‘[’ and
+               ‘]’ (3.6).
+
+notify         The _n_o_t_i_f_y command tells the shell to  report
+               on  the  termination of a specific _b_a_c_k_g_r_o_u_n_d
+               _j_o_b at the exact time it occurs as opposed to
+               waiting  until just before the next prompt to
+               report the termination.  The _n_o_t_i_f_y variable,
+               if set, causes the shell to always report the
+               termination of _b_a_c_k_g_r_o_u_n_d jobs  exactly  when
+               they occur (2.6).
+
+onintr         The  _o_n_i_n_t_r  command  is built into the shell
+               and is used to control the action of a  shell
+               command  script  when  an _i_n_t_e_r_r_u_p_t signal is
+               received (3.9).
+
+output         Many commands in UNIX result in some lines of
+               text  which  are  called  their _o_u_t_p_u_t_.  This
+               _o_u_t_p_u_t is usually placed on what is known  as
+               the  _s_t_a_n_d_a_r_d  _o_u_t_p_u_t  which is normally con‐
+               nected to the user’s terminal.  The shell has
+               a  syntax  using  the  metacharacter  ‘>’ for
+               redirecting the _s_t_a_n_d_a_r_d _o_u_t_p_u_t of a  command
+               to  a  file  (1.3).  Using the _p_i_p_e mechanism
+               and the metacharacter ‘|’ it is also possible
+               for the _s_t_a_n_d_a_r_d _o_u_t_p_u_t of one command to be‐
+               come the _s_t_a_n_d_a_r_d _i_n_p_u_t  of  another  command
+               (1.5).   Certain  commands  such  as the line
+               printer daemon _p do not place  their  results
+               on  the  _s_t_a_n_d_a_r_d  _o_u_t_p_u_t  but rather in more
+               useful places such as  on  the  line  printer
+               (2.3).   Similarly  the  _w_r_i_t_e command places
+               its output on another user’s terminal  rather
+               than  its  _s_t_a_n_d_a_r_d  _o_u_t_p_u_t  (2.3).  Commands
+               also have  a  _d_i_a_g_n_o_s_t_i_c  _o_u_t_p_u_t  where  they
+               write  their  error messages.  Normally these
+               go to the terminal even if the _s_t_a_n_d_a_r_d  _o_u_t_‐
+               _p_u_t  has  been sent to a file or another com‐
+               mand, but it is possible to direct error  di‐
+               agnostics  along with _s_t_a_n_d_a_r_d _o_u_t_p_u_t using a
+               special metanotation (2.5).
+
+path           The shell has a variable _p_a_t_h which gives the
+               names of the directories in which it searches
+               for the commands which it is given.   It  al‐
+               ways checks first to see if the command it is
+               given is built into the  shell.   If  it  is,
+               then it need not search for the command as it
+               can do it internally.  If the command is  not
+               builtin,  then  the shell searches for a file
+               with  the  name  given   in   each   of   the
+
+
+
+
+
+
+
+
+
+USD:4‐64                      An Introduction to the C shell
+
+
+               directories  in  the  _p_a_t_h  variable, left to
+               right.  Since the normal  definition  of  the
+               _p_a_t_h variable is
+
+                    path (. /usr/ucb /bin /usr/bin)
+
+               the  shell  normally looks in the current di‐
+               rectory, and then in the standard system  di‐
+               rectories  ‘/usr/ucb’,  ‘/bin’ and ‘/usr/bin’
+               for the named command (2.2).  If the  command
+               cannot be found the shell will print an error
+               diagnostic.  Scripts of shell  commands  will
+               be  executed using another shell to interpret
+               them if they have ‘execute’  permission  set.
+               This  is  normally  true because a command of
+               the form
+
+                    chmod 755 script
+
+               was executed to turn this execute  permission
+               on  (3.3).   If you add new commands to a di‐
+               rectory in the _p_a_t_h,  you  should  issue  the
+               command _r_e_h_a_s_h (2.2).
+
+pathname       A list of names, separated by ‘/’ characters,
+               forms a _p_a_t_h_n_a_m_e_.   Each  _c_o_m_p_o_n_e_n_t_,  between
+               successive  ‘/’ characters, names a directory
+               in which the  next  _c_o_m_p_o_n_e_n_t  file  resides.
+               _P_a_t_h_n_a_m_e_s  which begin with the character ‘/’
+               are interpreted relative to the  _r_o_o_t  direc‐
+               tory in the file system.  Other _p_a_t_h_n_a_m_e_s are
+               interpreted relative to the current directory
+               as  reported by _p_w_d_.  The last component of a
+               _p_a_t_h_n_a_m_e may name a  directory,  but  usually
+               names a file.
+
+pipeline       A  group  of commands which are connected to‐
+               gether, the _s_t_a_n_d_a_r_d _o_u_t_p_u_t of each connected
+               to  the _s_t_a_n_d_a_r_d _i_n_p_u_t of the next, is called
+               a _p_i_p_e_l_i_n_e_.  The _p_i_p_e mechanism used to  con‐
+               nect these commands is indicated by the shell
+               metacharacter ‘|’ (1.5, 2.3).
+
+popd           The _p_o_p_d command changes the shell’s  _w_o_r_k_i_n_g
+               _d_i_r_e_c_t_o_r_y  to the directory you most recently
+               left using the _p_u_s_h_d command.  It returns  to
+               the  directory  without  having  to  type its
+               name, forgetting  the  name  of  the  current
+               _w_o_r_k_i_n_g _d_i_r_e_c_t_o_r_y before doing so (2.7).
+
+port           The  part  of a computer system to which each
+               terminal is connected is called a _p_o_r_t.  Usu‐
+               ally  the system has a fixed number of _p_o_r_t_s,
+               some of  which  are  connected  to  telephone
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐65
+
+
+               lines  for  dial‐up access, and some of which
+               are permanently wired  directly  to  specific
+               terminals.
+
+pr             The _p_r command is used to prepare listings of
+               the contents of files with headers giving the
+               name  of  the  file  and the date and time at
+               which the file was last modified (2.3).
+
+printenv       The _p_r_i_n_t_e_n_v command is  used  to  print  the
+               current  setting of variables in the environ‐
+               ment (2.8).
+
+process        An instance of a running program is called  a
+               _p_r_o_c_e_s_s  (2.6).   UNIX assigns each _p_r_o_c_e_s_s a
+               unique number when it is started − called the
+               _p_r_o_c_e_s_s  _n_u_m_b_e_r.  _P_r_o_c_e_s_s _n_u_m_b_e_r_s can be used
+               to stop individual _p_r_o_c_e_s_s_e_s using  the  _k_i_l_l
+               or  _s_t_o_p commands when the _p_r_o_c_e_s_s_e_s are part
+               of a detached _b_a_c_k_g_r_o_u_n_d job.
+
+program        Usually synonymous  with  _c_o_m_m_a_n_d;  a  binary
+               file or shell command script which performs a
+               useful function is often called a _p_r_o_g_r_a_m.
+
+prompt         Many programs will print a _p_r_o_m_p_t on the ter‐
+               minal  when they expect input.  Thus the edi‐
+               tor ‘ex (1)’ will print a ‘:’ when it expects
+               input.  The shell _p_r_o_m_p_t_s for input with ‘% ’
+               and occasionally with ‘? ’ when reading  com‐
+               mands from the terminal (1.1).  The shell has
+               a variable _p_r_o_m_p_t which may be set to a  dif‐
+               ferent  value  to  change  the  shell’s  main
+               _p_r_o_m_p_t.  This is mostly used  when  debugging
+               the shell (2.8).
+
+pushd          The  _p_u_s_h_d  command, which means ‘push direc‐
+               tory’, changes the shell’s _w_o_r_k_i_n_g  _d_i_r_e_c_t_o_r_y
+               and also remembers the current _w_o_r_k_i_n_g _d_i_r_e_c_‐
+               _t_o_r_y before the change is made, allowing  you
+               to  return to the same directory via the _p_o_p_d
+               command  later  without  retyping  its   name
+               (2.7).
+
+ps             The  _p_s command is used to show the processes
+               you are currently running.  Each  process  is
+               shown  with its unique process number, an in‐
+               dication of the terminal name it is  attached
+               to, an indication of the state of the process
+               (whether it  is  running,  stopped,  awaiting
+               some  event  (sleeping),  and  whether  it is
+               swapped out), and the amount of CPU  time  it
+               has  used  so far.  The command is identified
+               by printing some of the words  used  when  it
+
+
+
+
+
+
+
+
+
+USD:4‐66                      An Introduction to the C shell
+
+
+               was  invoked  (2.6).  Shells, such as the _c_s_h
+               you use to run the _p_s command, are  not  nor‐
+               mally shown in the output.
+
+pwd            The  _p_w_d  command prints the full _p_a_t_h_n_a_m_e of
+               the  current  _w_o_r_k_i_n_g  _d_i_r_e_c_t_o_r_y.   The  _d_i_r_s
+               builtin  command  is  usually  a  better  and
+               faster choice.
+
+quit           The _q_u_i_t signal, generated by a control‐\, is
+               used to terminate programs which are behaving
+               unreasonably.  It normally  produces  a  core
+               image file (1.8).
+
+quotation      The  process by which metacharacters are pre‐
+               vented their special meaning, usually by  us‐
+               ing  the  character  ‘´ in pairs, or by using
+               the character ‘\’, is referred to  as  _q_u_o_t_a_‐
+               _t_i_o_n (1.7).
+
+redirection    The  routing  of input or output from or to a
+               file is known as _r_e_d_i_r_e_c_t_i_o_n of input or out‐
+               put (1.3).
+
+rehash         The _r_e_h_a_s_h command tells the shell to rebuild
+               its internal  table  of  which  commands  are
+               found  in  which  directories  in  your _p_a_t_h.
+               This is necessary when a new program  is  in‐
+               stalled in one of these directories (2.8).
+
+relative pathname
+               A _p_a_t_h_n_a_m_e which does not begin with a ‘/’ is
+               called a _r_e_l_a_t_i_v_e _p_a_t_h_n_a_m_e since it is inter‐
+               preted _r_e_l_a_t_i_v_e to the current _w_o_r_k_i_n_g _d_i_r_e_c_‐
+               _t_o_r_y.  The first _c_o_m_p_o_n_e_n_t of such a _p_a_t_h_n_a_m_e
+               refers to some file or directory in the _w_o_r_k_‐
+               _i_n_g _d_i_r_e_c_t_o_r_y, and subsequent _c_o_m_p_o_n_e_n_t_s  be‐
+               tween ‘/’ characters refer to directories be‐
+               low the _w_o_r_k_i_n_g  _d_i_r_e_c_t_o_r_y.   _P_a_t_h_n_a_m_e_s  that
+               are  not  _r_e_l_a_t_i_v_e  are called _a_b_s_o_l_u_t_e _p_a_t_h_‐
+               _n_a_m_e_s (1.6).
+
+repeat         The _r_e_p_e_a_t command iterates another command a
+               specified number of times.
+
+root           The  directory  that is at the top of the en‐
+               tire directory structure is called  the  _r_o_o_t
+               directory  since  it is the ‘root’ of the en‐
+               tire tree structure of directories.  The name
+               used  in  _p_a_t_h_n_a_m_e_s  to  indicate the _r_o_o_t is
+               ‘/’.  _P_a_t_h_n_a_m_e_s starting with ‘/’ are said to
+               be  _a_b_s_o_l_u_t_e since they start at the _r_o_o_t di‐
+               rectory.  _R_o_o_t is also used as the part of  a
+               _p_a_t_h_n_a_m_e  that  is  left  after  removing the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐67
+
+
+               _e_x_t_e_n_s_i_o_n.  See _f_i_l_e_n_a_m_e for a further expla‐
+               nation (1.6).
+
+RUBOUT         The  RUBOUT  or  DELETE  key is often used to
+               erase the previously  typed  character;  some
+               users  prefer the BACKSPACE for this purpose.
+               On older versions of UNIX this key served  as
+               the INTR character.
+
+scratch file   Files  whose  names  begin with a ‘#’ are re‐
+               ferred to as _s_c_r_a_t_c_h _f_i_l_e_s,  since  they  are
+               automatically  removed  by the system after a
+               couple of days of non‐use, or more frequently
+               if disk space becomes tight (1.3).
+
+script         Sequences  of shell commands placed in a file
+               are called shell command _s_c_r_i_p_t_s.  It is  of‐
+               ten  possible  to  perform simple tasks using
+               these _s_c_r_i_p_t_s without writing a program in  a
+               language such as C, by using the shell to se‐
+               lectively run other programs (3.3, 3.10).
+
+set            The builtin _s_e_t command is used to assign new
+               values  to  shell  variables  and to show the
+               values of the current variables.  Many  shell
+               variables  have  special meaning to the shell
+               itself.  Thus by using the  _s_e_t  command  the
+               behavior of the shell can be affected (2.1).
+
+setenv         Variables  in  the  environment ‘environ (5)’
+               can be changed by using  the  _s_e_t_e_n_v  builtin
+               command  (2.8).   The _p_r_i_n_t_e_n_v command can be
+               used to print the value of the  variables  in
+               the environment.
+
+shell          A  _s_h_e_l_l  is  a command language interpreter.
+               It is possible to  write  and  run  your  own
+               _s_h_e_l_l,  as  _s_h_e_l_l_s  are no different than any
+               other programs as far as the system  is  con‐
+               cerned.   This  manual deals with the details
+               of one particular _s_h_e_l_l, called _c_s_h_.
+
+shell script   See _s_c_r_i_p_t (3.3, 3.10).
+
+signal         A _s_i_g_n_a_l in UNIX is a short message  that  is
+               sent  to a running program which causes some‐
+               thing to happen to that process.  _S_i_g_n_a_l_s are
+               sent either by typing special _c_o_n_t_r_o_l charac‐
+               ters on the keyboard or by using the _k_i_l_l  or
+               _s_t_o_p commands (1.8, 2.6).
+
+sort           The _s_o_r_t program sorts a sequence of lines in
+               ways that can be controlled by argument _f_l_a_g_s
+               (1.5).
+
+
+
+
+
+
+
+
+
+USD:4‐68                      An Introduction to the C shell
+
+
+source         The  _s_o_u_r_c_e  command causes the shell to read
+               commands from a specified file.  It  is  most
+               useful for reading files such as _._c_s_h_r_c after
+               changing them (2.8).
+
+special character
+               See _m_e_t_a_c_h_a_r_a_c_t_e_r_s and the appendix  to  this
+               manual.
+
+standard       We  refer  often  to  the  _s_t_a_n_d_a_r_d _i_n_p_u_t and
+               _s_t_a_n_d_a_r_d _o_u_t_p_u_t of commands.  See  _i_n_p_u_t  and
+               _o_u_t_p_u_t (1.3, 3.8).
+
+status         A  command  normally returns a _s_t_a_t_u_s when it
+               finishes.  By convention a _s_t_a_t_u_s of zero in‐
+               dicates that the command succeeded.  Commands
+               may return non‐zero _s_t_a_t_u_s to  indicate  that
+               some  abnormal event has occurred.  The shell
+               variable _s_t_a_t_u_s is set to the _s_t_a_t_u_s returned
+               by  the  last  command.  It is most useful in
+               shell commmand scripts (3.6).
+
+stop           The _s_t_o_p command causes a _b_a_c_k_g_r_o_u_n_d  job  to
+               become _s_u_s_p_e_n_d_e_d (2.6).
+
+string         A  sequential  group  of characters taken to‐
+               gether is called a _s_t_r_i_n_g.  _S_t_r_i_n_g_s can  con‐
+               tain any printable characters (2.2).
+
+stty           The  _s_t_t_y  program changes certain parameters
+               inside UNIX which determine how your terminal
+               is  handled.   See  ‘stty (1)’ for a complete
+               description (2.6).
+
+substitution   The shell implements a  number  of  _s_u_b_s_t_i_t_u_‐
+               _t_i_o_n_s  where sequences indicated by metachar‐
+               acters are replaced by other sequences.   No‐
+               table  examples of this are history _s_u_b_s_t_i_t_u_‐
+               _t_i_o_n keyed by the metacharacter ‘!’ and vari‐
+               able  _s_u_b_s_t_i_t_u_t_i_o_n indicated by ‘$’.  We also
+               refer to _s_u_b_s_t_i_t_u_t_i_o_n_s as _e_x_p_a_n_s_i_o_n_s (3.4).
+
+suspended      A job becomes _s_u_s_p_e_n_d_e_d after a  STOP  signal
+               is  sent  to it, either by typing a _c_o_n_t_r_o_l‐z
+               at the terminal (for _f_o_r_e_g_r_o_u_n_d jobs)  or  by
+               using the _s_t_o_p command (for _b_a_c_k_g_r_o_u_n_d jobs).
+               When _s_u_s_p_e_n_d_e_d, a job temporarily stops  run‐
+               ning  until  it is restarted by either the _f_g
+               or _b_g command (2.6).
+
+switch         The _s_w_i_t_c_h command of the  shell  allows  the
+               shell  to select one of a number of sequences
+               of commands based on an argument string.   It
+               is  similar  to  the  _s_w_i_t_c_h statement in the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐69
+
+
+               language C (3.7).
+
+termination    When a command which is being  executed  fin‐
+               ishes we say it undergoes _t_e_r_m_i_n_a_t_i_o_n or _t_e_r_‐
+               _m_i_n_a_t_e_s_.  Commands  normally  terminate  when
+               they  read an _e_n_d‐_o_f‐_f_i_l_e from their _s_t_a_n_d_a_r_d
+               _i_n_p_u_t.  It is also possible to terminate com‐
+               mands  by  sending  them an _i_n_t_e_r_r_u_p_t or _q_u_i_t
+               signal (1.8).  The  _k_i_l_l  program  terminates
+               specified jobs (2.6).
+
+then           The  _t_h_e_n command is part of the shell’s ‘if‐
+               then‐else‐endif’ control  construct  used  in
+               command scripts (3.6).
+
+time           The  _t_i_m_e  command can be used to measure the
+               amount of CPU and real  time  consumed  by  a
+               specified  command  as  well as the amount of
+               disk i/o, memory utilized, and number of page
+               faults  and  swaps taken by the command (2.1,
+               2.8).
+
+tset           The _t_s_e_t program  is  used  to  set  standard
+               erase  and  kill  characters  and to tell the
+               system what kind of terminal you  are  using.
+               It is often invoked in a _._l_o_g_i_n file (2.1).
+
+tty            The word _t_t_y is a historical abbreviation for
+               ‘teletype’ which is frequently used  in  UNIX
+               to  indicate the _p_o_r_t to which a given termi‐
+               nal is connected.  The _t_t_y command will print
+               the  name  of  the  _t_t_y or _p_o_r_t to which your
+               terminal is presently connected.
+
+unalias        The _u_n_a_l_i_a_s command removes aliases (2.8).
+
+UNIX           UNIX is an  operating  system  on  which  _c_s_h
+               runs.   UNIX  provides facilities which allow
+               _c_s_h to invoke other programs such as  editors
+               and  text  formatters  which  you may wish to
+               use.
+
+unset          The _u_n_s_e_t command removes the definitions  of
+               shell variables (2.2, 2.8).
+
+variable expansion
+               See _v_a_r_i_a_b_l_e_s and _e_x_p_a_n_s_i_o_n (2.2, 3.4).
+
+variables      _V_a_r_i_a_b_l_e_s  in _c_s_h hold one or more strings as
+               value.  The most common use of  _v_a_r_i_a_b_l_e_s  is
+               in  controlling  the  behavior  of the shell.
+               See _p_a_t_h, _n_o_c_l_o_b_b_e_r, and _i_g_n_o_r_e_e_o_f for  exam‐
+               ples.   _V_a_r_i_a_b_l_e_s  such as _a_r_g_v are also used
+               in  writing  shell  programs  (shell  command
+
+
+
+
+
+
+
+
+
+USD:4‐70                      An Introduction to the C shell
+
+
+               scripts) (2.2).
+
+verbose        The  _v_e_r_b_o_s_e  shell  variable  can  be set to
+               cause commands to be echoed  after  they  are
+               history  expanded.   This  is often useful in
+               debugging shell scripts.  The  _v_e_r_b_o_s_e  vari‐
+               able  is  set  by the shell’s _−_v command line
+               option (3.10).
+
+wc             The _w_c program calculates the number of char‐
+               acters,  words,  and lines in the files whose
+               names are given as arguments (2.6).
+
+while          The _w_h_i_l_e builtin control construct  is  used
+               in shell command scripts (3.7).
+
+word           A sequence of characters which forms an argu‐
+               ment to a command is  called  a  _w_o_r_d.   Many
+               characters which are neither letters, digits,
+               ‘−’, ‘.’ nor ‘/’ form _w_o_r_d_s all by themselves
+               even  if  they  are not surrounded by blanks.
+               Any sequence of characters may be made into a
+               _w_o_r_d  by  surrounding  it with ‘´’ characters
+               except for the characters ‘´’ and  ‘!’  which
+               require   special   treatment   (1.1).   This
+               process  of  placing  special  characters  in
+               _w_o_r_d_s without their special meaning is called
+               _q_u_o_t_i_n_g.
+
+working directory
+               At any given time you are in  one  particular
+               directory,  called  your  _w_o_r_k_i_n_g  _d_i_r_e_c_t_o_r_y.
+               This directory’s name is printed by  the  _p_w_d
+               command  and  the  files listed by _l_s are the
+               ones in this directory.  You can change _w_o_r_k_‐
+               _i_n_g _d_i_r_e_c_t_o_r_i_e_s using _c_h_d_i_r.
+
+write          The  _w_r_i_t_e command is an obsolete way of com‐
+               municating with other users who are logged in
+               to  UNIX (you have to take turns typing).  If
+               you are both  using  display  terminals,  use
+               _t_a_l_k(1), which is much more pleasant.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

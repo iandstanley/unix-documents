@@ -1,0 +1,2765 @@
+
+
+
+
+
+
+                    NNRROOFFFF//TTRROOFFFF UUsseerr''ss MMaannuuaall
+
+                        _J_o_s_e_p_h _F_. _O_s_s_a_n_n_a
+               _(_u_p_d_a_t_e_d _f_o_r _4_._3_B_S_D _b_y _M_a_r_k _S_e_i_d_e_n_)
+
+                        Bell Laboratories
+                  Murray Hill, New Jersey 07974
+
+
+NNOOTTEE::  TThhiiss ddooccuummeenntt iinn iittss ccuurrrreenntt ffoorrmm ddeessccrriibbeess tthhee _t_r_o_f_f pprroo--
+ggrraamm ssuupppplliieedd wwiitthh 44..44BBSSDD..  TThhee _g_r_o_f_f pprrooggrraamm ssuupppplliieedd wwiitthh FFrreeee--
+BBSSDD  hhaass  aa  nnuummbbeerr  ooff aaddddiittiioonnaall ffeeaattuurreess aanndd aa ccoouuppllee ooff ssmmaallll
+iinnccoommppaattiibbiilliittiieess..  SSeeee _g_r_o_f_f_(_1_) ffoorr mmoorree ddeettaaiillss..
+
+IInnttrroodduuccttiioonn
+NROFF and TROFF are text processors under the  UNIX  Time-Sharing
+System  that  format text for typewriter-like terminals and for a
+Graphic Systems phototypesetter, respectively.   (Device-indepen-
+dent  TROFF,  part  of the Documenter's Workbench, supports addi-
+tional output devices.)  They accept lines of  text  interspersed
+with lines of format control information and format the text into
+a printable, paginated document  having  a  user-designed  style.
+NROFF  and  TROFF  offer  unusual  freedom  in  document styling,
+including: arbitrary style headers and footers;  arbitrary  style
+footnotes;  multiple automatic sequence numbering for paragraphs,
+sections, etc; multiple column output; dynamic  font  and  point-
+size  control; arbitrary horizontal and vertical local motions at
+any point; and a family of automatic overstriking,  bracket  con-
+struction, and line drawing functions.
+NROFF  and  TROFF are highly compatible with each other and it is
+almost always possible to prepare input acceptable to both.  Con-
+ditional  input  is provided that enables the user to embed input
+expressly destined for either program.  NROFF can prepare  output
+directly  for  a variety of terminal types and is capable of uti-
+lizing the full resolution of each terminal.
+UUssaaggee
+The general form of invoking NROFF (or  TROFF)  at  UNIX  command
+level is
+     nnrrooffff  _o_p_t_i_o_n_s  _f_i_l_e_s(or  ttrrooffff  _o_p_t_i_o_n_s  _f_i_l_e_s)
+where  _o_p_t_i_o_n_s represents any of a number of option arguments and
+_f_i_l_e_s represents the list of files containing the document to  be
+formatted.  An argument consisting of a single minus (--) is taken
+to be a file name corresponding to the  standard  input.   If  no
+file names are given input is taken from the standard input.  The
+options, which may appear in any order so  long  as  they  appear
+before the files, are:
+
+  _O_O_p_p_t_t_i_i_o_o_n_n  _E_E_f_f_f_f_e_e_c_c_t_t
+   --ii     Read  standard  input  after  the  input  files  are
+          exhausted.
+   --mm_n_a_m_e Prepends the macro file  //uussrr//lliibb//ttmmaacc.._n_a_m_e  to  the
+          input _f_i_l_e_s.
+   --nn_N    Number first generated page _N.
+   --oo_l_i_s_t Print  only pages whose page numbers appear in _l_i_s_t,
+
+
+
+
+
+
+
+
+          USD:21-2                                NROFF/TROFF User's Manual
+
+
+                    which consists of comma-separated numbers and number
+                    ranges.   A  number range has the form _N_-_M and means
+                    pages _N through _M_;  a  initial  _-_N  means  from  the
+                    beginning  to page _N_; and a final _N_- means from _N to
+                    the end.
+             --qq     Invoke the simultaneous input-output mode of the  rrdd
+                    request.
+             --rr_a_N   Number register _a (one-character) is set to _N.
+             --ss_N    Stop  every _N pages.  NROFF will halt prior to every
+                    _N pages (default _N=1)  to  allow  paper  loading  or
+                    changing, and will resume upon receipt of a newline.
+                    TROFF will stop the phototypesetter every  _N  pages,
+                    produce  a  trailer to allow changing cassettes, and
+                    will resume after the phototypesetter  START  button
+                    is pressed.
+             --zz     Efficiently suppress formatted output.  Only produce
+                    output to standard error (from ttmm requests or  diag-
+                    nostics).
+
+                              _N_N_R_R_O_O_F_F_F_F _O_O_n_n_l_l_y_y
+             --TT_n_a_m_e Specifies  the  name  of  the  output terminal type.
+                    Currently defined names are  3377  for  the  (default)
+                    Model  37 Teletype(R), ttnn330000 for the GE TermiNet 300
+                    (or any terminal  without  half-line  capabilities),
+                    330000SS  for  the  DASI-300S, 330000 for the DASI-300, and
+                    445500 for the DASI-450 (Diablo Hyterm).
+             --ee     Produce  equally-spaced  words  in  adjusted  lines,
+                    using full terminal resolution.
+             --hh     On  output,  use  tabs  during horizontal spacing to
+                    increase speed.  Device tabs setting are assumed  to
+                    be  (and  input  tabs  are initially set to) every 8
+                    character widths.
+
+                              _T_T_R_R_O_O_F_F_F_F _O_O_n_n_l_l_y_y
+             --aa     Send  a  printable  (ASCII)  approximation  of   the
+                    results to the standard output.
+             --bb     TROFF  will  report  whether  the phototypesetter is
+                    busy or available.  No text processing is done.
+             --ff     Refrain from feeding out paper and  stopping  photo-
+                    typesetter at the end of the run.
+             --tt     Direct  output to the standard output instead of the
+                    phototypesetter.
+             --ww     Wait until phototypesetter  is  available,  if  cur-
+                    rently busy.
+          Each option is invoked as a separate argument; for example,
+               nnrrooffff  --oo_4_,_8_-_1_0  --TT_3_0_0_S  --mm_a_b_c  _f_i_l_e_1  _f_i_l_e_2
+          requests  formatting  of pages 4, 8, 9, and 10 of a document con-
+          tained in the files named _f_i_l_e_1 and _f_i_l_e_2, specifies  the  output
+          terminal as a DASI-300S, and invokes the macro package _a_b_c.
+          Various pre- and post-processors are available for use with NROFF
+          and TROFF.  These include the  equation  preprocessors  NEQN  and
+          EQN1  (for NROFF and TROFF respectively), and the table-construc-
+          tion preprocessor TBL2.  A  reverse-line  postprocessor  COL3  is
+          available  for  multiple-column NROFF output on terminals without
+          reverse-line ability; COL expects the Model  37  Teletype  escape
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                                USD:21-3
+
+
+          sequences  that  NROFF produces by default.  TK3 is a 37 Teletype
+          simulator postprocessor for printing NROFF output on a  Tektronix
+          4014.  TC5 is a phototypesetter-simulator postprocessor for TROFF
+          that produces an approximation of  phototypesetter  output  on  a
+          Tektronix 4014.  For example, in
+               ttbbll  _f_i_l_e_s  ||  eeqqnn  ||  ttrrooffff  --tt _o_p_t_i_o_n_s  ||  ttcc
+          the  first || indicates the piping of TBL's output to EQN's input;
+          the second the piping of EQN's output to TROFF's input;  and  the
+          third indicates the piping of TROFF's output to TC.
+          The  remainder of this manual consists of: a Summary and outline;
+          a Reference Manual keyed to the outline; and a  set  of  Tutorial
+          Examples.  Another tutorial is [5].
+          RReeffeerreenncceess
+          [1]B.  W.  Kernighan,  L.  L.  Cherry, _T_y_p_e_s_e_t_t_i_n_g _M_a_t_h_e_m_a_t_i_c_s _-_-
+             _U_s_e_r_'_s _G_u_i_d_e _(_S_e_c_o_n_d _E_d_i_t_i_o_n_)_, Bell Laboratories.
+          [2]M. E. Lesk, _T_b_l _-_- _A _P_r_o_g_r_a_m _t_o _F_o_r_m_a_t _T_a_b_l_e_s_, Bell  Laborato-
+             ries internal memorandum.
+          [3]Internal on-line documentation (_m_a_n pages) on UNIX.
+          [4]B. W. Kernighan, _A _T_R_O_F_F _T_u_t_o_r_i_a_l, Bell Laboratories.
+          [5]Your site may have similar programs for more modern displays.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:21-4                                NROFF/TROFF User's Manual
+
+
+                   SSUUMMMMAARRYY OOFF RREEQQUUEESSTTSS AANNDD OOUUTTLLIINNEE OOFF TTHHIISS MMAANNUUAALL
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e_*_*  _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_#_#_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          11..  GGeenneerraall EExxppllaannaattiioonn
+          22..  FFoonntt aanndd CChhaarraacctteerr SSiizzee CCoonnttrrooll
+          ..ppss_+_-_N  10point previous     E Point size; also \\ss_+_-_N.<*>
+          ..ffzz _F _+_-_N       off     -    E font _F to point size _+_-_N.
+          ..ffzz SS _F _+_-_N     off     -    E Special  Font  characters to point
+          size _+_-_N.
+          ..ssss _N   12/36em ignored E    Space-character    size    set    to
+          _N/36em.<*>
+          ..ccss _F_N_M off     -       P    Constant   character  space  (width)
+          mode (font _F).<*>
+          ..bbdd _F _N off     -       P    Embolden font _F by _N-1 units.<*>
+          ..bbdd SS _F _N       off     -    P Embolden Special Font when current
+          font is _F.<*>
+          ..fftt _F   Roman   previous     E Change  to font _F = _x, _x_x, or 1-4.
+          Also \\ff_x,\\ff((_x_x,\\ff_N.
+          ..ffpp _N _F R,I,B,S ignored -    Font named  _F  mounted  on  physical
+          position 1<=_N<=4.
+          33..  PPaaggee CCoonnttrrooll
+          ..ppll _+_-_N 11in    11in    vv    Page length.
+          ..bbpp _+_-_N _N_=1     -       B<**>,vvEject current page; next page num-
+          ber _N.
+          ..ppnn _+_-_N _N_=1     ignored -    Next page number _N.
+          ..ppoo _+_-_N 0; 26/27in      previousvvPage offset.
+          ..nnee _N   -       _N_=1_V    D,vv  Need  _N vertical space (_V = vertical
+          spacing).
+          ..mmkk _R   none    internal     D Mark  current  vertical  place  in
+          register _R.
+          ..rrtt _+_-_N none    internal     D,vvReturn  _(_u_p_w_a_r_d  _o_n_l_y_)  to marked
+          vertical place.
+          44..  TTeexxtt FFiilllliinngg,, AAddjjuussttiinngg,, aanndd CCeenntteerriinngg
+          ..bbrr     -       -       B    Break.
+          ..ffii     fill    -       B,E  Fill output lines.
+          ..nnff     fill    -       B,E  No filling or  adjusting  of  output
+          lines.
+          ..aadd _c   adj,both        adjust EAdjust output lines with mode _c.
+          ..nnaa     adjust  -       E    No output line adjusting.
+          ..ccee _N   off     _N_=1     B,E  Center following _N input text lines.
+          55..  VVeerrttiiccaall SSppaacciinngg
+          ..vvss _N   1/6in;12pts     previousE,ppVertical   base  line  spacing
+          (_V).
+          ..llss _N   _N_=1     previous     E Output _N_-1 _Vs after each text out-
+          put line.
+          ..sspp _N   -       _N_=1_V    B,vv  Space  vertical distance _N _i_n _e_i_t_h_e_r
+          _d_i_r_e_c_t_i_o_n.
+          ..ssvv _N   -       _N_=1_V    vv    Save vertical distance _N.
+          ..ooss     -       -       -    Output saved vertical distance.
+          __________
+          *Values separated by ";;" are for NROFF and TROFF respectively.
+          #Notes are explained at the end of this Summary and Index
+          <*>No effect in NROFF.
+          <**>The use of " '' " as control character (instead of "..")   sup-
+          presses the break function.
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                                USD:21-5
+
+
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+
+          ..nnss     space   -       D    Turn no-space mode on.
+          ..rrss     -       -       D    Restore spacing; turn no-space  mode
+          off.
+          66..  LLiinnee LLeennggtthh aanndd IInnddeennttiinngg
+          ..llll _+_-_N 6.5in   previous     E,mmLine length.
+          ..iinn _+_-_N _N_=0     previous     B,E,mmIndent.
+          ..ttii _+_-_N -       ignored B,E,mm  Temporary indent.
+          77..  MMaaccrrooss,, SSttrriinnggss,, DDiivveerrssiioonn,, aanndd PPoossiittiioonn TTrraappss
+          ..ddee _x_x _y_y       -       _._y_y_=.... -Define  or redefine macro _x_x_; end
+          at call of _y_y.
+          ..aamm _x_x _y_y       -       _._y_y_=.... -Append to a macro.
+          ..ddss _x_x _s_t_r_i_n_g   -       ignored-Define  a  string  _x_x  containing
+          _s_t_r_i_n_g.
+          ..aass _x_x _s_t_r_i_n_g   -       ignored-Append _s_t_r_i_n_g to string _x_x.
+          ..rrmm _x_x  -       ignored -    Remove request, macro, or string.
+          ..rrnn _x_x _y_y       -       ignored-Rename  request, macro, or string
+          _x_x to _y_y.
+          ..ddii _x_x  -       end     D    Divert output to macro _x_x.
+          ..ddaa _x_x  -       end     D    Divert and append to _x_x.
+          ..wwhh _N _x_x        -       -    vv Set  location  trap;  negative  is
+          w.r.t. page bottom.
+          ..cchh _x_x _N        -       -    vv Change trap location.
+          ..ddtt _N _x_x        -       off  D,vvSet a diversion trap.
+          ..iitt _N _x_x        -       off  E Set an input-line count trap.
+          ..eemm _x_x  none    none    -    End macro is _x_x_.
+          88..  NNuummbbeerr RReeggiisstteerrss
+          ..nnrr _R _+_-_N _M     -       -    uu Define  and set number register _R;
+          auto-increment by _M.
+          ..aaff _R _c arabic  -       -    Assign format to register _R (_c_=11, ii,
+          II, aa, AA).
+          ..rrrr _R   -       -       -    Remove register _R.
+          99..  TTaabbss,, LLeeaaddeerrss,, aanndd FFiieellddss
+          ..ttaa _N_t _._._.      0.8; 0.5in   noneE,mmTab   settings;   _l_e_f_t  type,
+          unless _t_=RR(right), CC(centered).
+          ..ttcc _c   none    none    E    Tab repetition character.
+          ..llcc _c   ..       none    E    Leader repetition character.
+          ..ffcc _a _b off     off     -    Set field delimiter _a and pad  char-
+          acter _b.
+          1100..  IInnppuutt aanndd OOuuttppuutt CCoonnvveennttiioonnss aanndd CChhaarraacctteerr TTrraannssllaattiioonnss
+          ..eecc _c   \       \       -    Set escape character.
+          ..eeoo     on      -       -    Turn off escape character mechanism.
+          ..llgg _N   -;on    on      -    Ligature mode on if _N>0.
+          ..uull _N   off     _N_=1     E    Underline  (italicize  in  TROFF)  _N
+          input lines.
+          ..ccuu _N   off     _N_=1     E    Continuous underline in NROFF;  like
+          uull in TROFF.
+          ..uuff _F   Italic  Italic  -    Underline  font  set  to  _F  (to  be
+          switched to by uull).
+          ..cccc _c   ..       ..       E    Set control character to _c.
+          ..cc22 _c   ''       ''       E    Set nobreak control character to _c.
+          ..ttrr _a_b_c_d_._._._.    none    -    O Translate _a to _b, etc. on output.
+
+
+
+
+
+
+
+
+
+          USD:21-6                                NROFF/TROFF User's Manual
+
+
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+
+          1111..  LLooccaall HHoorriizzoonnttaall aanndd VVeerrttiiccaall MMoottiioonnss,, aanndd tthhee  WWiiddtthh  FFuunncc--
+          ttiioonn
+          1122..  OOvveerrssttrriikkee,, BBrraacckkeett,, LLiinnee--ddrraawwiinngg,, aanndd ZZeerroo--wwiiddtthh FFuunnccttiioonnss
+          1133..  HHyypphheennaattiioonn..
+          ..nnhh     hyphenate       -    E No hyphenation.
+          ..hhyy _N   hyphenate       hyphenateEHyphenate; _N _= mode.
+          ..hhcc _c   \\%%      \\%%      E    Hyphenation indicator character _c.
+          ..hhww _w_o_r_d_1 _._._.           ignored-Exception words.
+          1144..  TThhrreeee PPaarrtt TTiittlleess..
+          ..ttll _'_l_e_f_t_'_c_e_n_t_e_r_'_r_i_g_h_t_' -    - Three part title.
+          ..ppcc _c   %%       off     -    Page number character.
+          ..lltt _+_-_N 6.5in   previous     E,mmLength of title.
+          1155..  OOuuttppuutt LLiinnee NNuummbbeerriinngg..
+          ..nnmm _+_-_N _M _S _I   off     E    Number  mode  on or off, set parame-
+          ters.
+          ..nnnn _N   -       _N_=1     E    Do not number next _N lines.
+          1166..  CCoonnddiittiioonnaall AAcccceeppttaannccee ooff IInnppuutt
+          ..iiff _c _a_n_y_t_h_i_n_g  -       -    If condition _c true, accept _a_n_y_t_h_i_n_g
+          as input,
+                                       for multi-line use _\_{_a_n_y_t_h_i_n_g_\_}.
+          ..iiff !!_c _a_n_y_t_h_i_n_g -       -    If  condition  _c  false, accept _a_n_y_-
+          _t_h_i_n_g.
+          ..iiff _N _a_n_y_t_h_i_n_g  -       uu    If expression _N  >  0,  accept  _a_n_y_-
+          _t_h_i_n_g.
+          ..iiff !!_N _a_n_y_t_h_i_n_g -       uu    If  expression  _N  <= 0, accept _a_n_y_-
+          _t_h_i_n_g.
+          ..iiff _'_s_t_r_i_n_g_1_'_s_t_r_i_n_g_2_' _a_n_y_t_h_i_n_g -If _s_t_r_i_n_g_1 identical to  _s_t_r_i_n_g_2,
+          accept _a_n_y_t_h_i_n_g.
+          ..iiff !!_'_s_t_r_i_n_g_1_'_s_t_r_i_n_g_2_' _a_n_y_t_h_i_n_g-If   _s_t_r_i_n_g_1   not  identical  to
+          _s_t_r_i_n_g_2, accept _a_n_y_t_h_i_n_g.
+          ..iiee _c _a_n_y_t_h_i_n_g  -       uu    If portion  of  if-else;  all  above
+          forms (like iiff).
+          ..eell _a_n_y_t_h_i_n_g            -    - Else portion of if-else.
+          1177..  EEnnvviirroonnmmeenntt SSwwiittcchhiinngg..
+          ..eevv _N   _N_=0     previous     - Environment switched (_p_u_s_h _d_o_w_n).
+          1188..  IInnsseerrttiioonnss ffrroomm tthhee SSttaannddaarrdd IInnppuutt
+          ..rrdd _p_r_o_m_p_t      -       _p_r_o_m_p_t_=BELRead insertion.
+          ..eexx     -       -       -    Exit from NROFF/TROFF.
+          1199..  IInnppuutt//OOuuttppuutt FFiillee SSwwiittcchhiinngg
+          ..ssoo _f_i_l_e_n_a_m_e            -    - Switch source file _(_p_u_s_h _d_o_w_n_).
+          ..nnxx _f_i_l_e_n_a_m_e            end-of-file-Next file.
+          ..ppii _p_r_o_g_r_a_m             -    - Pipe   output  to  _p_r_o_g_r_a_m  (NROFF
+          only).
+          2200..  MMiisscceellllaanneeoouuss
+          ..mmcc _c _N -       off     E,mm  Set margin character _c  and  separa-
+          tion _N.
+          ..ttmm _s_t_r_i_n_g      -       newline-Print  _s_t_r_i_n_g  on  terminal (UNIX
+          standard error output).
+          ..iigg _y_y  -       _._y_y_=....  -    Ignore till call of _y_y.
+          ..ppmm _t   -       all     -    Print macro names and sizes;
+                                       if _t present, print  only  total  of
+          sizes.
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                                USD:21-7
+
+
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+
+          ..aabb _s_t_r_i_n_g      -       -    - Print a message and abort.
+          ..ffll     -       -       B    Flush output buffer.
+          2211..  OOuuttppuutt aanndd EErrrroorr MMeessssaaggeess
+          _________________________________________________________________
+          NNootteess--
+             B  Request normally causes a break.
+             D  Mode or relevant parameters associated with current diversion level.
+             E  Relevant parameters are a part of the current environment.
+             O  Must stay in effect until logical output.
+             P  Mode must be still or again in effect at the time of physical output.
+          vv,pp,mm,uuDefault scale indicator; if not specified, scale indicators are _i_g_n_o_r_e_d.
+
+          AAllpphhaabbeettiiccaall RReeqquueesstt aanndd SSeeccttiioonn NNuummbbeerr CCrroossss RReeffeerreennccee
+          ab20   c210   di7   ex18   hw13   lg10   ne3   os5   rd18   ss2   uf10
+          ad4   cc10   ds7   fc9   hy13   li10   nf4   pc14   rm7   sv5   ul10
+          af8   ce4   dt7   fi4   ie16   ll6   nh13   pi19   rn7   ta9   vs5
+          am7   ch7   ec10   fl20   if16   ls5   nm15   pl3   rr8   tc9   wh7
+          as7   cs2   el16   fp2   ig20   lt14   nn15   pm20   rs5   ti6
+          bd2   cu10   em7   ft2   in6   mc20   nr8   pn3   rt3   tl14
+          bp3   da7   eo10   fz2   it7   mk3   ns5   po3   so19   tm20
+          br4   de7   ev17   hc13   lc9   na4   nx19   ps2   sp5   tr10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:21-8                                NROFF/TROFF User's Manual
+
+
+          EEssccaappee SSeeqquueenncceess ffoorr CChhaarraacctteerrss,, IInnddiiccaattoorrss,, aanndd FFuunnccttiioonnss
+
+           _S_S_e_e_c_c_t_t_i_i_o_o_n_n   _E_E_s_s_c_c_a_a_p_p_e_e
+          _R_R_e_e_f_f_e_e_r_r_e_e_n_n_c_c_e_e  _S_S_e_e_q_q_u_u_e_e_n_n_c_c_e_e       _M_M_e_e_a_a_n_n_i_i_n_n_g_g
+            10.1     \\\\             \ (to prevent or delay the interpretation of \)
+            10.1     \\ee             Printable version of the _c_u_r_r_e_n_t escape character.
+             2.1     \\''             ' (acute accent); equivalent to \\((aaaa
+             2.1     \\``             ` (grave accent); equivalent to \\((ggaa
+             2.1     \\--             - Minus sign in the _c_u_r_r_e_n_t font
+             7       \\..             Period (dot) (see ddee)
+            11.1     \\(space)       Unpaddable space-size space character
+            11.1     \\00             Digit width space
+            11.1     \\||             1/6em narrow space character (zero width in NROFF)
+            11.1     \\^^             1/12em half-narrow space character (zero width in NROFF)
+             4.1     \\&&             Non-printing, zero width character
+            10.6     \\!!             Transparent line indicator
+            10.7     \\""             Beginning of comment
+             7.3     \\$$_N            Interpolate argument 1<=_N<=9
+            13       \\%%             Default optional hyphenation character
+             2.1     \\((_x_x           Character named _x_x
+             7.1     \\**_x, \\**((_x_x     Interpolate string _x or _x_x
+             9.1     \\aa             Non-interpreted leader character
+            12.3     \\bb_'_a_b_c_._._._'     Bracket building function
+             4.2     \\cc             Interrupt text processing
+            11.1     \\dd             Forward (down) 1/2em vertical motion (1/2 line in NROFF)
+             2.2     \\ff_x,\\ff((_x_x,\\ff_N  Change to font named _x or _x_x, or position _N
+            11.1     \\hh_'_N _'         Local horizontal motion; move right _N _(_n_e_g_a_t_i_v_e _l_e_f_t_)
+            11.3     \\kk_x            Mark horizontal _i_n_p_u_t place in register _x
+            12.4     \\ll_'_N_c_'         Horizontal line drawing function (optionally with _c)
+            12.4     \\LL_'_N_c_'         Vertical line drawing function (optionally with _c)
+             8       \\nn_x,\\nn((_x_x      Interpolate number register _x or _x_x
+            12.1     \\oo_'_a_b_c_._._._'     Overstrike characters _a_, _b_, _c_, _._._.
+             4.1     \\pp             Break and spread output line
+            11.1     \\rr             Reverse 1em vertical motion (reverse line in NROFF)
+             2.3     \\ss_N,\\ss_+_-_N      Point-size change function
+             9.1     \\tt             Non-interpreted horizontal tab
+            11.1     \\uu             Reverse (up) 1/2em vertical motion (1/2 line in NROFF)
+            11.1     \\vv_'_N_'          Local vertical motion; move down _N _(_n_e_g_a_t_i_v_e _u_p_)
+            11.2     \\ww_'_s_t_r_i_n_g_'     Interpolate width of _s_t_r_i_n_g
+             5.2     \\xx_'_N_'          Extra line-space function _(_n_e_g_a_t_i_v_e _b_e_f_o_r_e_, _p_o_s_i_t_i_v_e _a_f_t_e_r_)
+            12.2     \\zz_c            Print _c with zero width (without spacing)
+            16       \\{{             Begin conditional input
+            16       \\}}             End conditional input
+            10.7     \\(newline)     Concealed (ignored) newline
+              -      \\_X             _X, any character _n_o_t listed above
+
+
+          The  escape  sequences \\\\, \\.., \\"", \\$$, \\**, \\aa, \\nn, \\tt, and \\(new-
+          line) are interpreted in _c_o_p_y _m_o_d_e (<section>7.2).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                                USD:21-9
+
+
+          PPrreeddeeffiinneedd GGeenneerraall NNuummbbeerr RReeggiisstteerrss
+
+           _S_S_e_e_c_c_t_t_i_i_o_o_n_n   _R_R_e_e_g_g_i_i_s_s_t_t_e_e_r_r
+          _R_R_e_e_f_f_e_e_r_r_e_e_n_n_c_c_e_e  _N_N_a_a_m_m_e_e      _D_D_e_e_s_s_c_c_r_r_i_i_p_p_t_t_i_i_o_o_n_n
+             3       %%         Current page number.
+            19       cc..        Number of _l_i_n_e_s read from current input file.
+            11.2     cctt        Character type (set by _w_i_d_t_h function).
+             7.4     ddll        Width (maximum) of last completed diversion.
+             7.4     ddnn        Height (vertical size) of last completed diversion.
+              -      ddww        Current day of the week (1-7).
+              -      ddyy        Current day of the month (1-31).
+            11.3     hhpp        Current horizontal place on _i_n_p_u_t line (not in ditroff)
+            15       llnn        Output line number.
+              -      mmoo        Current month (1-12).
+             4.1     nnll        Vertical position of last printed text base-line.
+            11.2     ssbb        Depth of string below base line (generated by _w_i_d_t_h function).
+            11.2     sstt        Height of string above base line (generated by _w_i_d_t_h function).
+              -      yyrr        Last two digits of current year.
+
+
+          PPrreeddeeffiinneedd RReeaadd--OOnnllyy NNuummbbeerr RReeggiisstteerrss
+
+           _S_S_e_e_c_c_t_t_i_i_o_o_n_n   _R_R_e_e_g_g_i_i_s_s_t_t_e_e_r_r
+          _R_R_e_e_f_f_e_e_r_r_e_e_n_n_c_c_e_e  _N_N_a_a_m_m_e_e      _D_D_e_e_s_s_c_c_r_r_i_i_p_p_t_t_i_i_o_o_n_n
+             7.3     ..$$        Number of arguments available at the current macro level.
+              -      ..AA        Set to 1 in TROFF, if --aa option used; always 1 in NROFF.
+            11.1     ..HH        Available horizontal resolution in basic units.
+             5.3     ..LL        Set to current _l_i_n_e_-_s_p_a_c_i_n_g (llss) parameter
+              -      ..PP        Set to 1 if the current page is being printed; otherwise 0.
+              -      ..TT        Set to 1 in NROFF, if --TT option used; always 0 in TROFF.
+            11.1     ..VV        Available vertical resolution in basic units.
+             5.2     ..aa        Post-line extra line-space most recently utilized using \\xx_'_N_'.
+            19       ..cc        Number of _l_i_n_e_s read from current input file.
+             7.4     ..dd        Current vertical place in current diversion; equal to nnll, if no diversion.
+             2.2     ..ff        Current font as physical quadrant (1-4).
+             4       ..hh        Text base-line high-water mark on current page or diversion.
+             6       ..ii        Current indent.
+             4.2     ..jj        Current adjustment mode and type.
+             4.1     ..kk        Length of text portion on current partial output line.
+             6       ..ll        Current line length.
+             4       ..nn        Length of text portion on previous output line.
+             3       ..oo        Current page offset.
+             3       ..pp        Current page length.
+             2.3     ..ss        Current point size.
+             7.5     ..tt        Distance to the next trap.
+             4.1     ..uu        Equal to 1 in fill mode and 0 in nofill mode.
+             5.1     ..vv        Current vertical line spacing.
+            11.2     ..ww        Width of previous character.
+              -      ..xx        Reserved version-dependent register.
+              -      ..yy        Reserved version-dependent register.
+             7.4     ..zz        Name of current diversion.
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:21-10                               NROFF/TROFF User's Manual
+
+
+                                  RREEFFEERREENNCCEE MMAANNUUAALL
+
+          11..  GGeenneerraall EExxppllaannaattiioonn
+          _1_._1_._F_o_r_m _o_f _i_n_p_u_t_.  Input consists of _t_e_x_t _l_i_n_e_s, which are  des-
+          tined  to  be printed, interspersed with _c_o_n_t_r_o_l _l_i_n_e_s, which set
+          parameters or otherwise control subsequent  processing.   Control
+          lines  begin  with  a _c_o_n_t_r_o_l _c_h_a_r_a_c_t_e_r--normally .. (period) or ''
+          (acute accent)--followed by a one  or  two  character  name  that
+          specifies  a  basic _r_e_q_u_e_s_t or the substitution of a user-defined
+          _m_a_c_r_o in place of the control line.  The control character '' sup-
+          presses  the  _b_r_e_a_k  function--the  forced  output of a partially
+          filled line--caused by certain requests.  The  control  character
+          may be separated from the request/macro name by white space (spa-
+          ces and/or tabs) for aesthetic reasons.  Names must  be  followed
+          by  either  space  or  newline.   Control lines with unrecognized
+          names are ignored.
+          Various special functions may be introduced anywhere in the input
+          by  means  of  an _e_s_c_a_p_e character, normally \\.  For example, the
+          function \\nn_R causes the interpolation (insertion in place) of the
+          contents  of the _n_u_m_b_e_r _r_e_g_i_s_t_e_r _R in place of the function; here
+          _R is either a single character name as in \\nn_x, or  left-parenthe-
+          sis-introduced, two-character name as in \\nn((_x_x.
+          _1_._2_._F_o_r_m_a_t_t_e_r  _a_n_d  _d_e_v_i_c_e _r_e_s_o_l_u_t_i_o_n_.  TROFF internally uses 432
+          units/inch, (for historical reasons, corresponding to the Graphic
+          Systems  phototypesetter  which  had  a  horizontal resolution of
+          1/432 inch and a  vertical  resolution  of  1/144  inch.)   NROFF
+          internally uses 240 units/inch, corresponding to the least common
+          multiple of the horizontal and vertical  resolutions  of  various
+          typewriter-like output devices.  TROFF rounds horizontal/vertical
+          numerical parameter input to its own internal horizontal/vertical
+          resolution.  NROFF similarly rounds numerical input to the actual
+          resolution of the  output  device  indicated  by  the  --TT  option
+          (default Model 37 Teletype).
+          _1_._3_._N_u_m_e_r_i_c_a_l  _p_a_r_a_m_e_t_e_r  _i_n_p_u_t_.   Both  NROFF  and  TROFF accept
+          numerical input with the scale indicator suffixes  shown  in  the
+          following table, where _S is the current type size in points, _V is
+          the current vertical line spacing in basic units, and _C is a _n_o_m_-
+          _i_n_a_l _c_h_a_r_a_c_t_e_r _w_i_d_t_h in basic units.
+
+           +----------+---------------------+----------------------------+
+           |  Scale   |                     | Number of basic units      |
+           |Indicator |       Meaning       | TROFF        NROFF         |
+           +----------+---------------------+------------+---------------+
+           |    ii     | Inch                | 432        | 240           |
+           |    cc     | Centimeter          | 432x50/127 | 240x50/127    |
+           |    PP     | Pica = 1/6 inch     | 72         | 240/6         |
+           |    mm     | Em = _S points       | 6x_S        | _C             |
+           |    nn     | En = Em/2           | 3x_S        | _C_, _s_a_m_e _a_s _E_m |
+           |    pp     | Point = 1/72 inch   | 6          | 240/72        |
+           |    uu     | Basic unit          | 1          | 1             |
+           |    vv     | Vertical line space | _V          | _V             |
+           |  none    | Default, see below  |            |               |
+           +----------+---------------------+------------+---------------+
+          In  NROFF, _b_o_t_h the em and the en are taken to be equal to the _C,
+          which is output-device dependent; common values are 1/10 and 1/12
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-11
+
+
+          inch.   Actual character widths in NROFF need not be all the same
+          and constructed characters such as -> (->) are often extra  wide.
+          The default scaling is ems for the horizontally-oriented requests
+          and functions llll, iinn, ttii, ttaa, lltt, ppoo, mmcc, \\hh, and \\ll; _Vs for  the
+          vertically-oriented  requests  and  functions ppll, wwhh, cchh, ddtt, sspp,
+          ssvv, nnee, rrtt, \\vv, \\xx, and \\LL; pp for the vvss request; and uu  for  the
+          requests  nnrr,  iiff,  and  iiee.  _A_l_l other requests ignore any scale
+          indicators.  When a number register containing an already  appro-
+          priately  scaled  number  is  interpolated  to  provide numerical
+          input, the unit scale indicator uu may need to be appended to pre-
+          vent an additional inappropriate default scaling.  The number, _N,
+          may be specified  in  decimal-fraction  form  but  the  parameter
+          finally stored is rounded to an integer number of basic units.
+          The  _a_b_s_o_l_u_t_e  _p_o_s_i_t_i_o_n indicator || may be prefixed to a number _N
+          to generate the distance to the vertical or horizontal  place  _N.
+          For  vertically-oriented  requests  and functions, ||_N becomes the
+          distance in basic units from the current vertical  place  on  the
+          page  or  in  a _d_i_v_e_r_s_i_o_n (<section>7.4) to the vertical place _N.
+          For _a_l_l other requests and functions,  ||_N  becomes  the  distance
+          from  the current horizontal place on the _i_n_p_u_t line to the hori-
+          zontal place _N.  For example,
+               ..sspp  ||33..22cc
+          will space _i_n _t_h_e _r_e_q_u_i_r_e_d _d_i_r_e_c_t_i_o_n to 3.2 centimeters from  the
+          top of the page.
+          _1_._4_._N_u_m_e_r_i_c_a_l _e_x_p_r_e_s_s_i_o_n_s_.  Wherever numerical input is expected,
+          an expression involving parentheses, the arithmetic operators  ++,
+          --,  //,  **, %% (mod), and the logical operators <<, >>, <<==, >>==, == (or
+          ====), && (and), :: (or) may be used.   Except  where  controlled  by
+          parentheses, evaluation of expressions is left-to-right; there is
+          no operator precedence.  In the case of certain requests, an ini-
+          tial ++ or -- is stripped and interpreted as an increment or decre-
+          ment indicator respectively.  In the presence of default scaling,
+          the  desired  scale indicator must be attached to _e_v_e_r_y number in
+          an expression for which the desired and default  scaling  differ.
+          For  example, if the number register xx contains 2 and the current
+          point size is 10, then
+               ..llll  ((44..2255ii++\\nnxxPP++33))//22uu
+          will set the line length to 1/2 the sum of 4.25 inches + 2  picas
+          + 30 points.
+          _1_._5_._N_o_t_a_t_i_o_n_.   Numerical parameters are indicated in this manual
+          in two ways.  +-_N means that the argument may take the  forms  _N,
+          +_N,  or  -_N  and  that  the  corresponding  effect  is to set the
+          affected parameter to _N, to increment it by _N, or to decrement it
+          by  _N respectively.  Plain _N means that an initial algebraic sign
+          is _n_o_t an increment indicator, but merely the sign of _N.   Gener-
+          ally, unreasonable numerical input is either ignored or truncated
+          to a reasonable value.  For example, most requests expect to  set
+          parameters to non-negative values; exceptions are sspp, wwhh, cchh, nnrr,
+          and iiff.  The requests ppss, fftt, ppoo, vvss, llss, llll, iinn, and lltt  restore
+          the _p_r_e_v_i_o_u_s parameter value in the _a_b_s_e_n_c_e of an argument.
+          Single  character  arguments  are  indicated by single lower case
+          letters and one/two character arguments are indicated by  a  pair
+          of  lower case letters.  Character string arguments are indicated
+          by multi-character mnemonics.
+
+
+
+
+
+
+
+
+
+          USD:21-12                               NROFF/TROFF User's Manual
+
+
+          22..  FFoonntt aanndd CChhaarraacctteerr SSiizzee CCoonnttrrooll
+          _2_._1_._C_h_a_r_a_c_t_e_r _s_e_t_.  The TROFF character set consists of  a  type-
+          setter-dependent  basic character set plus a Special Mathematical
+          Font character set--each having 102 characters.   An  example  of
+          these  character  sets  is  shown  in  the Appendix Table I.  All
+          printable ASCII characters are included, with some on the Special
+          Font.  With three exceptions, these ASCII characters are input as
+          themselves, and non-ASCII characters are input in the  form  \\((_x_x
+          where  _x_x is a two-character name given in the Appendix Table II.
+          The three ASCII exceptions are mapped as follows:
+
+                +-------------------------+-------------------------+
+                |      ASCII Input        |    Printed by TROFF     |
+                |Character       Name     | Character      Name     |
+                +-------------------------+-------------------------+
+                |    '       acute accent |     '       close quote |
+                |    `       grave accent |     `       open quote  |
+                |    -       minus        |     -       hyphen      |
+                +-------------------------+-------------------------+
+          The characters '', ``, and -- may be input by \\'', \\``, and \\-- respec-
+          tively  or by their names (Table II).  The ASCII characters @@, ##,
+          "", '', ``, <<, >>, \\, {{, }}, ~~, ^^, and __ exist  only  on  the  Special
+          Font and are printed as a 1-em space if that font is not mounted.
+          NROFF understands the entire TROFF character set, but can in gen-
+          eral print only ASCII characters, additional characters as may be
+          available on the output device, such characters as may be able to
+          be constructed by overstriking or other  combination,  and  those
+          that  can  reasonably  be mapped into other printable characters.
+          The exact behavior is determined by a driving table prepared  for
+          each device.  The characters '', ``, and __ print as themselves.
+          _2_._2_._F_o_n_t_s_.   The default mounted fonts are Times Roman (RR), Times
+          Italic (II), Times Bold (BB), and the Special Mathematical Font (SS)
+          on  physical  typesetter  positions  1, 2, 3, and 4 respectively.
+          These fonts are used in this document.  The  _c_u_r_r_e_n_t  font,  ini-
+          tially  Roman, may be changed (among the mounted fonts) by use of
+          the fftt request, or by imbedding at any desired point either  \\ff_x,
+          \\ff((_x_x, or \\ff_N where _x and _x_x are the name of a mounted font and _N
+          is a numerical font position.  It is _n_o_t necessary to  change  to
+          the  Special Font; characters on that font are automatically han-
+          dled.  A request for a named but  not-mounted  font  is  _i_g_n_o_r_e_d.
+          TROFF  can be informed that any particular font is mounted by use
+          of the ffpp request.  The  list  of  known  fonts  is  installation
+          dependent.    In   the   subsequent  discussion  of  font-related
+          requests, _F represents either a one/two-character  font  name  or
+          the  numerical font position, 1-4.  The current font is available
+          (as numerical position) in the read-only number register ..ff.
+          NROFF understands font control  and  normally  underlines  Italic
+          characters (see <section>10.5).
+          _2_._3_._C_h_a_r_a_c_t_e_r _s_i_z_e_.  Character point sizes available are typeset-
+          ter dependent, but often include 6, 7, 8, 9, 10, 11, 12, 14,  16,
+          18,  20, 22, 24, 28, and 36.  This is a range of 1/12 inch to 1/2
+          inch.  The ppss request is used to  change  or  restore  the  point
+          size.   Alternatively  the  point size may be changed between any
+          two characters by imbedding a \\ss_N at the desired point to set the
+          size  to  _N, or a \\ss_+_-_N (1<=_N<=9) to increment/decrement the size
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-13
+
+
+          by _N; \\ss00 restores the _p_r_e_v_i_o_u_s size.  Requested point size  val-
+          ues that are between two valid sizes yield the larger of the two.
+          The current size is available in the ..ss register.  NROFF  ignores
+          type size control.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_*_*_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ppss _+_-_N 10point previous     E Point  size  set to +-_N.  Alterna-
+                                       tively imbed \\ss_N or \\ss_+_-_N.  Any pos-
+                                       itive  size  value may be requested;
+                                       if invalid, the  next  larger  valid
+                                       size  will result, with a maximum of
+                                       36.  A paired  sequence  +_N,-_N  will
+                                       work  because the previous requested
+                                       value is also  remembered.   Ignored
+                                       in NROFF.
+          ..ffzz _F _+_-_N       off     -    E The  characters  in font _F will be
+                                       adjusted to be in size +-_N.  Charac-
+                                       ters in the Special Font encountered
+                                       during the use of font _F  will  have
+                                       the same size modification. (Use the
+                                       ..ffzz SS request if different treatment
+                                       of   Special   Font   characters  is
+                                       required). ..ffzz must follow  any  ..ffpp
+                                       request for the position.
+          ..ffzz SS _F _+_-_N     off     -    E The characters in the Special Font
+                                       will be in size +-_N  independent  of
+                                       previous ..ffzz requests.
+          ..ssss _N   12/36em ignored E    Space-character   size   is  set  to
+                                       _N/36ems.  This size is  the  minimum
+                                       word   spacing   in  adjusted  text.
+                                       Ignored in NROFF.
+          ..ccss _F_N_M off     -       P    Constant  character  space   (width)
+                                       mode  is  set  on  for  font  _F  (if
+                                       mounted); the width of every charac-
+                                       ter  will  be  taken to be _N/36 ems.
+                                       If _M is absent, the em  is  that  of
+                                       the  character's point size; if _M is
+                                       given,  the  em  is  _M-points.   All
+                                       affected  characters are centered in
+                                       this space, including those with  an
+                                       actual width larger than this space.
+                                       Special  Font  characters  occurring
+                                       while the current font is _F are also
+                                       so treated.  If  _N  is  absent,  the
+                                       mode  is  turned off.  The mode must
+                                       be still or again in effect when the
+                                       characters  are  physically printed.
+                                       Ignored in NROFF.
+          ..bbdd _F _N off     -       P    The characters in  font  _F  will  be
+                                       artificially  emboldened by printing
+                                       each one  twice,  separated  by  _N-1
+                                       basic units.  A reasonable value for
+                                       _N is 3 when the character size is in
+          __________
+          *Notes are explained at the end of the Summary and Index above.
+
+
+
+
+
+
+
+
+          USD:21-14                               NROFF/TROFF User's Manual
+
+
+                                       the  vicinity of 10 points.  If _N is
+                                       missing the embolden mode is  turned
+                                       off.   The  column  heads above were
+                                       printed with ..bbdd II 33.  The mode must
+                                       be still or again in effect when the
+                                       characters are  physically  printed.
+                                       Ignored in NROFF.
+          ..bbdd SS _F _N       off     -    P The characters in the Special Font
+                                       will be emboldened whenever the cur-
+                                       rent  font  is  _F.   This manual was
+                                       printed with ..bbddSSBB33.  The mode  must
+                                       be still or again in effect when the
+                                       characters are physically printed.
+          ..fftt _F   Roman   previous     E Font changed to _F.  Alternatively,
+                                       imbed  \\ff_F.   The  font  name  PP  is
+                                       reserved to mean the previous font.
+          ..ffpp _N _F R,I,B,S ignored -    Font position.  This is a  statement
+                                       that  a  font  named _F is mounted on
+                                       position _N (1-4).   It  is  a  fatal
+                                       error if _F is not known.  The photo-
+                                       typesetter has four fonts physically
+                                       mounted.   Each  font  consists of a
+                                       film strip which can be mounted on a
+                                       numbered  quadrant  of a wheel.  The
+                                       default mounting sequence assumed by
+                                       TROFF is R, I, B, and S on positions
+                                       1, 2, 3 and 4.
+          33..  PPaaggee ccoonnttrrooll
+          Top and bottom margins are _n_o_t automatically provided; it is con-
+          ventional  to define two _m_a_c_r_o_s and to set _t_r_a_p_s for them at ver-
+          tical positions  0  (top)  and  _-_N  (_N  from  the  bottom).   See
+          <section>7  and  Tutorial  Examples  <section>T2.   A pseudo-page
+          transition onto the _f_i_r_s_t page occurs either when the first _b_r_e_a_k
+          occurs  or  when  the  first _n_o_n_-_d_i_v_e_r_t_e_d text processing occurs.
+          Arrangements for a trap to occur at the top  of  the  first  page
+          must be completed before this transition.  In the following, ref-
+          erences to the _c_u_r_r_e_n_t _d_i_v_e_r_s_i_o_n  (<section>7.4)  mean  that  the
+          mechanism being described works during both ordinary and diverted
+          output (the former considered as the top diversion level).
+          The usable page width on the Graphic Systems phototypesetter  was
+          about  7.54 inches,  beginning about 1/27 inch from the left edge
+          of the 8 inch wide, continuous roll paper, but these characteris-
+          tics  are  typesetter-  dependent.   The  physical limitations on
+          NROFF output are output-device dependent.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ppll _+_-_N 11in    11in    vv    Page length set to _+_-_N.  The  inter-
+                                       nal limitation is about 75 inches in
+                                       TROFF and about 136 inches in NROFF.
+                                       The current page length is available
+                                       in the ..pp register.
+          ..bbpp _+_-_N _N_=1     -       B*,vv Begin  page.   The  current  page is
+          __________
+          *The use of " '' " as control character  (instead  of  "..")   sup-
+          presses the break function.
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-15
+
+
+                                       ejected and a new page is begun.  If
+                                       _+_-_N  is  given,  the new page number
+                                       will be _+_-_N.  Also see request nnss.
+          ..ppnn _+_-_N _N=1     ignored -    Page number.  The next page (when it
+                                       occurs)  will  have  the page number
+                                       _+_-_N.  A ppnn  must  occur  before  the
+                                       initial  pseudo-page  transition  to
+                                       affect the page number of the  first
+                                       page.  The current page number is in
+                                       the %% register.
+          ..ppoo _+_-_N 0; 26/27in<*>   previousvvPage offset.  The  current  _l_e_f_t
+                                       _m_a_r_g_i_n  is  set  to  _+_-_N.  The TROFF
+                                       initial value provides about  1 inch
+                                       of paper margin including the physi-
+                                       cal typesetter margin of  1/27 inch.
+                                       In    TROFF   the   maximum   (line-
+                                       length)+(page-offset) is about  7.54
+                                       inches.   See  <section>6.  The cur-
+                                       rent page offset is available in the
+                                       ..oo register.
+          ..nnee _N   -       _N_=1_V    D,vv  Need  _N vertical space.  If the dis-
+                                       tance, _D, to the next trap  position
+                                       (see <section>7.5) is less than _N, a
+                                       forward vertical  space  of  size  _D
+                                       occurs,  which will spring the trap.
+                                       If there are no remaining  traps  on
+                                       the  page,  _D is the distance to the
+                                       bottom of the page.  If _D_<_V, another
+                                       line   could  still  be  output  and
+                                       spring the trap.  In a diversion,  _D
+                                       is  the  distance  to  the _d_i_v_e_r_s_i_o_n
+                                       _t_r_a_p, if any, or is very large.
+          ..mmkk _R   none    internal     D Mark the _c_u_r_r_e_n_t vertical place in
+                                       an  internal  register (both associ-
+                                       ated  with  the  current   diversion
+                                       level),  or in register _R, if given.
+                                       See rrtt request.
+          ..rrtt _+_-_N none    internal     D,vvReturn _u_p_w_a_r_d _o_n_l_y  to  a  marked
+                                       vertical place in the current diver-
+                                       sion.  If _+_-_N (w.r.t. current place)
+                                       is  given, the place is _+_-_N from the
+                                       top of the page or diversion or,  if
+                                       _N  is absent, to a place marked by a
+                                       previous  mmkk.   Note  that  the   sspp
+                                       request  (<section>5.3)  may be used
+                                       in all cases instead of rrtt by  spac-
+                                       ing  to the absolute place stored in
+                                       an explicit  register;  e. g.  using
+                                       the sequence ..mmkk _R ... ..sspp ||\\nn_Ruu.
+          44..  TTeexxtt FFiilllliinngg,, AAddjjuussttiinngg,, aanndd CCeenntteerriinngg
+          _4_._1_._F_i_l_l_i_n_g  _a_n_d  _a_d_j_u_s_t_i_n_g_.   Normally, words are collected from
+          input text lines and assembled into an  output  text  line  until
+          some  word doesn't fit.  An attempt is then made to hyphenate the
+          __________
+          <*>Values separated by ";" are for NROFF and TROFF respectively.
+
+
+
+
+
+
+
+
+          USD:21-16                               NROFF/TROFF User's Manual
+
+
+          word to assemble a part of it into the output line.   The  spaces
+          between the words on the output line are then increased to spread
+          out the line to the current _l_i_n_e _l_e_n_g_t_h minus any current _i_n_d_e_n_t.
+          A _w_o_r_d is any string of characters delimited by the _s_p_a_c_e charac-
+          ter or the beginning/end of the input line.  Any adjacent pair of
+          words  that  must  be  kept together (neither split across output
+          lines nor spread apart in the adjustment  process)  can  be  tied
+          together  by  separating them with the _u_n_p_a_d_d_a_b_l_e _s_p_a_c_e character
+          "\\  " (backslash-space).  The adjusted word spacings are  uniform
+          in TROFF and the minimum interword spacing can be controlled with
+          the ssss request (<section>2).  In NROFF, they are normally nonuni-
+          form  because  of quantization to character-size spaces; however,
+          the command line option --ee causes uniform spacing with full  out-
+          put  device  resolution.   Filling,  adjustment,  and hyphenation
+          (<section>13) can all  be  prevented  or  controlled.   The  _t_e_x_t
+          _l_e_n_g_t_h  on  the last line output is available in the ..nn register,
+          and text base-line position on the page for this line is  in  the
+          nnll  register.   The text base-line high-water mark (lowest place)
+          on the current page is in the ..hh register. The ..kk register (read-
+          only)  contains  the horizontal size of the text portion (without
+          indent) of the current partially-collected output line  (if  any)
+          in the current environment.
+          An  input text line ending with .., ??, or !! is taken to be the end
+          of a _s_e_n_t_e_n_c_e, and an additional space character is automatically
+          provided  during  filling.   Multiple inter-word space characters
+          found in the input are retained, except for trailing spaces; ini-
+          tial spaces also cause a _b_r_e_a_k.
+          When  filling is in effect, a \\pp may be imbedded or attached to a
+          word to cause a _b_r_e_a_k at the _e_n_d of the word and have the result-
+          ing output line _s_p_r_e_a_d _o_u_t to fill the current line length.
+          A  text input line that happens to begin with a control character
+          (<section>10.4) can be made to not look like a  control  line  by
+          preceding it by the non-printing, zero-width filler character \\&&.
+          Still another way is to specify output translation of some conve-
+          nient   character   into   the   control   character   using   ttrr
+          (<section>10.5).
+          _4_._2_._I_n_t_e_r_r_u_p_t_e_d _t_e_x_t_.  The copying of an  input  line  in  _n_o_f_i_l_l
+          (non-fill)  mode  can  be  _i_n_t_e_r_r_u_p_t_e_d by terminating the partial
+          line with a \\cc.  The _n_e_x_t encountered input  text  line  will  be
+          considered  to  be a continuation of the same line of input text.
+          Similarly, a word within _f_i_l_l_e_d text may be interrupted by termi-
+          nating  the  word  (and  line) with \\cc; the next encountered text
+          will be taken as a continuation of the interrupted word.  If  the
+          intervening control lines cause a break, any partial line will be
+          forced out along with any partial word.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..bbrr     -       -       B    Break.  The filling of the line cur-
+                                       rently  being  collected  is stopped
+                                       and  the  line  is  output   without
+                                       adjustment.   Text  lines  beginning
+                                       with space characters and empty text
+                                       lines  (blank  lines)  also  cause a
+                                       break.
+          ..ffii     fill on -       B,E  Fill subsequent output  lines.   The
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-17
+
+
+                                       register  ..uu is 1 in fill mode and 0
+                                       in nofill mode.
+          ..nnff     fill on -       B,E  Nofill.  Subsequent output lines are
+                                       _n_e_i_t_h_e_r  filled _n_o_r adjusted.  Input
+                                       text lines are  copied  directly  to
+                                       output  lines _w_i_t_h_o_u_t _r_e_g_a_r_d for the
+                                       current line length.
+          ..aadd _c   adj,both        adjust ELine  adjustment  is  begun.   If
+                                       fill mode is not on, adjustment will
+                                       be deferred until fill mode is  back
+                                       on.   If  the  type  indicator  _c is
+                                       present,  the  adjustment  type   is
+                                       changed  as  shown  in the following
+                                       table.  The type indicator can  also
+                                       be a value saved  from the read-only
+                                       ..jj number register, which is set  to
+                                       contain  the current adjustment mode
+                                       and type.
+
+                                      +----------+--------------------------+
+                                      |Indicator |       Adjust Type        |
+                                      +----------+--------------------------+
+                                      |    ll     | adjust left margin only  |
+                                      |    rr     | adjust right margin only |
+                                      |    cc     | center                   |
+                                      | bb or nn   | adjust both margins      |
+                                      | absent   | unchanged                |
+                                      +----------+--------------------------+
+          ..nnaa     adjust  -       E    Noadjust.  Adjustment is turned off;
+                                       the  right  margin  will  be ragged.
+                                       The adjustment type for  aadd  is  not
+                                       changed.   Output line filling still
+                                       occurs if fill mode is on.
+          ..ccee _N   off     _N=1     B,E  Center the next _N input  text  lines
+                                       within   the   current  (line-length
+                                       minus indent).  If _N=0, any residual
+                                       count  is  cleared.   A break occurs
+                                       after each of the _N input lines.  If
+                                       the  input line is too long, it will
+                                       be left adjusted.
+          55..  VVeerrttiiccaall SSppaacciinngg
+          _5_._1_._B_a_s_e_-_l_i_n_e _s_p_a_c_i_n_g_.  The  vertical  spacing  _(_V_)  between  the
+          base-lines  of  successive  output  lines can be set using the vvss
+          request with a resolution of 1/144inch=1/2 point in TROFF, and to
+          the output device resolution in NROFF.  _V must be large enough to
+          accommodate the character sizes on  the  affected  output  lines.
+          For  the common type sizes (9-12 points), usual typesetting prac-
+          tice is to set _V to 2 points greater than the point  size;  TROFF
+          default  is 10-point type on a 12-point spacing (as in this docu-
+          ment).  The current _V is available in the ..vv register.  Multiple-
+          _V line separation (e.g. double spacing) may be requested with llss.
+          _5_._2_._E_x_t_r_a  _l_i_n_e_-_s_p_a_c_e_.  If a word contains a vertically tall con-
+          struct requiring the output line containing it to have extra ver-
+          tical space before and/or after it, the _e_x_t_r_a_-_l_i_n_e_-_s_p_a_c_e function
+          \\xx_'_N_' can be imbedded in or attached to that word.  In  this  and
+
+
+
+
+
+
+
+
+          USD:21-18                               NROFF/TROFF User's Manual
+
+
+          other  functions having a pair of delimiters around their parame-
+          ter (here ''), the delimiter choice is arbitrary, except  that  it
+          can't  look  like  the continuation of a number expression for _N.
+          If _N is negative, the output line containing  the  word  will  be
+          preceded  by _N extra vertical space; if _N is positive, the output
+          line containing the word will be followed  by  _N  extra  vertical
+          space.   If successive requests for extra space apply to the same
+          line, the maximum values are used.  The  most  recently  utilized
+          post-line extra line-space is available in the ..aa register.
+          _5_._3_._B_l_o_c_k_s _o_f _v_e_r_t_i_c_a_l _s_p_a_c_e_.  A block of vertical space is ordi-
+          narily requested using sspp, which honors  the  _n_o_-_s_p_a_c_e  mode  and
+          which does not space _p_a_s_t a trap.  A contiguous block of vertical
+          space may be reserved using ssvv.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..vvss _N   1/6in;12pts     previousE,ppSet vertical base-line spacing
+                                       size  _V.   Transient  _e_x_t_r_a vertical
+                                       space  available  with  \\xx_'_N_'   (see
+                                       above).
+          ..llss _N   _N_=1     previous     E _L_i_n_e  spacing  set to _+_-_N.  _N_-1 _Vs
+                                       _(_b_l_a_n_k _l_i_n_e_s_) are appended  to  each
+                                       output  text  line.  The (read-only)
+                                       number register ..LL is set to contain
+                                       the   current   line-spacing  value.
+                                       Appended blank lines are omitted, if
+                                       the  text or previous appended blank
+                                       line reached a trap position.
+          ..sspp _N   -       _N=1_V    B,vv  Space vertically  in  _e_i_t_h_e_r  direc-
+                                       tion.   If _N is negative, the motion
+                                       is _b_a_c_k_w_a_r_d (upward) and is  limited
+                                       to  the  distance  to the top of the
+                                       page.  Forward (downward) motion  is
+                                       truncated  to  the  distance  to the
+                                       nearest trap.  If the no-space  mode
+                                       is  on,  no  spacing occurs (see nnss,
+                                       and rrss below).
+          ..ssvv _N   -       _N_=1_V    vv    Save a contiguous vertical block  of
+                                       size _N.  If the distance to the next
+                                       trap is greater than _N,  _N  vertical
+                                       space  is output.  No-space mode has
+                                       _n_o effect.  If this distance is less
+                                       than _N, no vertical space is immedi-
+                                       ately output, but  _N  is  remembered
+                                       for  later  output (see ooss).  Subse-
+                                       quent ssvv requests will overwrite any
+                                       still remembered _N.
+          ..ooss     -       -       -    Output  saved  vertical  space.  No-
+                                       space mode has _n_o effect.   Used  to
+                                       finally  output  a block of vertical
+                                       space requested  by  an  earlier  ssvv
+                                       request.
+          ..nnss     space   -       D    No-space  mode  turned on.  When on,
+                                       the  no-space   mode   inhibits   sspp
+                                       requests  and  bbpp requests _w_i_t_h_o_u_t a
+                                       next page number.  The no-space mode
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-19
+
+
+                                       is  turned off when a line of output
+                                       occurs, or with rrss.
+          ..rrss     space   -       D    Restore spacing.  The no-space  mode
+                                       is turned off.
+          Blank text line.        -    B Causes a break and outputs a blank
+                                       line just like sspp 11.
+          66..  LLiinnee LLeennggtthh aanndd IInnddeennttiinngg
+          The maximum line length for fill mode may be set  with  llll.   The
+          indent  may be set with iinn; an indent applicable to _o_n_l_y the _n_e_x_t
+          output line may be set with ttii.  The line length includes  indent
+          space  but  _n_o_t  page  offset  space.   The line-length minus the
+          indent is the basis for centering with ccee.  The effect of llll, iinn,
+          or  ttii  is  delayed,  if a partially collected line exists, until
+          after that line is output.  In fill mode the length of text on an
+          output  line  is  less than or equal to the line length minus the
+          indent.  The current line length and indent are available in reg-
+          isters  ..ll  and ..ii respectively.  The length of _t_h_r_e_e_-_p_a_r_t _t_i_t_l_e_s
+          produced by ttll (see <section>14) is _i_n_d_e_p_e_n_d_e_n_t_l_y set by lltt.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..llll _+_-_N 6.5in   previous     E,mmLine length is set  to  +-_N.   In
+                                       TROFF     the     maximum     (line-
+                                       length)+(page-offset) is about  7.54
+                                       inches.
+          ..iinn _+_-_N _N_=0     previous     B,E,mmIndent  is  set  to  _+_-_N.   The
+                                       indent is prepended to  each  output
+                                       line.
+          ..ttii _+_-_N -       ignored B,E,mm  Temporary indent.  The _n_e_x_t output
+                                       text line will be  indented  a  dis-
+                                       tance  _+_-_N  with respect to the cur-
+                                       rent indent.   The  resulting  total
+                                       indent  may  not  be  negative.  The
+                                       current indent is not changed.
+          77..  MMaaccrrooss,, SSttrriinnggss,, DDiivveerrssiioonn,, aanndd PPoossiittiioonn TTrraappss
+          _7_._1_._M_a_c_r_o_s _a_n_d _s_t_r_i_n_g_s_.  A _m_a_c_r_o is  a  named  set  of  arbitrary
+          _l_i_n_e_s  that may be invoked by name or with a _t_r_a_p.  A _s_t_r_i_n_g is a
+          named string of _c_h_a_r_a_c_t_e_r_s, _n_o_t including  a  newline  character,
+          that  may  be interpolated by name at any point.  Request, macro,
+          and string names share the _s_a_m_e  name  list.   Macro  and  string
+          names  may be one or two characters long and may usurp previously
+          defined request, macro, or string names.  Any of  these  entities
+          may be renamed with rrnn or removed with rrmm.  Macros are created by
+          ddee and ddii, and appended to by aamm and ddaa; ddii and ddaa  cause  normal
+          output  to  be  stored in a macro.  Strings are created by ddss and
+          appended to by aass.  A macro is invoked  in  the  same  way  as  a
+          request;  a  control line beginning .._x_x will interpolate the con-
+          tents of macro _x_x.  The remainder of the line may contain  up  to
+          nine  _a_r_g_u_m_e_n_t_s.   The  strings  _x and _x_x are interpolated at any
+          desired point with \\**_x and \\**((_x_x respectively.  String references
+          and macro invocations may be nested.
+          _7_._2_._C_o_p_y  _m_o_d_e  _i_n_p_u_t  _i_n_t_e_r_p_r_e_t_a_t_i_o_n_.  During the definition and
+          extension of strings and macros (not by diversion) the  input  is
+          read  in  _c_o_p_y  _m_o_d_e.  The input is copied without interpretation
+          _e_x_c_e_p_t that:
+               +o The contents of number registers indicated by \\nn are interpolated.
+
+
+
+
+
+
+
+
+          USD:21-20                               NROFF/TROFF User's Manual
+
+
+               +o Strings indicated by \\** are interpolated.
+               +o Arguments indicated by \\$$ are interpolated.
+               +o Concealed newlines indicated by \\(newline) are eliminated.
+               +o Comments indicated by \\"" are eliminated.
+               +o \\tt and \\aa are interpreted as ASCII horizontal tab and SOH respectively (<section>9).
+               +o \\\\ is interpreted as \\.
+               +o \\.. is interpreted as "..".
+          These interpretations can be suppressed by prepending a  \\.   For
+          example,  since  \\\\ maps into a \\, \\\\nn will copy as \\nn which will
+          be interpreted as a number register indicator when the  macro  or
+          string is reread.
+          _7_._3_._A_r_g_u_m_e_n_t_s_.  When a macro is invoked by name, the remainder of
+          the line is taken to contain up to nine arguments.  The  argument
+          separator is the space character, and arguments may be surrounded
+          by double-quotes to permit imbedded space characters.   Pairs  of
+          double-quotes  may be imbedded in double-quoted arguments to rep-
+          resent a single double-quote.  If the desired arguments won't fit
+          on  a  line,  a  concealed newline may be used to continue on the
+          next line.
+          When a macro is invoked the _i_n_p_u_t _l_e_v_e_l is _p_u_s_h_e_d  _d_o_w_n  and  any
+          arguments  available  at  the  previous  level become unavailable
+          until the macro is completely read  and  the  previous  level  is
+          restored.   A  macro's  own  arguments can be interpolated at _a_n_y
+          point within the macro with \\$$_N, which interpolates the _Nth argu-
+          ment  (1<=_N<=9).   If  an  invoked argument doesn't exist, a null
+          string results.  For example, the macro _x_x may be defined by
+               ..ddee xxxx \\""bbeeggiinn ddeeffiinniittiioonn
+               TTooddaayy iiss \\\\$$11 tthhee \\\\$$22..
+               ....     \\""eenndd ddeeffiinniittiioonn
+          and called by
+               ..xxxx MMoonnddaayy 1144tthh
+          to produce the text
+               TTooddaayy iiss MMoonnddaayy tthhee 1144tthh..
+          Note that the \\$$ was concealed in the definition with a prepended
+          \\.  The number of currently available arguments is in the ..$$ reg-
+          ister.
+          No arguments are available at the top (non-macro) level  in  this
+          implementation.   Because string referencing is implemented as an
+          input-level push down, no arguments are available from  _w_i_t_h_i_n  a
+          string.  No arguments are available within a trap-invoked macro.
+          Arguments  are  copied  in  _c_o_p_y _m_o_d_e onto a stack where they are
+          available for reference.  The mechanism does not allow  an  argu-
+          ment to contain a direct reference to a _l_o_n_g string (interpolated
+          at copy time) and it is advisable to  conceal  string  references
+          (with an extra \\) to delay interpolation until argument reference
+          time.
+          _7_._4_._D_i_v_e_r_s_i_o_n_s_.  Processed output may be diverted  into  a  macro
+          for   purposes   such   as   footnote  processing  (see  Tutorial
+          <section>T5) or determining the horizontal and vertical  size  of
+          some text for conditional changing of pages or columns.  A single
+          diversion trap may be set at a specified vertical position.   The
+          number  registers ddnn and ddll respectively contain the vertical and
+          horizontal size of the most recently ended diversion.   Processed
+          text  that  is diverted into a macro retains the vertical size of
+          each of its lines when reread in _n_o_f_i_l_l mode  regardless  of  the
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-21
+
+
+          current  _V.  Constant-spaced (ccss) or emboldened (bbdd) text that is
+          diverted can be reread correctly only if these modes are again or
+          still  in  effect at reread time.  One way to do this is to imbed
+          in the diversion the appropriate  ccss  or  bbdd  requests  with  the
+          _t_r_a_n_s_p_a_r_e_n_t mechanism described in <section>10.6.
+          Diversions may be nested and certain parameters and registers are
+          associated with the current diversion level (the  top  non-diver-
+          sion  level may be thought of as the 0th diversion level).  These
+          are the diversion trap and associated macro, no-space  mode,  the
+          internally-saved marked place (see mmkk and rrtt), the current verti-
+          cal place (..dd register), the current  high-water  text  base-line
+          (..hh register), and the current diversion name (..zz register).
+          _7_._5_._T_r_a_p_s_.   Three  types  of trap mechanisms are available--page
+          traps, a diversion trap, and an  input-line-count  trap.   Macro-
+          invocation  traps  may  be  planted using wwhh at any page position
+          including the top.  This trap position may be changed  using  cchh.
+          Trap  positions at or below the bottom of the page have no effect
+          unless or until moved to within the page or rendered effective by
+          an increase in page length.  Two traps may be planted at the _s_a_m_e
+          position only by first planting them at different  positions  and
+          then moving one of the traps; the first planted trap will conceal
+          the second unless and until the first one is moved (see  Tutorial
+          Examples  <section>T5).  If the first one is moved back, it again
+          conceals the second trap.  The macro associated with a page  trap
+          is automatically invoked when a line of text is output whose ver-
+          tical size _r_e_a_c_h_e_s or _s_w_e_e_p_s _p_a_s_t the  trap  position.   Reaching
+          the  bottom  of a page springs the top-of-page trap, if any, pro-
+          vided there is a next page.  The distance to the next trap  posi-
+          tion  is  available  in  the  ..tt  register; if there are no traps
+          between the current position and the bottom of the page, the dis-
+          tance returned is the distance to the page bottom.
+          A macro-invocation trap effective in the current diversion may be
+          planted using ddtt.  The ..tt register works in a diversion; if there
+          is  no  subsequent  trap  a  _l_a_r_g_e  distance  is returned.  For a
+          description of input-line-count traps, see the iitt request below.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ddee _x_x _y_y       -       _._y_y_=.... -Define or redefine the macro  _x_x.
+                                       The  contents  of the macro begin on
+                                       the next input  line.   Input  lines
+                                       are  copied  in  _c_o_p_y _m_o_d_e until the
+                                       definition is terminated by  a  line
+                                       beginning  with  .._y_y,  whereupon the
+                                       macro _y_y is called.  In the  absence
+                                       of  _y_y, the definition is terminated
+                                       by a line beginning  with  "....".   A
+                                       macro  may  contain ddee requests pro-
+                                       vided the terminating macros  differ
+                                       or the contained definition termina-
+                                       tor is concealed.  "...." can be  con-
+                                       cealed  as  \\\\....  which will copy as
+                                       \\.... and be reread as "....".
+          ..aamm _x_x _y_y       -       _._y_y_=.... -Append to macro  (append  version
+                                       of ddee).
+          ..ddss _x_x _s_t_r_i_n_g   -       ignored-Define  a  string  _x_x  containing
+
+
+
+
+
+
+
+
+          USD:21-22                               NROFF/TROFF User's Manual
+
+
+                                       _s_t_r_i_n_g.  Any initial double-quote in
+                                       _s_t_r_i_n_g  is  stripped  off  to permit
+                                       initial blanks.
+          ..aass _x_x _s_t_r_i_n_g   -       ignored-Append  _s_t_r_i_n_g   to   string   _x_x
+                                       (append version of ddss).
+          ..rrmm _x_x  -       ignored -    Remove  request,  macro,  or string.
+                                       The name _x_x is removed from the name
+                                       list  and  any related storage space
+                                       is  freed.   Subsequent   references
+                                       will have no effect.
+          ..rrnn _x_x _y_y       -       ignored-Rename  request, macro, or string
+                                       _x_x to _y_y.  If _y_y exists, it is first
+                                       removed.
+          ..ddii _x_x  -       end     D    Divert  output  to macro _x_x.  Normal
+                                       text processing occurs during diver-
+                                       sion  except that page offsetting is
+                                       not done.  The diversion  ends  when
+                                       the  request ddii or ddaa is encountered
+                                       without  an   argument;   extraneous
+                                       requests  of  this  type  should not
+                                       appear when  nested  diversions  are
+                                       being used.
+          ..ddaa _x_x  -       end     D    Divert, appending to _x_x (append ver-
+                                       sion of ddii).
+          ..wwhh _N _x_x        -       -    vv Install a trap  to  invoke  _x_x  at
+                                       page  position  _N_; a _n_e_g_a_t_i_v_e _N will
+                                       be interpreted with respect  to  the
+                                       page  _b_o_t_t_o_m.   Any macro previously
+                                       planted at _N is replaced by  _x_x.   A
+                                       zero  _N refers to the _t_o_p of a page.
+                                       In the  absence  of  _x_x,  the  first
+                                       found trap at _N, if any, is removed.
+          ..cchh _x_x _N        -       -    vv Change the trap position for macro
+                                       _x_x to be _N.  In the  absence  of  _N,
+                                       the trap, if any, is removed.
+          ..ddtt _N _x_x        -       off  D,vvInstall a diversion trap at posi-
+                                       tion _N in the _c_u_r_r_e_n_t  diversion  to
+                                       invoke  macro  _x_x.   Another ddtt will
+                                       redefine the diversion trap.  If  no
+                                       arguments  are  given, the diversion
+                                       trap is removed.
+          ..iitt _N _x_x        -       off  E Set an  input-line-count  trap  to
+                                       invoke the macro _x_x after _N lines of
+                                       _t_e_x_t input have been  read  (control
+                                       or  request lines don't count).  The
+                                       text may be  in-line  text  or  text
+                                       interpolated   by  inline  or  trap-
+                                       invoked macros.
+          ..eemm _x_x  none    none    -    The macro _x_x will  be  invoked  when
+                                       all  input has ended.  The effect is
+                                       the same as if the  contents  of  _x_x
+                                       had been at the end of the last file
+                                       processed.
+          88..  NNuummbbeerr RReeggiisstteerrss
+          A variety of parameters are available to the user as  predefined,
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-23
+
+
+          named _n_u_m_b_e_r _r_e_g_i_s_t_e_r_s (see Summary and Index, page 7).  In addi-
+          tion, the user may define  his  own  named  registers.   Register
+          names  are  one  or  two characters long and _d_o _n_o_t conflict with
+          request, macro, or string names.  Except for  certain  predefined
+          read-only  registers,  a  number  register  can be read, written,
+          automatically incremented or decremented, and  interpolated  into
+          the  input  in  a  variety  of  formats.  One common use of user-
+          defined registers is  to  automatically  number  sections,  para-
+          graphs,  lines,  etc.   A  number  register  may be used any time
+          numerical input is expected or desired and may be used in numeri-
+          cal _e_x_p_r_e_s_s_i_o_n_s (<section>1.4).
+          Number  registers are created and modified using nnrr, which speci-
+          fies the name, numerical  value,  and  the  auto-increment  size.
+          Registers  are also modified, if accessed with an auto-increment-
+          ing sequence.  If the registers _x and _x_x both contain _N and  have
+          the  auto-increment  size  _M, the following access sequences have
+          the effect shown:
+
+                    +---------+--------------------+-------------+
+                    |         |     Effect on      |   Value     |
+                    |Sequence |     Register       |Interpolated |
+                    +---------+--------------------+-------------+
+                    |\\nn_x      |       none         |     _N       |
+                    |\\nn((_x_x    |       none         |     _N       |
+                    |\\nn++_x     |_x incremented by _M  |    _N_+_M      |
+                    |\\nn--_x     |_x decremented by _M  |    _N_-_M      |
+                    |\\nn++((_x_x   |_x_x incremented by _M |    _N_+_M      |
+                    |\\nn--((_x_x   |_x_x decremented by _M |    _N_-_M      |
+                    +---------+--------------------+-------------+
+          When interpolated, a number  register  is  converted  to  decimal
+          (default),  decimal  with leading zeros, lower-case Roman, upper-
+          case  Roman,  lower-case  sequential  alphabetic,  or  upper-case
+          sequential alphabetic according to the format specified by aaff.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..nnrr _R _+_-_N _M     -       -    uu The  number register _R is assigned
+                                       the value _+_-_N with  respect  to  the
+                                       previous  value, if any.  The incre-
+                                       ment for auto-incrementing is set to
+                                       _M.
+          ..aaff _R _c arabic  -       -    Assign  format _c to register _R.  The
+                                       available formats are:
+
+                                   +-------+-----------------------------------+
+                                   |       |            Numbering              |
+                                   |Format |             Sequence              |
+                                   +-------+-----------------------------------+
+                                   |  11    |0,1,2,3,4,5,...                    |
+                                   | 000011   |000,001,002,003,004,005,...        |
+                                   |  ii    |0,i,ii,iii,iv,v,...                |
+                                   |  II    |0,I,II,III,IV,V,...                |
+                                   |  aa    |0,a,b,c,...,z,aa,ab,...,zz,aaa,... |
+                                   |  AA    |0,A,B,C,...,Z,AA,AB,...,ZZ,AAA,... |
+                                   +-------+-----------------------------------+
+                                       An arabic  format  having  _N  digits
+
+
+
+
+
+
+
+
+          USD:21-24                               NROFF/TROFF User's Manual
+
+
+                                       specifies  a field width of _N digits
+                                       (example 2  above).   The  read-only
+                                       registers  and  the  _w_i_d_t_h  function
+                                       (<section>11.2) are always arabic.
+          ..rrrr _R   -       ignored -    Remove register _R.  If  many  regis-
+                                       ters  are being created dynamically,
+                                       it may become necessary to remove no
+                                       longer  used  registers to recapture
+                                       internal  storage  space  for  newer
+                                       registers.
+          99..  TTaabbss,, LLeeaaddeerrss,, aanndd FFiieellddss
+          _9_._1_._T_a_b_s _a_n_d _l_e_a_d_e_r_s_.  The ASCII horizontal tab character and the
+          ASCII SOH (hereafter known as the _l_e_a_d_e_r character) can  both  be
+          used to generate either horizontal motion or a string of repeated
+          characters.  The length of the generated entity  is  governed  by
+          internal  _t_a_b  _s_t_o_p_s specifiable with ttaa.  The default difference
+          is that tabs generate motion and leaders  generate  a  string  of
+          periods;  ttcc  and  llcc  offer  the choice of repeated character or
+          motion.  There  are  three  types  of  internal  tab  stops--_l_e_f_t
+          adjusting,  _r_i_g_h_t  adjusting,  and  _c_e_n_t_e_r_i_n_g.   In the following
+          table: _D is the distance from the current position on  the  _i_n_p_u_t
+          line  (where  a  tab  or  leader was found) to the next tab stop;
+          _n_e_x_t_-_s_t_r_i_n_g consists of the input characters  following  the  tab
+          (or  leader) up to the next tab (or leader) or end of line; and _W
+          is the width of _n_e_x_t_-_s_t_r_i_n_g.
+
+             +---------+--------------------+---------------------------+
+             |  Tab    |Length of motion or |       Location of         |
+             |  type   |repeated characters |       _n_e_x_t_-_s_t_r_i_n_g         |
+             +---------+--------------------+---------------------------+
+             |  Left   |         _D          |Following _D                |
+             | Right   |        _D_-_W         |Right adjusted within _D    |
+             |Centered |       _D_-_W_/2        |Centered on right end of _D |
+             +---------+--------------------+---------------------------+
+          The length of generated motion is allowed  to  be  negative,  but
+          that  of a repeated character string cannot be.  Repeated charac-
+          ter strings contain an integer  number  of  characters,  and  any
+          residual  distance is prepended as motion.  Tabs or leaders found
+          after the last tab stop are ignored, but may  be  used  as  _n_e_x_t_-
+          _s_t_r_i_n_g terminators.
+          Tabs  and  leaders  are  not interpreted in _c_o_p_y _m_o_d_e.  \\tt and \\aa
+          always generate a non-interpreted tab  and  leader  respectively,
+          and are equivalent to actual tabs and leaders in _c_o_p_y _m_o_d_e.
+          _9_._2_._F_i_e_l_d_s_.   A _f_i_e_l_d is contained between a _p_a_i_r of _f_i_e_l_d _d_e_l_i_m_-
+          _i_t_e_r characters, and consists of sub-strings separated by _p_a_d_d_i_n_g
+          indicator  characters.   The  field length is the distance on the
+          _i_n_p_u_t line from the position where the field begins to  the  next
+          tab  stop.   The  difference  between the total length of all the
+          sub-strings and the field length is  incorporated  as  horizontal
+          padding space that is divided among the indicated padding places.
+          The incorporated padding is allowed to be negative.  For example,
+          if  the  field  delimiter  is  ##  and the padding indicator is ^^,
+          ##^^_x_x_x^^_r_i_g_h_t## specifies a right-adjusted string  with  the  string
+          _x_x_x centered in the remaining space.
+
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-25
+
+
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ttaa _N_t _._._.      8n; 0.5in    noneE,mmSet   tab  stops  and  types.
+                                       _t_=RR, right adjusting;  _t_=CC,  center-
+                                       ing;   _t   absent,  left  adjusting.
+                                       TROFF tab  stops  are  preset  every
+                                       0.5in.;   NROFF  every  8  character
+                                       widths.  The stop values  are  sepa-
+                                       rated  by  spaces,  and a value pre-
+                                       ceded by ++ is treated as  an  incre-
+                                       ment to the previous stop value.
+          ..ttcc _c   none    none    E    The tab repetition character becomes
+                                       _c, or is removed specifying motion.
+          ..llcc _c   ..       none    E    The  leader   repetition   character
+                                       becomes  _c, or is removed specifying
+                                       motion.
+          ..ffcc _a _b off     off     -    The field delimiter is set to _a; the
+                                       padding  indicator  is  set  to  the
+                                       _s_p_a_c_e character or to _b,  if  given.
+                                       In  the  absence  of  arguments  the
+                                       field mechanism is turned off.
+          1100..  IInnppuutt aanndd OOuuttppuutt CCoonnvveennttiioonnss aanndd CChhaarraacctteerr TTrraannssllaattiioonnss
+          _1_0_._1_._I_n_p_u_t _c_h_a_r_a_c_t_e_r _t_r_a_n_s_l_a_t_i_o_n_s_.  Ways of inputting the graphic
+          character  set were discussed in <section>2.1.  The ASCII control
+          characters horizontal tab (<section>9.1), SOH (<section>9.1), and
+          backspace  (<section>10.3)  are discussed elsewhere.  The newline
+          delimits input lines.  In addition, STX, ETX, ENQ, ACK,  and  BEL
+          are  accepted, and may be used as delimiters or translated into a
+          graphic with ttrr (<section>10.5).  _A_l_l others are ignored.
+          The _e_s_c_a_p_e character \\ introduces  _e_s_c_a_p_e  _s_e_q_u_e_n_c_e_s--causes  the
+          following  character  to  mean  another character, or to indicate
+          some function.  A complete list of such sequences is given in the
+          Summary  and  Index on page 6.  \\ should not be confused with the
+          ASCII control character ESC of the same name.  The escape charac-
+          ter  \\  can  be input with the sequence \\\\.  The escape character
+          can be changed with eecc, and all that  has  been  said  about  the
+          default  \\  becomes true for the new escape character.  \\ee can be
+          used to print whatever the current escape character is.  If  nec-
+          essary or convenient, the escape mechanism may be turned off with
+          eeoo, and restored with eecc.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..eecc _c   \\       \\       -    Set escape character to \\, or to  _c,
+                                       if given.
+          ..eeoo     on      -       -    Turn escape mechanism off.
+          _1_0_._2_._L_i_g_a_t_u_r_e_s_.   Five  ligatures  are  available  in the current
+          TROFF character set -- ffii, ffll, ffff, ffffii, and  ffffll.   They  may  be
+          input (even in NROFF) by \\((ffii, \\((ffll, \\((ffff, \\((FFii, and \\((FFll respec-
+          tively.  The ligature mode is normally on in TROFF, and _a_u_t_o_m_a_t_i_-
+          _c_a_l_l_y invokes ligatures during input.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..llgg _N   off; on on      -    Ligature  mode  is turned on if _N is
+                                       absent or non-zero, and  turned  off
+                                       if  _N_=0.   If  _N=2,  only  the  two-
+
+
+
+
+
+
+
+
+          USD:21-26                               NROFF/TROFF User's Manual
+
+
+                                       character  ligatures  are  automati-
+                                       cally  invoked.   Ligature  mode  is
+                                       inhibited   for   request,    macro,
+                                       string, register, or file names, and
+                                       in _c_o_p_y _m_o_d_e.  No effect in NROFF.
+          _1_0_._3_._B_a_c_k_s_p_a_c_i_n_g_, _u_n_d_e_r_l_i_n_i_n_g_, _o_v_e_r_s_t_r_i_k_i_n_g_, _e_t_c_.  Unless in _c_o_p_y
+          _m_o_d_e,  the  ASCII  backspace  character is replaced by a backward
+          horizontal motion  having  the  width  of  the  space  character.
+          Underlining   as   a   form   of  line-drawing  is  discussed  in
+          <section>12.4.  A generalized overstriking function is  described
+          in <section>12.1.
+          NROFF  automatically underlines characters in the _u_n_d_e_r_l_i_n_e font,
+          specifiable with uuff, normally Times Italic  on  font  position  2
+          (see  <section>2.2).   In  addition  to fftt and \\ff_F, the underline
+          font may be selected by uull and ccuu.  Underlining is restricted  to
+          an output-device-dependent subset of _r_e_a_s_o_n_a_b_l_e characters.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..uull _N   off     _N_=1     E    Underline  in  NROFF  (italicize  in
+                                       TROFF) the next _N input text  lines.
+                                       Actually,  switch to _u_n_d_e_r_l_i_n_e font,
+                                       saving the current  font  for  later
+                                       restoration;   _o_t_h_e_r   font  changes
+                                       within the span of a  uull  will  take
+                                       effect,  but  the  restoration  will
+                                       undo the last change.  Output gener-
+                                       ated by ttll (<section>14) _i_s affected
+                                       by the font  change,  but  does  _n_o_t
+                                       decrement  _N.   If _N>1, there is the
+                                       risk that a trap interpolated  macro
+                                       may  provide  text  lines within the
+                                       span; environment switching can pre-
+                                       vent this.
+          ..ccuu _N   off     _N_=1     E    A  variant  of  uull that causes _e_v_e_r_y
+                                       character to be underlined in NROFF.
+                                       Identical to uull in TROFF.
+          ..uuff _F   Italic  Italic  -    Underline  font set to _F.  In NROFF,
+                                       _F may _n_o_t be  on  position  1  (ini-
+                                       tially Times Roman).
+          _1_0_._4_._C_o_n_t_r_o_l  _c_h_a_r_a_c_t_e_r_s_.   Both  the control character .. and the
+          _n_o_-_b_r_e_a_k control character '' may be changed, if desired.  Such  a
+          change  must  be compatible with the design of any macros used in
+          the span of the change,  and  particularly  of  any  trap-invoked
+          macros.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..cccc _c   ..       ..       E    The  basic  control character is set
+                                       to _c, or reset to "..".
+          ..cc22 _c   ''       ''       E    The _n_o_b_r_e_a_k control character is set
+                                       to _c, or reset to "''".
+          _1_0_._5_._O_u_t_p_u_t  _t_r_a_n_s_l_a_t_i_o_n_.   One  character can be made a stand-in
+          for another character using ttrr.  All text processing (e. g. char-
+          acter  comparisons) takes place with the input (stand-in) charac-
+          ter which appears to have the width of the final character.   The
+          graphic  translation  occurs  at  the moment of output (including
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-27
+
+
+          diversion).
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ttrr _a_b_c_d_._._._.    none    -    O Translate _a into _b, _c into _d, etc.
+                                       If  an  odd  number of characters is
+                                       given, the last one will  be  mapped
+                                       into  the  space  character.   To be
+                                       consistent, a particular translation
+                                       must  stay  in  effect from _i_n_p_u_t to
+                                       _o_u_t_p_u_t time.
+          _1_0_._6_._T_r_a_n_s_p_a_r_e_n_t _t_h_r_o_u_g_h_p_u_t_.  An input line beginning with  a  \\!!
+          is  read  in _c_o_p_y _m_o_d_e and _t_r_a_n_s_p_a_r_e_n_t_l_y output (without the ini-
+          tial \\!!); the text processor is otherwise unaware of  the  line's
+          presence.  This mechanism may be used to pass control information
+          to a post-processor or to imbed control lines in a macro  created
+          by a diversion.
+          _1_0_._7_._C_o_m_m_e_n_t_s  _a_n_d  _c_o_n_c_e_a_l_e_d  _n_e_w_l_i_n_e_s_.   An  uncomfortably long
+          input line that must stay one line (e. g. a string definition, or
+          nofilled  text)  can  be split into many physical lines by ending
+          all but the last one with the escape \\.  The sequence  \\(newline)
+          is _a_l_w_a_y_s ignored--except in a comment.  Comments may be imbedded
+          at the _e_n_d of any line by prefacing them with \\"".  The newline at
+          the  end of a comment cannot be concealed.  A line beginning with
+          \\"" will appear as a blank line and behave like ..sspp 11;  a  comment
+          can be on a line by itself by beginning the line with ..\\"".
+          1111..   LLooccaall  HHoorriizzoonnttaall aanndd VVeerrttiiccaall MMoottiioonnss,, aanndd tthhee WWiiddtthh FFuunncc--
+          ttiioonn
+          _1_1_._1_._L_o_c_a_l _M_o_t_i_o_n_s_.  The functions \\vv''_N'' and \\hh''_N''  can  be  used
+          for  _l_o_c_a_l vertical and horizontal motion respectively.  The dis-
+          tance _N may be negative; the _p_o_s_i_t_i_v_e  directions  are  _r_i_g_h_t_w_a_r_d
+          and _d_o_w_n_w_a_r_d.  A _l_o_c_a_l motion is one contained _w_i_t_h_i_n a line.  To
+          avoid unexpected vertical dislocations, it is necessary that  the
+          _n_e_t vertical local motion within a word in filled text and other-
+          wise within a line balance to zero.  The above and certain  other
+          escape  sequences  providing  local  motion are summarized in the
+          following table.
+
+          +-------------+---------------------------+-------------+----------------------------+
+          |  Vertical   |        Effect in          | Horizontal  |         Effect in          |
+          |Local Motion |   TROFF         NROFF     |Local Motion |     TROFF         NROFF    |
+          +-------------+---------------------------+-------------+----------------------------+
+          |   \\vv''_N''     |Move distance _N            |   \\hh''_N''     |Move distance _N             |
+          +-------------+------------+--------------+   \\(space)  |Unpaddable space-size space |
+          |   \\uu        |1/2 em up   |1/2 line up   |   \\00        |Digit-size space            |
+          |   \\dd        |1/2 em down |1/2 line down +-------------+----------------+-----------+
+          |   \\rr        |1 em up     |1 line up     |   \\||        |1/6 em space    |ignored    |
+          |             |            |              |   \\^^        |1/12 em space   |ignored    |
+          +-------------+------------+--------------+-------------+----------------+-----------+
+          As  an  example,  EE22  could  be   generated   by   the   sequence
+          EE\\ss--22\\vv''--00..44mm''22\\vv''00..44mm''\\ss++22;  it  should be noted in this example
+          that the 0.4 em vertical motions are at the smaller size.
+          _1_1_._2_._W_i_d_t_h _F_u_n_c_t_i_o_n_.  The _w_i_d_t_h function \\ww''_s_t_r_i_n_g'' generates the
+          numerical  width  of  _s_t_r_i_n_g  (in  basic  units).   Size and font
+          changes may be safely imbedded in _s_t_r_i_n_g, and will not affect the
+          current environment.  For example, ..ttii --\\ww''11.. ''uu could be used to
+
+
+
+
+
+
+
+
+          USD:21-28                               NROFF/TROFF User's Manual
+
+
+          temporarily indent leftward a distance equal to the size  of  the
+          string "11.. ".
+          The  width function also sets three number registers.  The regis-
+          ters sstt and ssbb are set respectively to  the  highest  and  lowest
+          extent of _s_t_r_i_n_g relative to the baseline; then, for example, the
+          total _h_e_i_g_h_t of the string is \\nn((ssttuu--\\nn((ssbbuu.  In TROFF the number
+          register  cctt  is set to a value between 0 and 3: 0 means that all
+          of the characters in _s_t_r_i_n_g  were  short  lower  case  characters
+          without  descenders (like ee); 1 means that at least one character
+          has a descender (like yy); 2 means that at least one character  is
+          tall  (like HH); and 3 means that both tall characters and charac-
+          ters with descenders are present.
+          _1_1_._3_._M_a_r_k _h_o_r_i_z_o_n_t_a_l _p_l_a_c_e_.  The escape sequence \\kk_x  will  cause
+          the _c_u_r_r_e_n_t horizontal position in the _i_n_p_u_t _l_i_n_e to be stored in
+          register    _x.     As    an     example,     the     construction
+          \\kkxx_w_o_r_d\\hh''||\\nnxxuu++22uu''_w_o_r_d  will  embolden  _w_o_r_d  by  backing  up to
+          almost its beginning and overprinting it, resulting in _w_w_o_o_r_r_d_d.
+          1122..  OOvveerrssttrriikkee,, BBrraacckkeett,, LLiinnee--ddrraawwiinngg,, aanndd ZZeerroo--wwiiddtthh FFuunnccttiioonnss
+          _1_2_._1_._O_v_e_r_s_t_r_i_k_i_n_g_.  Automatically centered overstriking of up  to
+          nine   characters   is   provided   by  the  _o_v_e_r_s_t_r_i_k_e  function
+          \\oo''_s_t_r_i_n_g''.  The characters in _s_t_r_i_n_g are overprinted  with  cen-
+          ters  aligned;  the  total width is that of the widest character.
+          _s_t_r_i_n_g should _n_o_t contain local vertical  motion.   As  examples,
+          \\oo''ee\\'''' produces ee'', and \\oo''\\((mmoo\\((ssll'' produces <<eelleemmee//nntt ooff>>.
+          _1_2_._2_._Z_e_r_o_-_w_i_d_t_h _c_h_a_r_a_c_t_e_r_s_.  The function \\zz_c will output _c with-
+          out spacing over it, and can  be  used  to  produce  left-aligned
+          overstruck combinations.  As examples, \\zz\\((ccii\\((ppll will produce OO++,
+          and \\((bbrr\\zz\\((rrnn\\__((uull\\((bbrr will produce the  smallest  possible  con-
+          structed box ||__||.
+          _1_2_._3_._L_a_r_g_e  _B_r_a_c_k_e_t_s_.   The  Special Mathematical Font contains a
+          number of bracket construction pieces (,-`--.-'{}| __  || )  that
+          can  be  combined  into  various  bracket  styles.   The function
+          \\bb''_s_t_r_i_n_g'' may be used to pile up vertically  the  characters  in
+          _s_t_r_i_n_g  (the  first character on top and the last at the bottom);
+          the characters are vertically separated by  1 em  and  the  total
+          pile  is  centered  1/2em above the current baseline (1/2 line in
+          NROFF).                        For                     || e||xample,
+          \\bb''\\((llcc\\((llff''EE\\||\\bb''\\((rrcc\\((rrff''\\xx''--00..55mm''\\xx''00..55mm'' produces  __EE__ .
+          _1_2_._4_._L_i_n_e  _d_r_a_w_i_n_g_.   The  function  \\ll''_N_c'' will draw a string of
+          repeated _c's towards the right for a distance _N.  (\\ll is  \\(lower
+          case  L).  If _c looks like a continuation of an expression for _N,
+          it may insulated from _N with a \\&&.  If _c is not specified, the  __
+          (baseline  rule) is used (underline character in NROFF).  If _N is
+          negative, a backward horizontal motion of size _N is  made  _b_e_f_o_r_e
+          drawing  the string.  Any space resulting from _N/(size of _c) hav-
+          ing a remainder is put at the beginning (left end) of the string.
+          In  the case of characters that are designed to__be connected such
+          as baseline-rule __, underrule __,  and  root-en  ,  the  remainder
+          space is covered by over-lapping.  If _N is _l_e_s_s than the width of
+          _c, a single _c is centered on a distance  _N.   As  an  example,  a
+          macro to underscore a string can be written
+               ..ddee uuss
+               \\\\$$11\\ll''||00\\((uull''
+               ....
+
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-29
+
+
+          or one to draw a box around a string
+               ..ddee bbxx
+               \\((bbrr\\||\\\\$$11\\||\\((bbrr\\ll''||00\\((rrnn''\\ll''||00\\((uull''
+               ....
+          such that
+               ..uuss ""uunnddeerrlliinneedd wwoorrddss""
+          and
+               ..bbxx ""wwoorrddss iinn aa bbooxx""  ________________
+          yield u_n_d_e_r_l_i_n_e_d__w_o_r_d_s_ and |_w_o_r_d_s__i_n__a__b_o_x_|_.
+          The  function  \\LL''_N_c'' will draw a vertical line consisting of the
+          (optional) character _c stacked vertically apart 1em  (1  line  in
+          NROFF),  with  the first two characters overlapped, if necessary,
+          to form a continuous line.  The default character is the _b_o_x _r_u_l_e
+           |   (\\((bbrr);  the other suitable character is the _b_o_l_d _v_e_r_t_i_c_a_l |
+          (\\((bbvv).  The line is begun without any initial motion relative to
+          the current base line.  A positive _N specifies a line drawn down-
+          ward and a negative _N specifies a line drawn upward.   After  the
+          line is drawn _n_o compensating motions are made; the instantaneous
+          ba_s_e_l_i_n_e__i_s__a_t__t_h_e___e__n__d__o_f__t_h_e__l_i_n_e_._________________________________
+          T||he horizontal and vertical line drawing functions may be used in  ||
+          c|ombination  to produce large boxes.  The zero-width _b_o_x_-_r_u_l_e and  |
+          t|he 1/2-em wide _u_n_d_e_r_r_u_l_e were  _d_e_s_i_g_n_e_d  to  form  corners  when  |
+          u|sing 1-em vertical spacings.  For example the macro               |
+          |    ..ddee eebb                                                        |
+          |    ..sspp --11  \\""ccoommppeennssaattee ffoorr nneexxtt aauuttoommaattiicc bbaassee--lliinnee ssppaacciinngg     |
+          |    ..nnff     \\""aavvooiidd ppoossssiibbllyy oovveerrfflloowwiinngg wwoorrdd bbuuffffeerr              |
+          |    \\hh''--..55nn''\\LL''||\\\\nnaauu--11''\\ll''\\\\nn((..lluu++11nn\\((uull''\\LL''--||\\\\nnaauu++11''\\ll''||00uu--..55nn\\((|uull''    \\""ddrraaww bbooxx
+          |    ..ffii                                                           |
+          |    ....                                                            |
+          w|ill  draw  a box around some text whose beginning vertical place  |
+          w|as saved in number register _a (e. g. using ..mmkk aa)  as  done  for  |
+          t|_h_i_s__p_a_r_a_g_r_a_p_h_._____________________________________________________|_
+          1133..  HHyypphheennaattiioonn..
+          The  automatic  hyphenation  may  be  switched  off and on.  When
+          switched on with hhyy, several variants may be set.  A  _h_y_p_h_e_n_a_t_i_o_n
+          _i_n_d_i_c_a_t_o_r  character may be imbedded in a word to specify desired
+          hyphenation points, or may be prepended to suppress  hyphenation.
+          In addition, the user may specify a small exception word list.
+          Only words that consist of a central alphabetic string surrounded
+          by (usually null) non-alphabetic strings  are  considered  candi-
+          dates  for automatic hyphenation.  Words that were input contain-
+          ing hyphens (minus), em-dashes (\\((eemm), or  hyphenation  indicator
+          characters--such  as  mother-in-law--are _a_l_w_a_y_s subject to split-
+          ting after those characters, whether or not automatic hyphenation
+          is on or off.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..nnhh     hyphenate       -    E Automatic  hyphenation  is  turned
+                                       off.
+          ..hhyy_N    on,_N_=1  on,_N_=1  E    Automatic hyphenation is  turned  on
+                                       for  _N>=1,  or off for _N_=0.  If _N_=2,
+                                       _l_a_s_t lines (ones that will  cause  a
+                                       trap)  are  not hyphenated.  For _N_=4
+                                       and 8, the last and first two  char-
+                                       acters  respectively  of  a word are
+
+
+
+
+
+
+
+
+          USD:21-30                               NROFF/TROFF User's Manual
+
+
+                                       not split  off.   These  values  are
+                                       additive; i. e. _N_=14 will invoke all
+                                       three restrictions.
+          ..hhcc _c   \\%%      \\%%      E    Hyphenation indicator  character  is
+                                       set  to _c or to the default \\%%.  The
+                                       indicator does  not  appear  in  the
+                                       output.
+          ..hhww _w_o_r_d_1 _._._.           ignored-Specify   hyphenation  points  in
+                                       words  with  imbedded  minus  signs.
+                                       Versions  of  a word with terminal _s
+                                       are implied;  i. e.  _d_i_g_-_i_t  implies
+                                       _d_i_g_-_i_t_s.  This list is examined ini-
+                                       tially _a_n_d after each suffix  strip-
+                                       ping.    The   space   available  is
+                                       small--about 128 characters.
+          1144..  TThhrreeee PPaarrtt TTiittlleess..
+          The titling function ttll provides for automatic placement of three
+          fields  at  the  left,  center, and right of a line with a title-
+          length specifiable with lltt.  ttll may  be  used  anywhere,  and  is
+          independent  of the normal text collecting process.  A common use
+          is in header and footer macros.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ttll _'_l_e_f_t_'_c_e_n_t_e_r_'_r_i_g_h_t_' -    - The  strings  _l_e_f_t,  _c_e_n_t_e_r,   and
+                                       _r_i_g_h_t    are    respectively   left-
+                                       adjusted,   centered,   and   right-
+                                       adjusted   in   the  current  title-
+                                       length.  Any of the strings  may  be
+                                       empty, and overlapping is permitted.
+                                       If the page-number  character  (ini-
+                                       tially %%) is found within any of the
+                                       fields it is replaced by the current
+                                       page   number   having   the  format
+                                       assigned to register %%.  Any charac-
+                                       ter may be used as the string delim-
+                                       iter.
+          ..ppcc _c   %%       off     -    The page number character is set  to
+                                       _c, or removed.  The page-number reg-
+                                       ister remains %%.
+          ..lltt _+_-_N 6.5in   previous     E,mmLength of title set to _+_-_N.   The
+                                       line-length and the title-length are
+                                       _i_n_d_e_p_e_n_d_e_n_t.  Indents do  not  apply
+                                       to titles; page-offsets do.
+          1155..  OOuuttppuutt LLiinnee NNuummbbeerriinngg..
+              Automatic sequence numbering of output lines may be requested
+              with nnmm.  When in effect, a three-digit, arabic number plus a
+            3 digit-space  is  prepended  to  output  text lines.  The text
+              lines are thus offset by  four  digit-spaces,  and  otherwise
+              retain  their  line length; a reduction in line length may be
+            6 desired to keep the right margin aligned with an earlier mar-
+              gin.  Blank lines, other vertical spaces, and lines generated
+              by ttll are _n_o_t numbered.  Numbering can  be  temporarily  sus-
+            9 pended  with  nnnn,  or with an ..nnmm followed by a later ..nnmm ++00.
+              In addition, a line number indent _I, and the number-text sep-
+              aration  _S may be specified in digit-spaces.  Further, it can
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-31
+
+
+           12 be specified that only those line numbers that are  multiples
+              of some number _M are to be printed (the others will appear as
+              blank number fields).
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..nnmm _+_-_N _M _S _I           off  E Line  number  mode.   If  _+_-_N   is
+                                       given,  line numbering is turned on,
+                                       and the next output line numbered is
+                                       numbered  _+_-_N.   Default  values are
+                                       _M_=1, _S_=1, and _I_=0.  Parameters  cor-
+                                       responding  to missing arguments are
+                                       unaffected; a  non-numeric  argument
+                                       is   considered   missing.   In  the
+                                       absence of all arguments,  numbering
+                                       is  turned off; the next line number
+                                       is preserved  for  possible  further
+                                       use in number register llnn.
+          ..nnnn _N   -       _N_=1     E    The next _N text output lines are not
+                                       numbered.
+           15 As an example, the paragraph portions  of  this  section  are
+              numbered  with  _M_=3: ..nnmm 11 33 was placed at the beginning; ..nnmm
+              was placed at the end of the first paragraph; and ..nnmm ++00  was
+           18 placed  in front of this paragraph; and ..nnmm finally placed at
+              the end.  Line lengths were also changed  (by  \\ww''00000000''uu)  to
+              keep the right side aligned.  Another example is ..nnmm ++55 55 xx 33
+           21 which turns on numbering with the line  number  of  the  next
+              line  to  be  five  greater than the last numbered line, with
+              _M_=5, with spacing _S untouched, and with the indent _I  set  to
+           24 3.
+          1166..  CCoonnddiittiioonnaall AAcccceeppttaannccee ooff IInnppuutt
+          In  the following, _c is a one-character, built-in _c_o_n_d_i_t_i_o_n name,
+          !! signifies _n_o_t, _N is a numerical expression, _s_t_r_i_n_g_1 and _s_t_r_i_n_g_2
+          are strings delimited by any non-blank, non-numeric character _n_o_t
+          in the strings, and _a_n_y_t_h_i_n_g  represents  what  is  conditionally
+          accepted.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..iiff _c _a_n_y_t_h_i_n_g          -    - If  condition  _c true, accept _a_n_y_-
+                                       _t_h_i_n_g as input; in  multi-line  case
+                                       use _\_{_a_n_y_t_h_i_n_g_\_}.
+          ..iiff !!_c _a_n_y_t_h_i_n_g         -    - If  condition _c false, accept _a_n_y_-
+                                       _t_h_i_n_g.
+          ..iiff _N _a_n_y_t_h_i_n_g          -    uu If expression _N > 0,  accept  _a_n_y_-
+                                       _t_h_i_n_g.
+          ..iiff !!_N _a_n_y_t_h_i_n_g -       uu    If  expression  _N  <= 0, accept _a_n_y_-
+                                       _t_h_i_n_g.
+          ..iiff _'_s_t_r_i_n_g_1_'_s_t_r_i_n_g_2_' _a_n_y_t_h_i_n_g -If _s_t_r_i_n_g_1 identical to  _s_t_r_i_n_g_2,
+                                       accept _a_n_y_t_h_i_n_g.
+          ..iiff !!_'_s_t_r_i_n_g_1_'_s_t_r_i_n_g_2_' _a_n_y_t_h_i_n_g-If   _s_t_r_i_n_g_1   not  identical  to
+                                       _s_t_r_i_n_g_2, accept _a_n_y_t_h_i_n_g.
+          ..iiee _c _a_n_y_t_h_i_n_g          -    uu If portion of if-else;  all  above
+                                       forms (like iiff).
+          ..eell _a_n_y_t_h_i_n_g            -    - Else portion of if-else.
+          The built-in condition names are:
+
+
+
+
+
+
+
+
+
+          USD:21-32                               NROFF/TROFF User's Manual
+
+
+                          +----------+----------------------------+
+           25             |Condition |                            |
+           26             |  Name    |          True If           |
+                          +----------+----------------------------+
+           27             |    oo     |Current page number is odd  |
+           28             |    ee     |Current page number is even |
+           29             |    tt     |Formatter is TROFF          |
+           30             |    nn     |Formatter is NROFF          |
+                          +----------+----------------------------+
+          If  the  condition  _c is _t_r_u_e, or if the number _N is greater than
+          zero, or if the strings compare  identically  (including  motions
+          and  character size and font), _a_n_y_t_h_i_n_g is accepted as input.  If
+          a !! precedes the condition, number,  or  string  comparison,  the
+          sense of the acceptance is reversed.
+          Any  spaces  between  the condition and the beginning of _a_n_y_t_h_i_n_g
+          are skipped over.  The _a_n_y_t_h_i_n_g can be either a single input line
+          (text,  macro,  or  whatever) or a number of input lines.  In the
+          multi-line case, the first line must begin with a left  delimiter
+          \\{{ and the last line must end with a right delimiter \\}}.
+          The  request  iiee  (if-else)  is  identical  to iiff except that the
+          acceptance state is remembered.  A  subsequent  and  matching  eell
+          (else)  request  then  uses  the  reverse  sense  of  that state.
+          iiee - eell pairs may be nested.
+          Some examples are:
+               ..iiff ee ..ttll ''EEvveenn PPaaggee %%''''''
+          which outputs a title if the page number is even; and
+               ..iiee \\nn%%>>11 \\{{\\
+               ''sspp 00..55ii
+               ..ttll ''PPaaggee %%''''''
+               ''sspp ||11..22ii \\}}
+               ..eell ..sspp ||22..55ii
+          which treats page 1 differently from other pages.
+          1177..  EEnnvviirroonnmmeenntt SSwwiittcchhiinngg..
+          A number of the parameters that control the text  processing  are
+          gathered  together  into an _e_n_v_i_r_o_n_m_e_n_t, which can be switched by
+          the user.  The environment parameters are those  associated  with
+          requests  noting  E in their _N_o_t_e_s column; in addition, partially
+          collected lines and words are  in  the  environment.   Everything
+          else is global; examples are page-oriented parameters, diversion-
+          oriented parameters, number registers, and macro and string defi-
+          nitions.  All environments are initialized with default parameter
+          values.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..eevv _N   _N_=0     previous     - Environment switched  to  environ-
+                                       ment  0<=_N<=2.  Switching is done in
+                                       push-down fashion so that  restoring
+                                       a  previous environment _m_u_s_t be done
+                                       with ..eevv rather than specific refer-
+                                       ence.
+          1188..  IInnsseerrttiioonnss ffrroomm tthhee SSttaannddaarrdd IInnppuutt
+          The  input  can  be  temporarily  switched to the system _s_t_a_n_d_a_r_d
+          _i_n_p_u_t with rrdd, which will switch back when _t_w_o newlines in a  row
+          are  found (the _e_x_t_r_a blank line is not used).  This mechanism is
+          intended for insertions in  form-letter-like  documentation.   On
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-33
+
+
+          UNIX, the _s_t_a_n_d_a_r_d _i_n_p_u_t can be the user's keyboard, a _p_i_p_e, or a
+          _f_i_l_e.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..rrdd _p_r_o_m_p_t      -       _p_r_o_m_p_t_=BELRead insertion from  the  stan-
+                                       dard  input  until two newlines in a
+                                       row  are  found.   If  the  standard
+                                       input is the user's keyboard, _p_r_o_m_p_t
+                                       (or  a  BEL)  is  written  onto  the
+                                       user's  terminal.  rrdd behaves like a
+                                       macro, and arguments may  be  placed
+                                       after _p_r_o_m_p_t.
+          ..eexx     -       -       -    Exit  from  NROFF/TROFF.   Text pro-
+                                       cessing is terminated exactly as  if
+                                       all input had ended.
+          If  insertions  are  to be taken from the terminal keyboard _w_h_i_l_e
+          output is being printed on the terminal, the command line  option
+          --qq  will  turn  off the echoing of keyboard input and prompt only
+          with BEL.  The regular input and insertion input _c_a_n_n_o_t  simulta-
+          neously come from the standard input.
+          As  an  example, multiple copies of a form letter may be prepared
+          by entering the insertions for all the copies in one file  to  be
+          used  as  the standard input, and causing the file containing the
+          letter to reinvoke itself using  nnxx  (<section>19);  the  process
+          would ultimately be ended by an eexx in the insertion file.
+          1199..  IInnppuutt//OOuuttppuutt FFiillee SSwwiittcchhiinngg
+          The (read-only) number register ..cc contains the input line number
+          in the current input file.  The number register cc.. is  a  general
+          register serving the same purpose.
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..ssoo _f_i_l_e_n_a_m_e            -    - Switch source file.  The top input
+                                       (file reading) level is switched  to
+                                       _f_i_l_e_n_a_m_e.    The  effect  of  an  ssoo
+                                       encountered in a macro occurs  imme-
+                                       diately.   When  the  new file ends,
+                                       input is again taken from the origi-
+                                       nal file.  ssoo's may be nested.
+          ..nnxx _f_i_l_e_n_a_m_e            end-of-file-Next  file  is _f_i_l_e_n_a_m_e.  The
+                                       current file  is  considered  ended,
+                                       and   the   input   is   immediately
+                                       switched to _f_i_l_e_n_a_m_e.
+          ..ppii _p_r_o_g_r_a_m             -    - Pipe  output  to  _p_r_o_g_r_a_m   (NROFF
+                                       only).    This  request  must  occur
+                                       _b_e_f_o_r_e  any  printing  occurs.    No
+                                       arguments  are  transmitted  to _p_r_o_-
+                                       _g_r_a_m.
+          2200..  MMiisscceellllaanneeoouuss
+          _R_R_e_e_q_q_u_u_e_e_s_s_t_t _I_I_n_n_i_i_t_t_i_i_a_a_l_l _I_I_f_f _N_N_o_o
+          _F_F_o_o_r_r_m_m    _V_V_a_a_l_l_u_u_e_e   _A_A_r_r_g_g_u_u_m_m_e_e_n_n_t_t     _N_N_o_o_t_t_e_e_s_s_E_E_x_x_p_p_l_l_a_a_n_n_a_a_t_t_i_i_o_o_n_n
+          ..mmcc _c _N -       off     E,mm  Specifies that a _m_a_r_g_i_n character  _c |
+                                       appear  a distance _N to the right of |
+                                       the right  margin  after  each  non- |
+                                       empty  text  line (except those pro- |
+                                       duced by ttll).  If the output line is |
+
+
+
+
+
+
+
+
+          USD:21-34                               NROFF/TROFF User's Manual
+
+
+                                       too-long  (as  can  happen in nofill |
+                                       mode) the character will be appended |
+                                       to the line.  If _N is not given, the |
+                                       previous _N is used; the initial _N is |
+                                       0.2 inches   in  NROFF  and  1em  in |
+                                       TROFF.  The  margin  character  used |
+                                       with  this  paragraph was a 12-point |
+                                       box-rule.                            |
+          ..ttmm _s_t_r_i_n_g      -       newline-After  skipping  initial  blanks,
+                                       _s_t_r_i_n_g (rest of the line) is read in
+                                       _c_o_p_y _m_o_d_e and written on the  user's
+                                       terminal. (see <section>21).
+          ..iigg _y_y  -       _._y_y_=....  -    Ignore   input  lines.   iigg  behaves
+                                       exactly like ddee (<section>7)  except
+                                       that  the  input  is discarded.  The
+                                       input is read in _c_o_p_y _m_o_d_e, and  any
+                                       auto-incremented  registers  will be
+                                       affected.
+          ..ppmm _t   -       all     -    Print macros.  The names  and  sizes
+                                       of  all  of  the  defined macros and
+                                       strings are printed  on  the  user's
+                                       terminal;  if  _t  is given, only the
+                                       total of the sizes is printed.   The
+                                       sizes  is  given  in  _b_l_o_c_k_s  of 128
+                                       characters.
+          ..aabb _s_t_r_i_n_g      -       -    - Print _s_t_r_i_n_g on standard error and
+                                       terminate  immediately.  The default
+                                       _s_t_r_i_n_g is  "User  Abort".  Does  not
+                                       cause  a break.  Only output preced-
+                                       ing the last break is written.
+          ..ffll     -       -       B    Flush output buffer.  Used in inter-
+                                       active debugging to force output.
+          2211..  OOuuttppuutt aanndd EErrrroorr MMeessssaaggeess..
+          The  output  from  ttmm,  ppmm, aabb and the prompt from rrdd, as well as
+          various _e_r_r_o_r messages are written  onto  UNIX's  _s_t_a_n_d_a_r_d  _e_r_r_o_r
+          output.   The latter is different from the _s_t_a_n_d_a_r_d _o_u_t_p_u_t, where
+          NROFF formatted output goes.  By default, both are  written  onto
+          the user's terminal, but they can be independently redirected.
+          Various  _e_r_r_o_r conditions may occur during the operation of NROFF
+          and TROFF.  Certain less serious errors having only local  impact
+          do  not  cause  processing  to  terminate.  Two examples are _w_o_r_d
+          _o_v_e_r_f_l_o_w, caused by a word that is too large to fit into the word
+          buffer  (in  fill  mode),  and _l_i_n_e _o_v_e_r_f_l_o_w, caused by an output
+          line that grew too large to fit  in  the  line  buffer;  in  both
+          cases,  a  message is printed, the offending excess is discarded,
+          and the affected word or line is marked at the point  of  trunca-
+          tion  with  a * in NROFF and a <= in TROFF.  The philosophy is to
+          continue processing, if possible, on the grounds that output use-
+          ful  for  debugging  may be produced.  If a serious error occurs,
+          processing terminates, and an  appropriate  message  is  printed.
+          Examples  are  the inability to create, read, or write files, and
+          the exceeding of certain internal limits that make future  output
+          unlikely to be useful.
+
+
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-35
+
+
+
+
+
+                                  TTUUTTOORRIIAALL EEXXAAMMPPLLEESS
+
+
+          TT11..  IInnttrroodduuccttiioonn                 areas respectively.  A trap  is
+          Although  NROFF  and TROFF have   planted  at page position 0 for
+          by design a syntax  reminiscent   the header, and at _-_N  (_N  from
+          of  earlier  text   processors*   the   page   bottom)   for  the
+          with the intent of easing their   footer.  The simplest such def-
+          use, it is almost always neces-   initions might be
+          sary  to  prepare  at  least  a     ..ddee hhdd    \\""ddeeffiinnee hheeaaddeerr
+          small set of macro  definitions     ''sspp 11ii
+          to   describe  most  documents.     ....        \\""eenndd ddeeffiinniittiioonn
+          Such common formatting needs as     ..ddee ffoo    \\""ddeeffiinnee ffooootteerr
+          page  margins and footnotes are     ''bbpp
+          deliberately  not  built   into     ....        \\""eenndd ddeeffiinniittiioonn
+          NROFF  and TROFF.  Instead, the     ..wwhh 00 hhdd
+          macro  and  string  definition,     ..wwhh --11ii ffoo
+          number   register,   diversion,   which  provide blank 1 inch top
+          environment  switching,   page-   and bottom margins.  The header
+          position  trap, and conditional   will  occur  on the _f_i_r_s_t page,
+          input  mechanisms  provide  the   only if the definition and trap
+          basis  for  user-defined imple-   exist   prior  to  the  initial
+          mentations.                       pseudo-page          transition
+          The examples  to  be  discussed   (<section>3).   In  fill  mode,
+          are  intended  to be useful and   the output  line  that  springs
+          somewhat realistic,  but  won't   the  footer  trap was typically
+          necessarily  cover all relevant   forced out because some part or
+          contingencies.  Explicit numer-   whole  word  didn't  fit on it.
+          ical parameters are used in the   If anything in the  footer  and
+          examples to make them easier to   header  that  follows  causes a
+          read  and to illustrate typical   _b_r_e_a_k, that word or  part  word
+          values.  In many cases,  number   will  be  forced  out.  In this
+          registers  would really be used   and  other  examples,  requests
+          to reduce the number of  places   like  bbpp  and  sspp that normally
+          where  numerical information is   cause breaks are invoked  using
+          kept, and to concentrate condi-   the  _n_o_-_b_r_e_a_k control character
+          tional parameter initialization   ''  to  avoid  this.   When  the
+          like  that  which  depends   on   header/footer  design  contains
+          whether TROFF or NROFF is being   material requiring  independent
+          used.                             text  processing,  the environ-
+          TT22..  PPaaggee MMaarrggiinnss                 ment may be switched,  avoiding
+          As  discussed  in   <section>3,   most  interaction with the run-
+          _h_e_a_d_e_r  and  _f_o_o_t_e_r  macros are   ning text.
+          usually defined to describe the   A more realistic example  would
+          top   and  bottom  page  margin   be
+          __________                          ..ddee hhdd    \\""hheeaaddeerr
+          *For   example:  P. A. Crisman,     ..iiff tt ..ttll ''\\((rrnn''''\\((rrnn''  \\""ttrrooffff ccuutt mmaarrkk
+          Ed., _T_h_e _C_o_m_p_a_t_i_b_l_e  _T_i_m_e_-_S_h_a_r_-     ..iiff \\\\nn%%>>11 \\{{\\
+          _i_n_g  _S_y_s_t_e_m_,  MIT  Press, 1965,     ''sspp ||00..55ii--11\\""ttll bbaassee aatt 00..55ii
+          Section AH9.01 (Description  of     ..ttll ''''-- %% --''''\\""cceenntteerreedd ppaaggee nnuummbbeerr
+          RUNOFF  program  on  MIT's CTSS     ..ppss       \\""rreessttoorree ssiizzee
+          system).                            ..fftt       \\""rreessttoorree ffoonntt
+
+
+
+
+
+
+
+
+          USD:21-36                               NROFF/TROFF User's Manual
+
+
+            ..vvss  \\}}   \\""rreessttoorree vvss            ..  ------    \\""hheeaaddeerr ssttuuffff
+            ''sspp ||11..00ii  \\""ssppaaccee ttoo 11..00ii        ..ppss \\\\nn((ss22\\""rreessttoorree pprreevviioouuss ssiizzee
+            ..nnss       \\""ttuurrnn oonn nnoo--ssppaaccee mmooddee ..ppss \\\\nn((ss11\\""rreessttoorree ccuurrrreenntt ssiizzee
+            ....                                ....
+            ..ddee ffoo    \\""ffooootteerr              Page numbers may be printed  in
+            ..ppss 1100    \\""sseett ffooootteerr//hheeaaddeerr ssiizzteehe bottom margin by a separate
+            ..fftt RR     \\""sseett ffoonntt            macro  triggered   during   the
+            ..vvss 1122pp   \\""sseett bbaassee--lliinnee ssppaacciinnggfooter's page ejection:
+            ..iiff \\\\nn%%==11 \\{{\\                    ..ddee bbnn    \\""bboottttoomm nnuummbbeerr
+            ''sspp ||\\\\nn((..ppuu--00..55ii--11  \\""ttll bbaassee 00..55ii..ttuullpp''''-- %% --''''\\""cceenntteerreedd ppaaggee nnuummbbeerr
+            ..ttll ''''-- %% --'''' \\}}  \\""ffiirrsstt ppaaggee nnuummbb..ee..rr
+            ''bbpp                               ..wwhh --00..55ii--11vv bbnn \\""ttll bbaassee 00..55ii uupp
+            ....                              TT33..  PPaarraaggrraapphhss aanndd HHeeaaddiinnggss
+            ..wwhh 00 hhdd                        The   housekeeping   associated
+            ..wwhh --11ii ffoo                      with starting a  new  paragraph
+          which  sets the size, font, and   should  be collected in a para-
+          base-line   spacing   for   the   graph macro that, for  example,
+          header/footer   material,   and   does  the  desired preparagraph
+          ultimately restores them.   The   spacing,  forces  the   correct
+          material in this case is a page   font,  size, base-line spacing,
+          number at  the  bottom  of  the   and indent, checks that  enough
+          first  page  and  at the top of   space remains for _m_o_r_e _t_h_a_n _o_n_e
+          the remaining pages.  If  TROFF   line, and requests a  temporary
+          is used, a _c_u_t _m_a_r_k is drawn in   indent.
+          the form of _r_o_o_t_-_e_n's  at  each     ..ddee ppgg    \\""ppaarraaggrraapphh
+          margin.    The  sspp's  refer  to     ..bbrr       \\""bbrreeaakk
+          absolute  positions  to   avoid     ..fftt RR     \\""ffoorrccee ffoonntt,,
+          dependence   on  the  base-line     ..ppss 1100    \\""ssiizzee,,
+          spacing.   Another  reason  for     ..vvss 1122pp   \\""ssppaacciinngg,,
+          this  in the footer is that the     ..iinn 00     \\""aanndd iinnddeenntt
+          footer is invoked by printing a     ..sspp 00..44   \\""pprreessppaaccee
+          line   whose  vertical  spacing     ..nnee 11++\\\\nn((..VVuu\\""wwaanntt mmoorree tthhaann 11 lliinnee
+          swept past the trap position by     ..ttii 00..22ii  \\""tteemmpp iinnddeenntt
+          possibly  as  much as the base-     ....
+          line  spacing.   The   _n_o_-_s_p_a_c_e   The  first  break  in  ppgg  will
+          mode is turned on at the end of   force out any previous  partial
+          hhdd to render ineffective  acci-   lines,  and  must  occur before
+          dental occurrences of sspp at the   the vvss.  The forcing  of  font,
+          top of the running text.          etc.   is   partly   a  defense
+          The above method  of  restoring   against prior error and  partly
+          size,  font,  etc.  presupposes   to  permit  things like section
+          that such  requests  (that  set   heading macros to  set  parame-
+          _p_r_e_v_i_o_u_s value) are _n_o_t used in   ters only once.  The prespacing
+          the  running  text.   A  better   parameter   is   suitable   for
+          scheme is save and restore both   TROFF; a larger space, at least
+          the current _a_n_d previous values   as big  as  the  output  device
+          as  shown  for size in the fol-   vertical  resolution,  would be
+          lowing:                           more suitable  in  NROFF.   The
+            ..ddee ffoo                          choice  of  remaining  space to
+            ..nnrr ss11 \\\\nn((..ss\\""ccuurrrreenntt ssiizzee     test  for  in  the  nnee  is  the
+            ..ppss                             smallest  amount  greater  than
+            ..nnrr ss22 \\\\nn((..ss\\""pprreevviioouuss ssiizzee    one line (the ..VV is the  avail-
+            ..  ------    \\""rreesstt ooff ffooootteerr      able vertical resolution).
+            ....                              A macro to automatically number
+            ..ddee hhdd                          section  headings  might   look
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-37
+
+
+          like:                             is arranged  for  two  columns,
+            ..ddee sscc    \\""sseeccttiioonn             but   is  easily  modified  for
+            ..  ------    \\""ffoorrccee ffoonntt,, eettcc..    more.
+            ..sspp 00..44   \\""pprreessppaaccee              ..ddee hhdd    \\""hheeaaddeerr
+            ..nnee 22..44++\\\\nn((..VVuu \\""wwaanntt 22..44++ lliinneess ..  ------
+            ..ffii                               ..nnrr ccll 00 11\\""iinniitt ccoolluummnn ccoouunntt
+            \\\\nn++SS..                            ..mmkk       \\""mmaarrkk ttoopp ooff tteexxtt
+            ....                                ....
+            ..nnrr SS 00 11 \\""iinniitt SS                ..ddee ffoo    \\""ffooootteerr
+          The  usage  is ..sscc, followed by     ..iiee \\\\nn++((ccll<<22 \\{{\\
+          the section heading text,  fol-     ..ppoo ++33..44ii \\""nneexxtt ccoolluummnn;; 33..11++00..33
+          lowed  by  ..ppgg.   The  nnee  test     ..rrtt       \\""bbaacckk ttoo mmaarrkk
+          value  includes  one  line   of     ..nnss \\}}    \\""nnoo--ssppaaccee mmooddee
+          heading,  0.4  line in the fol-     ..eell \\{{\\
+          lowing ppgg, and one line of  the     ..ppoo \\\\nnMMuu \\""rreessttoorree lleefftt mmaarrggiinn
+          paragraph  text.   A  word con-     ..  ------
+          sisting  of  the  next  section     ''bbpp \\}}
+          number and a period is produced     ....
+          to begin the heading line.  The     ..llll 33..11ii  \\""ccoolluummnn wwiiddtthh
+          format of the number may be set     ..nnrr MM \\\\nn((..oo\\""ssaavvee lleefftt mmaarrggiinn
+          by aaff (<section>8).               Typically a portion of the  top
+          Another  common  form  is   the   of the first page contains full
+          labeled,   indented  paragraph,   width text; the request for the
+          where the label protrudes  left   narrower  line  length, as well
+          into the indent space.            as another ..mmkk  would  be  made
+            ..ddee llpp    \\""llaabbeelleedd ppaarraaggrraapphh   where the two column output was
+            ..ppgg                             to begin.
+            ..iinn 00..55ii  \\""ppaarraaggrraapphh iinnddeenntt    TT55..  FFoooottnnoottee PPrroocceessssiinngg
+            ..ttaa 00..22ii 00..55ii\\""llaabbeell,, ppaarraaggrraapphh The footnote  mechanism  to  be
+            ..ttii 00                           described  is used by imbedding
+            \\tt\\\\$$11\\tt\\cc\\""ffllooww iinnttoo ppaarraaggrraapphh the footnotes in the input text
+            ....                              at   the  point  of  reference,
+          The   intended  usage  is  "..llpp   demarcated by  an  initial  ..ffnn
+          _l_a_b_e_l";  _l_a_b_e_l  will  begin  at   and a terminal ..eeff:
+          0.2inch,  and  cannot  exceed a     ..ffnn
+          length   of   0.3inch   without     _F_o_o_t_n_o_t_e _t_e_x_t _a_n_d _c_o_n_t_r_o_l _l_i_n_e_s_._._.
+          intruding  into  the paragraph.     ..eeff
+          The  label   could   be   right   In the following, footnotes are
+          adjusted   against  0.4inch  by   processed in a  separate  envi-
+          setting the tabs  instead  with   ronment  and diverted for later
+          ..ttaa 00..44iiRR 00..55ii.   The last line   printing in the  space  immedi-
+          of llpp ends with \\cc so  that  it   ately  prior to the bottom mar-
+          will become a part of the first   gin.  There  is  provision  for
+          line of the text that follows.    the  case  where  the last col-
+          TT44..  MMuullttiippllee CCoolluummnn OOuuttppuutt       lected  footnote  doesn't  com-
+          The production of multiple col-   pletely  fit  in  the available
+          umn  pages  requires the footer   space.
+          macro to decide whether it  was     ..ddee hhdd    \\""hheeaaddeerr
+          invoked  by other than the last     ..  ------
+          column, so that it will begin a     ..nnrr xx 00 11 \\""iinniitt ffoooottnnoottee ccoouunntt
+          new  column rather than produce     ..nnrr yy 00--\\\\nnbb\\""ccuurrrreenntt ffooootteerr ppllaaccee
+          the bottom margin.  The  header     ..cchh ffoo --\\\\nnbbuu\\""rreesseett ffooootteerr ttrraapp
+          can  initialize a column regis-     ..iiff \\\\nn((ddnn ..ffzz\\""lleeffttoovveerr ffoooottnnoottee
+          ter that the footer will incre-     ....
+          ment  and  test.  The following     ..ddee ffoo    \\""ffooootteerr
+
+
+
+
+
+
+
+
+          USD:21-38                               NROFF/TROFF User's Manual
+
+
+            ..nnrr ddnn 00  \\""zzeerroo llaasstt ddiivveerrssiioonn sstiihzzeee register  ddnn  indicates  a
+            ..iiff \\\\nnxx \\{{\\                    leftover   footnote,   ffzz    is
+            ..eevv 11     \\""eexxppaanndd ffoooottnnootteess iinn eeivvn11voked  to  reprocess it.  The
+            ..nnff       \\""rreettaaiinn vveerrttiiccaall ssiizzeefootnote start macro ffnn  begins
+            ..FFNN       \\""ffoooottnnootteess           a  diversion  (append) in envi-
+            ..rrmm FFNN    \\""ddeelleettee iitt           ronment 1, and  increments  the
+            ..iiff ""\\\\nn((..zz""ffyy"" ..ddii \\""eenndd oovveerrfflloocwwouddniitvveerrxxss;iioonnif the count is one,
+            ..nnrr xx 00   \\""ddiissaabbllee ffxx          the footnote  separator  ffss  is
+            ..eevv  \\}}   \\""ppoopp eennvviirroonnmmeenntt     interpolated.  The separator is
+            ..  ------                          kept in  a  separate  macro  to
+            ''bbpp                             permit  user redefinition.  The
+            ....                              footnote end macro eeff  restores
+            ..ddee ffxx    \\""pprroocceessss ffoooottnnoottee oovveerrtffhlleoowwprevious  environment  and
+            ..iiff \\\\nnxx ..ddii ffyy\\""ddiivveerrtt oovveerrfflloowwends the diversion after saving
+            ....                              the spacing size in register zz.
+            ..ddee ffnn    \\""ssttaarrtt ffoooottnnoottee      yy is then  decremented  by  the
+            ..ddaa FFNN    \\""ddiivveerrtt ((aappppeenndd)) ffoooottnnsooittzeee of the footnote, available
+            ..eevv 11     \\""iinn eennvviirroonnmmeenntt 11    in ddnn; then on the first  foot-
+            ..iiff \\\\nn++xx==11 ..ffss \\""iiff ffiirrsstt,, iinncclluunddoeetess,eeppaayyrraaittsoorrfurther decremented
+            ..ffii       \\""ffiillll mmooddee           by the difference  in  vertical
+            ....                              base-line  spacings  of the two
+            ..ddee eeff    \\""eenndd ffoooottnnoottee        environments,  to  prevent  the
+            ..bbrr       \\""ffiinniisshh oouuttppuutt       late triggering the footer trap
+            ..nnrr zz \\\\nn((..vv\\""ssaavvee ssppaacciinngg      from causing the last  line  of
+            ..eevv       \\""ppoopp eevv              the combined footnotes to over-
+            ..ddii       \\""eenndd ddiivveerrssiioonn       flow.  The footer trap is  then
+            ..nnrr yy --\\\\nn((ddnn\\""nneeww ffooootteerr ppoossiittiioosnne,,t  to the lower (on the page)
+            ..iiff \\\\nnxx==11 ..nnrr yy --((\\\\nn((..vv--\\\\nnzz)) \\of yy or the current page  posi-
+                      \\""uunncceerrttaaiinnttyy ccoorrrreeccttiiootnnion  (nnll)  plus  one  line, to
+            ..cchh ffoo \\\\nnyyuu\\""yy iiss nneeggaattiivvee     allow for printing  the  refer-
+            ..iiff ((\\\\nn((nnll++11vv))>>((\\\\nn((..pp++\\\\nnyy)) \\ ence  line.  If indicated by xx,
+            ..cchh ffoo \\\\nn((nnlluu++11vv \\""iitt ddiiddnn''tt ffiittthe footer ffoo rereads the foot-
+            ....                              notes from FFNN in nofill mode in
+            ..ddee ffss    \\""sseeppaarraattoorr           environment 1, and deletes  FFNN.
+            \\ll''11ii''    \\""11 iinncchh rruullee         If the footnotes were too large
+            ..bbrr                             to fit, the macro  ffxx  will  be
+            ....                              trap-invoked  to  redivert  the
+            ..ddee ffzz    \\""ggeett lleeffttoovveerr ffoooottnnootteeoverflow into ffyy, and the  reg-
+            ..ffnn                             ister ddnn will later indicate to
+            ..nnff       \\""rreettaaiinn vveerrttiiccaall ssiizzeethe header whether ffyy is empty.
+            ..ffyy       \\""wwhheerree ffxx ppuutt iitt     Both  ffoo  and ffxx are planted in
+            ..eeff                             the nominal footer  trap  posi-
+            ....                              tion in an order that causes ffxx
+            ..nnrr bb 11..00ii\\""bboottttoomm mmaarrggiinn ssiizzee  to be concealed unless  the  ffoo
+            ..wwhh 00 hhdd  \\""hheeaaddeerr ttrraapp         trap is moved.  The footer then
+            ..wwhh 1122ii ffoo\\""ffooootteerr ttrraapp,, tteemmpp ppoosstiiettriimooinnnates the overflow  diver-
+            ..wwhh --\\\\nnbbuu ffxx\\""ffxx aatt ffooootteerr ppoossiittsiiiooonnn, if necessary, and zeros xx
+            ..cchh ffoo --\\\\nnbbuu\\""ccoonncceeaall ffxx wwiitthh ffooto  disable  ffxx,  because   the
+          The  header  hhdd  initializes  a   uncertainty correction together
+          footnote  count register xx, and   with a not-too-late  triggering
+          sets both  the  current  footer   of the footer can result in the
+          trap  position  register  yy and   footnote  rereading   finishing
+          the footer  trap  itself  to  a   before reaching the ffxx trap.
+          nominal  position  specified in   A good exercise for the student
+          register bb.   In  addition,  if   is  to  combine  the  multiple-
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-39
+
+
+          column and footnote mechanisms.
+          TT66..  TThhee LLaasstt PPaaggee
+          After  the  last input file has
+          ended, NROFF and  TROFF  invoke
+          the  _e_n_d _m_a_c_r_o (<section>7), if
+          any,  and  when  it   finishes,
+          eject   the  remainder  of  the
+          page.  During  the  eject,  any
+          traps encountered are processed
+          normally.  At the _e_n_d  of  this
+          last  page,  processing  termi-
+          nates _u_n_l_e_s_s  a  partial  line,
+          word,  or partial word remains.
+          If it is desired  that  another
+          page be started, the end-macro
+            ..ddee eenn    \\""eenndd--mmaaccrroo
+            \\cc
+            ''bbpp
+            ....
+            ..eemm eenn
+          will  deposit  a  null  partial
+          word, and effect  another  last
+          page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:21-40                               NROFF/TROFF User's Manual
+
+
+                                       TTaabbllee II
+
+                                 FFoonntt SSttyyllee EExxaammpplleess
+
+
+
+          The following fonts are printed in 12-point, with a vertical
+          spacing of 14-point, and with non-alphanumeric characters sepa-
+          rated by 1/4em space (all measurements on 8.5 x 11 inch paper
+          prior to photoreduction).  This font sample is printed on an
+          Apple Laserwriter at University of California, Berkeley.
+
+
+
+          Times Roman
+          abcdefghijklmnopqrstuvwxyz
+          ABCDEFGHIJKLMNOPQRSTUVWXYZ
+          1234567890
+          !$%&()`'*+-.,/:;=?[]|
+          +o[]---_1/41/23/4fiflffffiffl<degree><*>'/c(R)(C)
+
+          _T_i_m_e_s _I_t_a_l_i_c
+          _a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s_t_u_v_w_x_y_z
+          _A_B_C_D_E_F_G_H_I_J_K_L_M_N_O_P_Q_R_S_T_U_V_W_X_Y_Z
+          _1_2_3_4_5_6_7_8_9_0
+          _!_$_%_&_(_)_`_'_*_+_-_._,_/_:_;_=_?_[_]_|
+          _+_o_[_]_-_-_-___1_/_4_1_/_2_3_/_4_f_i_f_l_f_f_f_f_i_f_f_l_<_d_e_g_r_e_e_>_<_*_>_'_/_c_(_R_)_(_C_)
+
+          TTiimmeess BBoolldd
+          aabbccddeeffgghhiijjkkllmmnnooppqqrrssttuuvvwwxxyyzz
+          AABBCCDDEEFFGGHHIIJJKKLLMMNNOOPPQQRRSSTTUUVVWWXXYYZZ
+          11223344556677889900
+          !!$$%%&&(())``''**++--..,,//::;;==??[[]]||
+          ++oo[[]]------__11//4411//2233//44ffiiffllffffffffiiffffll<<ddeeggrreeee>><<**>>''//cc((RR))((CC))
+
+          Special Mathematical Font
+          "'\^_`~/<>{}#@+-=*
+          <alpha><beta><gamma><delta><epsilon><zeta><eta>
+          <theta><iota><kappa><lambda><mu><nu><xi>o<pi><rho>
+          <sigma><sigma><tau><upsilon><phi><chi><psi><omega>
+          <Gamma><Delta><Theta><Lambda><Xi><Pi><Sigma>Y<Phi>
+          <Psi><O_mega>
+          <sqrt> >=<===~~=!=-><-|^|vx/+-<union><intersection>
+          <propersubset><propersuperset><subsetorequal>
+          <supersetorequal><infinity><del>
+          <section><nabla>~<integral><proportionalto>{}
+          <elementof><**>=><=|O,-`--.-'{}||__||~~||
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          USD:21-30                               NROFF/TROFF User's Manual
+
+
+                               TTaabbllee IIII
+
+              IInnppuutt NNaammiinngg CCoonnvveennttiioonnss ffoorr '',, ``,, aanndd  --
+                 aanndd ffoorr NNoonn--AASSCCIIII SSppeecciiaall CChhaarraacctteerrss
+
+
+
+          NNoonn--AASSCCIIII cchhaarraacctteerrss aanndd _m_m_i_i_n_n_u_u_s_s oonn tthhee ssttaannddaarrdd ffoonnttss..
+
+               _I_I_n_n_p_p_u_u_t_t                  _C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r _I_I_n_n_p_p_u_u_t_t_C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r
+          _C_C_h_h_a_a_r_r _N_N_a_a_m_m_e_e                     _N_N_a_a_m_m_e_e    _C_C_h_h_a_a_r_r_N_N_a_a_m_m_e_e_N_N_a_a_m_m_e_e
+            '  '   close quote           3/4 \(34                      3/4
+            `  `   open quote            fi  \(fi                      fi
+           --  \(em                  3/4 Efml da\s(hfl                      fl
+            -  -   hyphen or             ff  \(ff                      ff
+            -  \(hy                    hypfhfein\(Fi                      ffi
+            -  \-  current font minus    ffl \(Fl                      ffl
+            +o  \(bu                   <bduelglreete>   \(de                degree
+           []  \(sq                    squ<a*r>e\(dg                    dagger
+            _  \(ru                     rul'e \(fm                   foot mark
+           1/4 \(14                      1//c4 \(ct                   cent sign
+           1/2 \(12                      1(/R2) \(rg                  registered
+           (C) \(co                   copyright
+
+
+          NNoonn--AASSCCIIII cchhaarraacctteerrss aanndd '',, ``,, __,, ++,, --,, ==,, aanndd **
+          oonn tthhee ssppeecciiaall ffoonntt..
+          The ASCII characters @, #, ", ', `, <, >, \, {, },
+          ~, ^, and _ exist _o_n_l_y on the special font and are
+          printed as a 1-em space if that font is not
+          mounted.  The following characters exist only on
+          the special font except for the upper case Greek
+          letter names followed by <*> which are mapped into
+          upper case English letters in whatever font is
+          mounted on font position one (default Times
+          Roman).  The special math plus, minus, and equals
+          are provided to insulate the appearance of equa-
+          tions from the choice of standard fonts.
+
+               _I_I_n_n_p_p_u_u_t_t                  _C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r _I_I_n_n_p_p_u_u_t_t_C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r
+          _C_C_h_h_a_a_r_r _N_N_a_a_m_m_e_e                     _N_N_a_a_m_m_e_e    _C_C_h_h_a_a_r_r_N_N_a_a_m_m_e_e_N_N_a_a_m_m_e_e
+            +  \(pl                   m<aetphsipllouns>  \(*e                epsilon
+            -  \(mi                  mat<hzemtian>us  \(*z                 zeta
+            =  \(eq                  math<eetqau>als \(*y                  eta
+            *  \(**                   ma<tthhesttaa>r  \(*h                 theta
+        <section>  \(sc                s<eicottiao>n   \(*i                 iota
+            '  \(aa                 acut<ekaapcpcae>nt \(*k                 kappa
+            `  \(ga                 gra<vleamabcdcae>nt \(*l                lambda
+            _  \(ul                   und<emrur>ul\e(*m                      mu
+            /  \(sl          slash (match<innug> b\a(c*knslash)                nu
+         <alpha>   \(*a                 a<lxpih>a\(*c                      xi
+         <beta>    \(*b                 betoa \(*o                    omicron
+         <gamma>   \(*g                 g<apmim>a\(*p                      pi
+         <delta>   \(*d                 d<erlhtoa>    \(*r                  rho
+         <sigma>   \(*s                 sigma
+
+
+
+
+
+
+
+
+          NROFF/TROFF User's Manual                               USD:21-31
+
+
+               _I_I_n_n_p_p_u_u_t_t                  _C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r _I_I_n_n_p_p_u_u_t_t_C_C_h_h_a_a_r_r_a_a_c_c_t_t_e_e_r_r
+          _C_C_h_h_a_a_r_r _N_N_a_a_m_m_e_e                     _N_N_a_a_m_m_e_e    _C_C_h_h_a_a_r_r_N_N_a_a_m_m_e_e_N_N_a_a_m_m_e_e
+         <sigma>   \(ts            termin<aXli|>si\\g((m*baCv                 bold Xviertical
+          <tau>    \(*t                  t|aO_u \\((*lOf        left floorOm(ilcerfotn<b*o>ttom of big
+        <upsilon>  \(*u                up<sPiil>on\(*Psquare bracket)       Pi
+          <phi>    \(*f                  p_hP|i \\((*rRf          right flooRrho(<r*i>ght bottom)
+          <chi>    \(*x                <Sci|hg~ima>\(lc\(*S        left ceilSiinggma(left top)
+          <psi>    \(*q                  p~sT|i \\((*rTc           right ceiTlaiun<g*>(right top)
+         <omega>   \(*w                 omeYga\(*U                    Upsilon
+            A  \(*A                   Alp<hPah<i*>>   \(*F                  Phi
+            B  \(*B                    BetaX<*>\(*X                    Chi<*>
+         <Gamma>   \(*G                 G<aPmsmia>    \(*Q                  Psi
+         <Delta>   \(*D                <DOemletgaa>   \(*W                 Omega
+            E  \(*E                  Eps<islqor_nt<>*>  \(sr              square root
+            Z  \(*Z                    Zeta<*>\(rn               root en extender
+            H  \(*Y                    Eta><=*>\(>=                      >=
+         <Theta>   \(*H                 Th<e=ta\(<=                      <=
+            I  \(*I                    Iot=a=<*>\(==               identically equal
+            K  \(*K                   Kapp~a=<*>\(~=                   approx =
+        <Lambda>   \(*L                Lamb~da\(ap                 approximates
+            M  \(*M                     Mu!<=*>\(!=                   not equal
+            N  \(*N                     Nu-<>*>\(->                  right arrow
+           <-  \(<-                  left arrow
+            |^  \(ua                   up arrow
+            |v  \(da                  down arrow
+            x  \(mu                   multiply
+            /  \(di                    divide
+           +-  \(+-                  plus-minus
+         <union>   \(cu              cup (union)
+     <intersection>                     \(ca    cap (intersection)
+     <proper subset>                    \(sb    subset of
+    <proper superset>                   \(sp    superset of
+    <subset or equal>                   \(ib    improper subset
+   <superset or equal>                  \(ip    improper superset
+       <infinity>  \(if               infinity
+          <del>    \(pd          partial derivative
+         <nabla>   \(gr               gradient
+            ~  \(no                      not
+       <integral>  \(is             integral sign
+    <proportional to>                   \(pt    proportional to
+           {}  \(es                   empty set
+      <element of> \(mo               member of
+            |  \(br               box vertical rule
+          <**> \(dd                 double dagger
+           =>  \(rh                  right hand
+           <=  \(lh                   left hand
+            |  \(or                      or
+            O  \(ci                    circle
+           ,-  \(lt         left top of big curly bracket
+           `-  \(lb                  left bottom
+           -.  \(rt                   right top
+           -'  \(rb                   right bot
+            {  \(lk       left center of big curly bracket
+            }  \(rk       right center of big curly bracket

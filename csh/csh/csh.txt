@@ -1,0 +1,4620 @@
+
+
+
+
+
+
+
+
+
+               [1mAn Introduction to the C shell[0m
+
+
+                        [4mWilliam[24m [4mJoy[0m
+            [4m(revised[24m [4mfor[24m [4m4.3BSD[24m [4mby[24m [4mMark[24m [4mSeiden)[0m
+                 Computer Science Division
+ Department of Electrical Engineering and Computer Science
+             University of California, Berkeley
+                 Berkeley, California 94720
+
+
+                          [4mABSTRACT[0m
+
+          [4mCsh[24m is a new command language interpreter for
+     UNIX® systems.  It incorporates good  features  of
+     other  shells  and  a [4mhistory[24m mechanism similar to
+     the [4mredo[24m of INTERLISP.  While  incorporating  many
+     features  of other shells which make writing shell
+     programs (shell scripts) easier, most of the  fea‐
+     tures  unique to [4mcsh[24m are designed more for the in‐
+     teractive UNIX user.
+
+          UNIX users who have read a general  introduc‐
+     tion  to the system will find a valuable basic ex‐
+     planation of the shell here.  Simple terminal  in‐
+     teraction  with [4mcsh[24m is possible after reading just
+     the first section of this  document.   The  second
+     section  describes  the shell’s capabilities which
+     you can explore after you have begun to become ac‐
+     quainted with the shell.  Later sections introduce
+     features which are useful, but not  necessary  for
+     all users of the shell.
+
+          Additional  information  includes an appendix
+     listing special characters  of  the  shell  and  a
+     glossary  of terms and commands introduced in this
+     manual.
+
+
+[1mIntroduction[0m
+
+     A [4mshell[24m is a command language interpreter.  [4mCsh[24m is  the
+name  of  one  particular  command interpreter on UNIX.  The
+primary purpose of [4mcsh[24m is to translate command  lines  typed
+at  a  terminal  into  system actions, such as invocation of
+other programs.  [4mCsh[24m is a user program  just  like  any  you
+might  write.   Hopefully, [4mcsh[24m will be a very useful program
+for you in interacting with the UNIX system.
+
+     In addition to this document, you will want to refer to
+a   copy  of  the  UNIX  User  Reference  Manual.   The  [4mcsh[0m
+
+
+
+
+
+
+
+
+
+USD:4‐2                       An Introduction to the C shell
+
+
+documentation in section 1 of the manual provides a full de‐
+scription of all features of the shell and is the definitive
+reference for questions about the shell.
+
+     Many words in  this  document  are  shown  in  [4mitalics.[0m
+These  are  important  words;  names  of commands, and words
+which have special meaning in discussing the shell and UNIX.
+Many  of  the  words are defined in a glossary at the end of
+this document.  If you don’t know what is meant by  a  word,
+you should look for it in the glossary.
+
+[1mAcknowledgements[0m
+
+     Numerous people have provided good input about previous
+versions of [4mcsh[24m and aided in its debugging and in the debug‐
+ging of its documentation.  I would especially like to thank
+Michael Ubell who made the crucial observation that  history
+commands could be done well over the word structure of input
+text, and implemented a prototype history  mechanism  in  an
+older version of the shell.  Eric Allman has also provided a
+large number of useful comments on  the  shell,  helping  to
+unify  those  concepts which are present and to identify and
+eliminate useless  and  marginally  useful  features.   Mike
+O’Brien  suggested  the  pathname  hashing  mechanism  which
+speeds command execution.  Jim Kulp added  the  job  control
+and directory stack primitives and added their documentation
+to this introduction.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐3
+
+
+[1m1.  Terminal usage of the shell[0m
+
+[1m1.1.  The basic notion of commands[0m
+
+     A [4mshell[24m in UNIX acts mostly as a medium  through  which
+other  [4mprograms[24m  are invoked.  While it has a set of [4mbuiltin[0m
+functions which it performs directly,  most  commands  cause
+execution  of  programs  that  are, in fact, external to the
+shell.  The shell is thus distinguished from the command in‐
+terpreters of other systems both by the fact that it is just
+a user program, and by the fact that it is used  almost  ex‐
+clusively as a mechanism for invoking other programs.
+
+     [4mCommands[24m  in  the  UNIX  system  consist  of  a list of
+strings or [4mwords[24m interpreted as a [4mcommand[24m [4mname[24m  followed  by
+[4marguments.[24m  Thus the command
+
+     mail bill
+
+consists  of  two words.  The first word [4mmail[24m names the com‐
+mand to be executed, in this case  the  mail  program  which
+sends  messages  to other users.  The shell uses the name of
+the command in attempting to execute it for  you.   It  will
+look  in  a  number  of [4mdirectories[24m for a file with the name
+[4mmail[24m which is expected to contain the mail program.
+
+     The rest of the words of the command are given as [4margu‐[0m
+[4mments[24m  to  the  command itself when it is executed.  In this
+case we specified also the argument  [4mbill[24m  which  is  inter‐
+preted  by the [4mmail[24m program to be the name of a user to whom
+mail is to be sent.  In normal terminal usage we  might  use
+the [4mmail[24m command as follows.
+
+     % mail bill
+     I have a question about the csh documentation.
+     My document seems to be missing page 5.
+     Does a page five exist?
+          Bill
+     EOT
+     %
+
+
+     Here  we typed a message to send to [4mbill[24m and ended this
+message with a ^D which sent an end‐of‐file to the mail pro‐
+gram.   (Here  and  throughout  this  document, the notation
+‘‘^[4mx[24m’’ is to be read ‘‘control‐[4mx[24m’’ and represents the strik‐
+ing  of  the [4mx[24m key while the control key is held down.)  The
+mail program then echoed the characters ‘EOT’ and  transmit‐
+ted  our  message.   The characters ‘% ’ were printed before
+and after the mail command by the shell to indicate that in‐
+put was needed.
+
+     After typing the ‘% ’ prompt the shell was reading com‐
+mand input from our terminal.  We typed a  complete  command
+
+
+
+
+
+
+
+
+
+USD:4‐4                       An Introduction to the C shell
+
+
+‘mail  bill’.  The shell then executed the [4mmail[24m program with
+argument [4mbill[24m and went dormant waiting for it  to  complete.
+The  mail program then read input from our terminal until we
+signalled an end‐of‐file via typing a  ^D  after  which  the
+shell  noticed  that mail had completed and signaled us that
+it was ready to read from the terminal again by printing an‐
+other ‘% ’ prompt.
+
+     This  is  the essential pattern of all interaction with
+UNIX through the shell.  A complete command is typed at  the
+terminal,  the shell executes the command and when this exe‐
+cution completes, it prompts for a new command.  If you  run
+the  editor  for  an hour, the shell will patiently wait for
+you to finish editing and obediently prompt you again  when‐
+ever you finish editing.
+
+     An  example  of a useful command you can execute now is
+the [4mtset[24m command, which sets  the  default  [4merase[24m  and  [4mkill[0m
+characters on your terminal − the erase character erases the
+last character you typed and the kill character  erases  the
+entire  line you have entered so far.  By default, the erase
+character is the delete key (equivalent to  ‘^?’)   and  the
+kill  character  is  ‘^U’.   Some  people prefer to make the
+erase character the backspace key (equivalent to ‘^H’).  You
+can make this be true by typing
+
+     tset −e
+
+which  tells  the program [4mtset[24m to set the erase character to
+tset’s default setting for this character (a backspace).
+
+[1m1.2.  Flag arguments[0m
+
+     A useful notion in UNIX is that  of  a  [4mflag[24m  argument.
+While  many arguments to commands specify file names or user
+names, some arguments rather specify an optional  capability
+of  the  command  which  you wish to invoke.  By convention,
+such arguments begin with the character ‘−’ (hyphen).   Thus
+the command
+
+     ls
+
+will  produce a list of the files in the current [4mworking[24m [4mdi‐[0m
+[4mrectory[24m.  The option [4m−s[24m is the size option, and
+
+     ls −s
+
+causes [4mls[24m to also give, for each file the size of  the  file
+in  blocks  of  512 characters.  The manual section for each
+command in the UNIX reference manual gives the available op‐
+tions  for  each command.  The [4mls[24m command has a large number
+of useful and interesting options.  Most other commands have
+either no options or only one or two options.  It is hard to
+remember  options  of  commands  which  are  not  used  very
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐5
+
+
+frequently,  so  most UNIX utilities perform only one or two
+functions rather than having a large number of hard  to  re‐
+member options.
+
+[1m1.3.  Output to files[0m
+
+     Commands  that  normally  read input or write output on
+the terminal can also be executed  with  this  input  and/or
+output done to a file.
+
+     Thus suppose we wish to save the current date in a file
+called ‘now’.  The command
+
+     date
+
+will print the current date on our terminal.   This  is  be‐
+cause  our  terminal  is the default [4mstandard[24m [4moutput[24m for the
+date command and the date command prints  the  date  on  its
+standard  output.   The  shell lets us [4mredirect[24m the [4mstandard[0m
+[4moutput[24m of a command through a notation using the [4mmetacharac‐[0m
+[4mter[24m  ‘>’  and  the  name  of  the file where output is to be
+placed.  Thus the command
+
+     date > now
+
+runs the [4mdate[24m command such that its standard output  is  the
+file  ‘now’  rather  than  the  terminal.  Thus this command
+places the current date and time into the file ‘now’.  It is
+important to know that the [4mdate[24m command was unaware that its
+output was going to a file rather than to the terminal.  The
+shell  performed  this  [4mredirection[24m before the command began
+executing.
+
+     One other thing to note here is  that  the  file  ‘now’
+need  not have existed before the [4mdate[24m command was executed;
+the shell would have created the file if it did  not  exist.
+And  if  the  file  did exist?  If it had existed previously
+these previous contents would have been discarded!  A  shell
+option [4mnoclobber[24m exists to prevent this from happening acci‐
+dentally; it is discussed in section 2.2.
+
+     The system normally keeps files which you  create  with
+‘>’  and  all other files.  Thus the default is for files to
+be permanent.  If you wish to create a file  which  will  be
+removed  automatically,  you  can  begin its name with a ‘#’
+character, this ‘scratch’ character denotes  the  fact  that
+the file will be a scratch file.*  The  system  will  remove
+───────────
+*Note  that  if your erase character is a ‘#’, you
+will have to precede the ‘#’ with a ‘\’.  The fact
+that  the ‘#’ character is the old (pre‐CRT) stan‐
+dard erase character means that it seldom  appears
+in  a  file name, and allows this convention to be
+used for scratch files.  If you are using  a  CRT,
+
+
+
+
+
+
+
+
+
+USD:4‐6                       An Introduction to the C shell
+
+
+such  files  after a couple of days, or sooner if file space
+becomes very tight.   Thus,  in  running  the  [4mdate[24m  command
+above,  we  don’t really want to save the output forever, so
+we would more likely do
+
+     date > #now
+
+
+[1m1.4.  Metacharacters in the shell[0m
+
+     The shell has a  large  number  of  special  characters
+(like  ‘>’)  which  indicate special functions.  We say that
+these notations have [4msyntactic[24m and [4msemantic[24m meaning  to  the
+shell.   In  general, most characters which are neither let‐
+ters nor digits have special meaning to the shell.  We shall
+shortly  learn  a  means of [4mquotation[24m which allows us to use
+[4mmetacharacters[24m without the shell treating them in  any  spe‐
+cial way.
+
+     Metacharacters normally have effect only when the shell
+is reading our input.  We need not worry about placing shell
+metacharacters  in a letter we are sending via [4mmail,[24m or when
+we are typing in text or data to some other  program.   Note
+that  the  shell  is only reading input when it has prompted
+with ‘% ’ (although we can type our  input  even  before  it
+prompts).
+
+[1m1.5.  Input from files; pipelines[0m
+
+     We learned above how to [4mredirect[24m the [4mstandard[24m [4moutput[24m of
+a command to a file.  It is also possible  to  redirect  the
+[4mstandard[24m  [4minput[24m of a command from a file.  This is not often
+necessary since most commands will read from  a  file  whose
+name is given as an argument.  We can give the command
+
+     sort < data
+
+to  run the [4msort[24m command with standard input, where the com‐
+mand normally reads its input, from  the  file  ‘data’.   We
+would more likely say
+
+     sort data
+
+letting  the [4msort[24m command open the file ‘data’ for input it‐
+self since this is less to type.
+
+     We should note that if we just typed
+
+     sort
+
+then the sort program would sort  lines  from  its  [4mstandard[0m
+───────────
+your  erase character should be a ^H, as we demon‐
+strated in section 1.1 how this could be set up.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐7
+
+
+[4minput.[24m   Since  we  did  not [4mredirect[24m the standard input, it
+would sort lines as we typed them on the terminal  until  we
+typed a ^D to indicate an end‐of‐file.
+
+     A  most useful capability is the ability to combine the
+standard output of one command with the  standard  input  of
+another,  i.e.  to run the commands in a sequence known as a
+[4mpipeline.[24m  For instance the command
+
+     ls −s
+
+normally produces a list of the files in our directory  with
+the size of each in blocks of 512 characters.  If we are in‐
+terested in learning which of our files is  largest  we  may
+wish  to have this sorted by size rather than by name, which
+is the default way in which [4mls[24m sorts.  We could look at  the
+many  options of [4mls[24m to see if there was an option to do this
+but would eventually discover that there is not.  Instead we
+can use a couple of simple options of the [4msort[24m command, com‐
+bining it with [4mls[24m to get what we want.
+
+     The [4m−n[24m option of sort specifies a numeric  sort  rather
+than an alphabetic sort.  Thus
+
+     ls −s | sort −n
+
+specifies that the output of the [4mls[24m command run with the op‐
+tion [4m−s[24m is to be [4mpiped[24m to the command [4msort[24m run with the  nu‐
+meric  sort option.  This would give us a sorted list of our
+files by size, but with the smallest first.  We  could  then
+use  the [4m−r[24m reverse sort option and the [4mhead[24m command in com‐
+bination with the previous command doing
+
+     ls −s | sort −n −r | head −5
+
+Here we have taken a list of  our  files  sorted  alphabeti‐
+cally,  each  with  the size in blocks.  We have run this to
+the standard input of the [4msort[24m command asking it to sort nu‐
+merically in reverse order (largest first).  This output has
+then been run into the command [4mhead[24m which gives us the first
+few  lines.  In this case we have asked [4mhead[24m for the first 5
+lines.  Thus this command gives us the names  and  sizes  of
+our 5 largest files.
+
+     The notation introduced above is called the [4mpipe[24m mecha‐
+nism.  Commands separated by ‘|’  characters  are  connected
+together by the shell and the standard output of each is run
+into the standard input of the next.  The  leftmost  command
+in a pipeline will normally take its standard input from the
+terminal and the rightmost will place its standard output on
+the  terminal.   Other  examples  of pipelines will be given
+later when we discuss the history mechanism;  one  important
+use of pipes which is illustrated there is in the routing of
+information to the line printer.
+
+
+
+
+
+
+
+
+
+USD:4‐8                       An Introduction to the C shell
+
+
+[1m1.6.  Filenames[0m
+
+     Many commands to be executed will  need  the  names  of
+files  as  arguments.  UNIX [4mpathnames[24m consist of a number of
+[4mcomponents[24m separated by ‘/’.  Each component except the last
+names  a  directory  in which the next component resides, in
+effect specifying the [4mpath[24m of directories to follow to reach
+the file.  Thus the pathname
+
+     /etc/motd
+
+specifies a file in the directory ‘etc’ which is a subdirec‐
+tory of the [4mroot[24m directory ‘/’.  Within this  directory  the
+file  named is ‘motd’ which stands for ‘message of the day’.
+A [4mpathname[24m that begins with a slash is said to be  an  [4mabso‐[0m
+[4mlute[24m pathname since it is specified from the absolute top of
+the entire directory hierarchy of  the  system  (the  [4mroot[24m).
+[4mPathnames[24m  which  do  not  begin with ‘/’ are interpreted as
+starting in the current [4mworking[24m [4mdirectory[24m, which is, by  de‐
+fault, your [4mhome[24m directory and can be changed dynamically by
+the [4mcd[24m change directory command.  Such pathnames are said to
+be [4mrelative[24m to the working directory since they are found by
+starting in the working directory and  descending  to  lower
+levels  of  directories  for each [4mcomponent[24m of the pathname.
+If the pathname contains no slashes at all then the file  is
+contained  in  the working directory itself and the pathname
+is merely the name of the file in this directory.   Absolute
+pathnames have no relation to the working directory.
+
+     Most  filenames  consist  of  a  number of alphanumeric
+characters and ‘.’s (periods).  In fact, all printing  char‐
+acters  except  ‘/’  (slash) may appear in filenames.  It is
+inconvenient to have most non‐alphabetic characters in file‐
+names  because  many  of  these  have special meaning to the
+shell.  The character ‘.’ (period) is not a  shell‐metachar‐
+acter  and is often used to separate the [4mextension[24m of a file
+name from the base of the name.  Thus
+
+     prog.c prog.o prog.errs prog.output
+
+are four related files.  They share a [4mbase[24m portion of a name
+(a  base  portion  being  that part of the name that is left
+when a trailing ‘.’ and following characters which  are  not
+‘.’  are  stripped  off).   The  file  ‘prog.c’ might be the
+source for a C program, the file ‘prog.o’ the  corresponding
+object  file, the file ‘prog.errs’ the errors resulting from
+a compilation of the program and the file ‘prog.output’  the
+output of a run of the program.
+
+     If  we  wished to refer to all four of these files in a
+command, we could use the notation
+
+     prog.*
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                       USD:4‐9
+
+
+This expression is expanded by the shell, before the command
+to which it is an argument is executed, into a list of names
+which begin with ‘prog.’.  The character  ‘*’  here  matches
+any sequence (including the empty sequence) of characters in
+a file name.   The  names  which  match  are  alphabetically
+sorted and placed in the [4margument[24m [4mlist[24m of the command.  Thus
+the command
+
+     echo prog.*
+
+will echo the names
+
+     prog.c prog.errs prog.o prog.output
+
+Note that the names are in sorted order here, and a  differ‐
+ent  order  than we listed them above.  The [4mecho[24m command re‐
+ceives four words as arguments, even though  we  only  typed
+one  word as an argument directly.  The four words were gen‐
+erated by [4mfilename[24m [4mexpansion[24m of the one input word.
+
+     Other notations for [4mfilename[24m [4mexpansion[24m are also  avail‐
+able.   The  character ‘?’ matches any single character in a
+filename.  Thus
+
+     echo ? ?? ???
+
+will echo a line of filenames; first those with one  charac‐
+ter  names, then those with two character names, and finally
+those with three character names.  The names of each  length
+will be independently sorted.
+
+     Another  mechanism consists of a sequence of characters
+between ‘[’ and ‘]’.  This metasequence matches  any  single
+character from the enclosed set.  Thus
+
+     prog.[co]
+
+will match
+
+     prog.c prog.o
+
+in  the  example  above.   We  can also place two characters
+around a ‘−’ in this notation to denote a range.  Thus
+
+     chap.[1−5]
+
+might match files
+
+     chap.1 chap.2 chap.3 chap.4 chap.5
+
+if they existed.  This is shorthand for
+
+     chap.[12345]
+
+
+
+
+
+
+
+
+
+
+USD:4‐10                      An Introduction to the C shell
+
+
+and otherwise equivalent.
+
+     An important point to note is that if a list  of  argu‐
+ment words to a command (an [4margument[24m [4mlist)[24m contains filename
+expansion syntax, and  if  this  filename  expansion  syntax
+fails  to match any existing file names, then the shell con‐
+siders this to be an error and prints a diagnostic
+
+     No match.
+
+and does not execute the command.
+
+     Another very important point is  that  files  with  the
+character  ‘.’ at the beginning are treated specially.  Nei‐
+ther ‘*’ or ‘?’ or the ‘[’  ‘]’  mechanism  will  match  it.
+This  prevents  accidental matching of the filenames ‘.’ and
+‘..’  in the working directory which have special meaning to
+the  system, as well as other files such as [4m.cshrc[24m which are
+not normally visible.  We will discuss the special  role  of
+the file [4m.cshrc[24m later.
+
+     Another  filename  expansion  mechanism gives access to
+the pathname of the [4mhome[24m directory of other users.  This no‐
+tation consists of the character ‘~’ (tilde) followed by an‐
+other user’s login name.   For  instance  the  word  ‘~bill’
+would  map to the pathname ‘/usr/bill’ if the home directory
+for ‘bill’ was ‘/usr/bill’.  Since, on large systems,  users
+may  have  login  directories  scattered over many different
+disk volumes with different prefix directory names, this no‐
+tation  provides  a convenient way of accessing the files of
+other users.
+
+     A special case of  this  notation  consists  of  a  ‘~’
+alone,  e.g.  ‘~/mbox’.   This  notation  is expanded by the
+shell into the file ‘mbox’ in your [4mhome[24m directory, i.e. into
+‘/usr/bill/mbox’  for  me  on Ernie Co‐vax, the UCB Computer
+Science Department VAX machine, where this document was pre‐
+pared.   This  can  be  very  useful  if you have used [4mcd[24m to
+change to another directory and have found a file  you  wish
+to copy using [4mcp.[24m  If I give the command
+
+     cp thatfile ~
+
+the shell will expand this command to
+
+     cp thatfile /usr/bill
+
+since my home directory is /usr/bill.
+
+     There  also exists a mechanism using the characters ‘{’
+and ‘}’ for abbreviating a set of words  which  have  common
+parts  but cannot be abbreviated by the above mechanisms be‐
+cause they are not files, are the names of  files  which  do
+not  yet  exist,  are not thus conveniently described.  This
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐11
+
+
+mechanism will be described much later, in section  4.2,  as
+it is used less frequently.
+
+[1m1.7.  Quotation[0m
+
+     We have already seen a number of metacharacters used by
+the shell.  These metacharacters pose a problem in  that  we
+cannot  use  them directly as parts of words.  Thus the com‐
+mand
+
+     echo *
+
+will not echo the character ‘*’.   It  will  either  echo  a
+sorted  list  of filenames in the current [4mworking[24m [4mdirectory,[0m
+or print the message ‘No match’ if there are no files in the
+working directory.
+
+     The  recommended mechanism for placing characters which
+are neither numbers, digits, ‘/’, ‘.’ or ‘−’ in an  argument
+word  to  a  command  is to enclose it with single quotation
+characters ‘´’, i.e.
+
+     echo ´*´
+
+There is one special character ‘!’ which is used by the [4mhis‐[0m
+[4mtory[24m  mechanism  of the shell and which cannot be [4mescaped[24m by
+placing it within ‘´’ characters.  It and the character  ‘´’
+itself can be preceded by a single ‘\’ to prevent their spe‐
+cial meaning.  Thus
+
+     echo \´\!
+
+prints
+
+     ´!
+
+These two mechanisms suffice to place any printing character
+into  a  word which is an argument to a shell command.  They
+can be combined, as in
+
+     echo \´´*´
+
+which prints
+
+     ´*
+
+since the first ‘\’ escaped the first ‘´’ and  the  ‘*’  was
+enclosed between ‘´’ characters.
+
+[1m1.8.  Terminating commands[0m
+
+     When you are executing a command and the shell is wait‐
+ing for it to complete there are several ways to force it to
+stop.  For instance if you type the command
+
+
+
+
+
+
+
+
+
+USD:4‐12                      An Introduction to the C shell
+
+
+     cat /etc/passwd
+
+the  system  will print a copy of a list of all users of the
+system on your terminal.  This is  likely  to  continue  for
+several  minutes unless you stop it.  You can send an INTER‐
+RUPT [4msignal[24m to the [4mcat[24m command by typing ^C on  your  termi‐
+nal.*   Since  [4mcat[24m does not take any precautions to avoid or
+otherwise handle this signal the INTERRUPT will cause it  to
+terminate.   The  shell  notices that [4mcat[24m has terminated and
+prompts you again with ‘% ’.  If you  hit  INTERRUPT  again,
+the  shell  will just repeat its prompt since it handles IN‐
+TERRUPT signals and chooses to continue to execute  commands
+rather  than  terminating like [4mcat[24m did, which would have the
+effect of logging you out.
+
+     Another way in which many programs  terminate  is  when
+they get an end‐of‐file from their standard input.  Thus the
+[4mmail[24m program in the first example above was terminated  when
+we  typed a ^D which generates an end‐of‐file from the stan‐
+dard input.  The shell also terminates when it gets an  end‐
+of‐file  printing  ‘logout’; UNIX then logs you off the sys‐
+tem.  Since this means that typing too many ^D’s  can  acci‐
+dentally  log us off, the shell has a mechanism for prevent‐
+ing this.  This [4mignoreeof[24m option will be discussed  in  sec‐
+tion 2.2.
+
+     If  a  command has its standard input redirected from a
+file, then it will normally terminate when  it  reaches  the
+end of this file.  Thus if we execute
+
+     mail bill < prepared.text
+
+the  mail  command  will  terminate without our typing a ^D.
+This is because it read to the end‐of‐file of our file ‘pre‐
+pared.text’  in which we placed a message for ‘bill’ with an
+editor program.  We could also have done
+
+     cat prepared.text | mail bill
+
+since the [4mcat[24m command  would  then  have  written  the  text
+through  the pipe to the standard input of the mail command.
+When the [4mcat[24m command completed  it  would  have  terminated,
+closing  down  the  pipeline and the [4mmail[24m command would have
+received an end‐of‐file from it  and  terminated.   Using  a
+pipe  here  is more complicated than redirecting input so we
+would more likely use the first form.  These commands  could
+also have been stopped by sending an INTERRUPT.
+
+     Another  possibility  for stopping a command is to sus‐
+pend its execution  temporarily,  with  the  possibility  of
+───────────
+*On  some older Unix systems the DEL or RUBOUT key
+has the same effect. "stty all" will tell you  the
+INTR key value.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐13
+
+
+continuing  execution later.  This is done by sending a STOP
+signal via typing a ^Z.  This  signal  causes  all  commands
+running  on the terminal (usually one but more if a pipeline
+is executing) to become suspended.  The shell  notices  that
+the command(s) have been suspended, types ‘Stopped’ and then
+prompts for a new command.  The previously executing command
+has  been  suspended,  but  otherwise unaffected by the STOP
+signal.  Any other commands can be executed while the origi‐
+nal command remains suspended.  The suspended command can be
+continued using the [4mfg[24m command with no arguments.  The shell
+will  then retype the command to remind you which command is
+being continued, and cause the command to resume  execution.
+Unless  any input files in use by the suspended command have
+been changed in the meantime, the suspension has  no  effect
+whatsoever  on  the  execution of the command.  This feature
+can be very useful during editing, when you need to look  at
+another  file before continuing.  An example of command sus‐
+pension follows.
+
+     % mail harold
+     Someone just copied a big file into my directory and its name is
+     ^Z
+     Stopped
+     % ls
+     funnyfile
+     prog.c
+     prog.o
+     % jobs
+     [1]  + Stopped   mail harold
+     % fg
+     mail harold
+     funnyfile. Do you know who did it?
+     EOT
+     %
+
+In this example someone was sending a message to Harold  and
+forgot  the name of the file he wanted to mention.  The mail
+command was suspended by typing ^Z.  When the shell  noticed
+that  the mail program was suspended, it typed ‘Stopped’ and
+prompted for a new command.  Then the [4mls[24m command  was  typed
+to  find out the name of the file.  The [4mjobs[24m command was run
+to find out which command was suspended.  At this  time  the
+[4mfg[24m  command was typed to continue execution of the mail pro‐
+gram.  Input to the mail  program  was  then  continued  and
+ended  with  a  ^D which indicated the end of the message at
+which time the mail program typed  EOT.   The  [4mjobs[24m  command
+will  show which commands are suspended.  The ^Z should only
+be typed at the beginning of a line since  everything  typed
+on  the current line is discarded when a signal is sent from
+the keyboard.  This also happens on INTERRUPT, and QUIT sig‐
+nals.   More  information on suspending jobs and controlling
+them is given in section 2.6.
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐14                      An Introduction to the C shell
+
+
+     If you write or run programs which are  not  fully  de‐
+bugged  then  it  may be necessary to stop them somewhat un‐
+gracefully.  This can be done by sending them a QUIT signal,
+sent by typing a ^\.  This will usually provoke the shell to
+produce a message like:
+
+     Quit (Core dumped)
+
+indicating that a file ‘core’ has  been  created  containing
+information about the running program’s state when it termi‐
+nated due to the QUIT signal.  You  can  examine  this  file
+yourself,  or  forward  information to the maintainer of the
+program telling him/her where the [4mcore[24m [4mfile[24m is.
+
+     If you run background commands (as explained in section
+2.6) then these commands will ignore INTERRUPT and QUIT sig‐
+nals at the terminal.  To stop them you must  use  the  [4mkill[0m
+command.  See section 2.6 for an example.
+
+     If  you want to examine the output of a command without
+having it move off the screen as the output of the
+
+     cat /etc/passwd
+
+command will, you can use the command
+
+     more /etc/passwd
+
+The [4mmore[24m program pauses after each  complete  screenful  and
+types  ‘−−More−−’  at which point you can hit a space to get
+another screenful, a return to get another line,  a  ‘?’  to
+get  some  help  on other commands, or a ‘q’ to end the [4mmore[0m
+program.  You can also use more as a filter, i.e.
+
+     cat /etc/passwd | more
+
+works just like the more simple more command above.
+
+     For stopping output of commands not involving [4mmore[24m  you
+can  use  the  ^S key to stop the typeout.  The typeout will
+resume when you hit ^Q or any other key, but ^Q is  normally
+used because it only restarts the output and does not become
+input to the program which is running.  This works  well  on
+low‐speed  terminals, but at 9600 baud it is hard to type ^S
+and ^Q fast enough to paginate the output nicely, and a pro‐
+gram like [4mmore[24m is usually used.
+
+     An additional possibility is to use the ^O flush output
+character; when this character is typed, all output from the
+current  command is thrown away (quickly) until the next in‐
+put read occurs or until the next shell prompt.  This can be
+used to allow a command to complete without having to suffer
+through the output on a slow terminal; ^O is  a  toggle,  so
+flushing  can  be turned off by typing ^O again while output
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐15
+
+
+is being flushed.
+
+[1m1.9.  What now?[0m
+
+     We have so far seen a number of mechanisms of the shell
+and  learned  a lot about the way in which it operates.  The
+remaining sections will go yet further into the internals of
+the  shell,  but you will surely want to try using the shell
+before you go any further.  To try it you can log in to UNIX
+and type the following command to the system:
+
+     chsh myname /bin/csh
+
+Here  ‘myname’  should  be replaced by the name you typed to
+the system prompt of ‘login:’ to get onto the system.   Thus
+I  would use ‘chsh bill /bin/csh’.  [1mYou only have to do this[0m
+[1monce; it takes effect at next login.  [22mYou are now  ready  to
+try using [4mcsh.[0m
+
+     Before you do the ‘chsh’ command, the shell you are us‐
+ing when you log into the system  is  ‘/bin/sh’.   In  fact,
+much  of  the  above  discussion is applicable to ‘/bin/sh’.
+The next section will introduce many features particular  to
+[4mcsh[24m  so you should change your shell to [4mcsh[24m before you begin
+reading it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐16                      An Introduction to the C shell
+
+
+[1m2.  Details on the shell for terminal users[0m
+
+[1m2.1.  Shell startup and termination[0m
+
+     When you login, the shell is started by the  system  in
+your  [4mhome[24m  directory  and begins by reading commands from a
+file [4m.cshrc[24m in this directory.  All  shells  which  you  may
+start during your terminal session will read from this file.
+We will later see what kinds of commands are usefully placed
+there.   For  now  we  need not have this file and the shell
+does not complain about its absence.
+
+     A [4mlogin[24m [4mshell[24m, executed after you login to the  system,
+will,  after  it  reads  commands from [4m.cshrc,[24m read commands
+from a file [4m.login[24m also in your home directory.   This  file
+contains  commands  which you wish to do each time you login
+to the UNIX system.  My [4m.login[24m file looks something like:
+
+     set ignoreeof
+     set mail=(/usr/spool/mail/bill)
+     echo "${prompt}users" ; users
+     alias ts \
+          ´set noglob ; eval `tset −s −m dialup:c100rv4pna −m plugboard:?hp2621nl *`´;
+     ts; stty intr ^C kill ^U crt
+     set time=15 history=10
+     msgs −f
+     if (−e $mail) then
+          echo "${prompt}mail"
+          mail
+     endif
+
+
+     This file contains several commands to be  executed  by
+UNIX each time I login.  The first is a [4mset[24m command which is
+interpreted directly by the shell.  It sets the shell  vari‐
+able [4mignoreeof[24m which causes the shell to not log me off if I
+hit ^D.  Rather, I use the [4mlogout[24m command to log off of  the
+system.   By  setting  the [4mmail[24m variable, I ask the shell to
+watch for incoming mail to me.  Every 5  minutes  the  shell
+looks  for  this  file and tells me if more mail has arrived
+there.  An alternative to this is to put the command
+
+     biff y
+
+in place of this [4mset;[24m this will cause me to be notified  im‐
+mediately  when  mail arrives, and to be shown the first few
+lines of the new message.
+
+     Next I set the shell variable ‘time’  to  ‘15’  causing
+the  shell  to  automatically print out statistics lines for
+commands which execute for at least 15 seconds of CPU  time.
+The  variable  ‘history’ is set to 10 indicating that I want
+the shell to remember the last 10 commands  I  type  in  its
+[4mhistory[24m [4mlist[24m, (described later).
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐17
+
+
+     I  create an [4malias[24m ‘‘ts’’ which executes a [4mtset[24m(1) com‐
+mand setting up the modes of the terminal.   The  parameters
+to  [4mtset[24m  indicate the kinds of terminal which I usually use
+when not on a hardwired port.  I  then  execute  ‘‘ts’’  and
+also  use the [4mstty[24m command to change the interrupt character
+to ^C and the line kill character to ^U.
+
+     I then run the ‘msgs’ program, which provides  me  with
+any  system  messages which I have not seen before; the ‘−f’
+option here prevents it from telling me  anything  if  there
+are  no  new  messages.  Finally, if my mailbox file exists,
+then I run the ‘mail’ program to process my mail.
+
+     When the ‘mail’ and ‘msgs’ programs finish,  the  shell
+will finish processing my [4m.login[24m file and begin reading com‐
+mands from the terminal, prompting for each with ‘% ’.  When
+I  log  off  (by  giving  the [4mlogout[24m command) the shell will
+print ‘logout’ and execute commands from the file  ‘.logout’
+if  it  exists  in  my home directory.  After that the shell
+will terminate and UNIX will log me off the system.  If  the
+system  is  not  going down, I will receive a new login mes‐
+sage.  In any case, after the ‘logout’ message the shell  is
+committed to terminating and will take no further input from
+my terminal.
+
+[1m2.2.  Shell variables[0m
+
+     The shell maintains a set of [4mvariables.[24m  We  saw  above
+the  variables  [4mhistory[24m  and  [4mtime[24m which had values ‘10’ and
+‘15’.  In fact, each shell variable has as value an array of
+zero  or more [4mstrings.[24m  Shell variables may be assigned val‐
+ues by the set command.  It has several forms, the most use‐
+ful of which was given above and is
+
+     set name=value
+
+
+     Shell  variables  may be used to store values which are
+to be used in commands later through a  substitution  mecha‐
+nism.   The  shell  variables  most commonly referenced are,
+however, those which the shell itself refers to.  By  chang‐
+ing  the  values  of these variables one can directly affect
+the behavior of the shell.
+
+     One of the most important  variables  is  the  variable
+[4mpath.[24m   This variable contains a sequence of directory names
+where the shell searches for commands.  The [4mset[24m command with
+no  arguments shows the value of all variables currently de‐
+fined (we usually say [4mset)[24m in the shell.  The default  value
+for path will be shown by [4mset[24m to be
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐18                      An Introduction to the C shell
+
+
+     % set
+     argv   ()
+     cwd    /usr/bill
+     home   /usr/bill
+     path   (. /usr/ucb /bin /usr/bin)
+     prompt %
+     shell  /bin/csh
+     status 0
+     term   c100rv4pna
+     user   bill
+     %
+
+This  output  indicates that the variable path points to the
+current  directory  ‘.’  and  then  ‘/usr/ucb’,  ‘/bin’  and
+‘/usr/bin’.   Commands  which  you may write might be in ‘.’
+(usually one of your directories).   Commands  developed  at
+Berkeley,  live  in  ‘/usr/ucb’  while commands developed at
+Bell Laboratories live in ‘/bin’ and ‘/usr/bin’.
+
+     A number of locally developed programs  on  the  system
+live  in  the  directory  ‘/usr/local’.  If we wish that all
+shells which we invoke to have access to these new  programs
+we can place the command
+
+     set path=(. /usr/ucb /bin /usr/bin /usr/local)
+
+in  our  file  [4m.cshrc[24m in our home directory.  Try doing this
+and then logging out and back in and do
+
+     set
+
+again to see that the value assigned to [4mpath[24m has changed.
+
+     One thing you should be aware of is that the shell  ex‐
+amines  each  directory  which you insert into your path and
+determines which commands are contained there.   Except  for
+the current directory ‘.’, which the shell treats specially,
+this means that if commands are added to a directory in your
+search  path after you have started the shell, they will not
+necessarily be found by the shell.  If you  wish  to  use  a
+command  which  has  been added in this way, you should give
+the command
+
+     rehash
+
+to the shell, which will cause it to recompute its  internal
+table  of  command locations, so that it will find the newly
+added command.  Since the shell has to look in  the  current
+directory  ‘.’ on each command, placing it at the end of the
+path specification usually works  equivalently  and  reduces
+───────────
+  † Another directory that might interest  you  is
+/usr/new, which contains many useful user‐contrib‐
+uted programs provided with Berkeley Unix.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐19
+
+
+overhead.
+
+     Other  useful  built in variables are the variable [4mhome[0m
+which shows your home directory,  [4mcwd[24m  which  contains  your
+current  working directory, the variable [4mignoreeof[24m which can
+be set in your [4m.login[24m file to tell the  shell  not  to  exit
+when  it  receives  an  end‐of‐file  from a terminal (as de‐
+scribed above).  The variable ‘ignoreeof’ is one of  several
+variables  which the shell does not care about the value of,
+only whether they are [4mset[24m or [4munset.[24m  Thus to set this  vari‐
+able you simply do
+
+     set ignoreeof
+
+and to unset it do
+
+     unset ignoreeof
+
+These  give  the  variable ‘ignoreeof’ no value, but none is
+desired or required.
+
+     Finally, some other built‐in shell variables of use are
+the variables [4mnoclobber[24m and [4mmail.[24m  The metasyntax
+
+     > filename
+
+which  redirects the standard output of a command will over‐
+write and destroy the previous contents of the  named  file.
+In  this  way you may accidentally overwrite a file which is
+valuable.  If you would prefer that the shell not  overwrite
+files in this way you can
+
+     set noclobber
+
+in your [4m.login[24m file.  Then trying to do
+
+     date > now
+
+would  cause  a  diagnostic  if  ‘now’ existed already.  You
+could type
+
+     date >!  now
+
+if you really wanted to overwrite  the  contents  of  ‘now’.
+The  ‘>!’ is a special metasyntax indicating that clobbering
+the file is ok.†
+
+
+
+───────────
+†The space between the ‘!’ and the word  ‘now’  is
+critical here, as ‘!now’ would be an invocation of
+the [4mhistory[24m mechanism, and have a totally  differ‐
+ent effect.
+
+
+
+
+
+
+
+
+
+USD:4‐20                      An Introduction to the C shell
+
+
+[1m2.3.  The shell’s history list[0m
+
+     The  shell  can  maintain  a [4mhistory[24m [4mlist[24m into which it
+places the words of previous commands.  It  is  possible  to
+use  a  notation to reuse commands or words from commands in
+forming new commands.  This mechanism can be used to  repeat
+previous  commands  or  to  correct minor typing mistakes in
+commands.
+
+     The following figure gives a sample  session  involving
+typical  usage  of  the  history mechanism of the shell.  In
+this example we have a very simple C program which has a bug
+(or  two)  in  it in the file ‘bug.c’, which we ‘cat’ out on
+our terminal.  We then try to run the C compiler on it,  re‐
+ferring to the file again as ‘!$’, meaning the last argument
+to the previous command.  Here the ‘!’ is the history mecha‐
+nism  invocation  metacharacter,  and the ‘$’ stands for the
+last argument, by analogy to ‘$’ in the editor which  stands
+for  the  end of the line.  The shell echoed the command, as
+it would have been typed without use of the  history  mecha‐
+nism,  and  then executed it.  The compilation yielded error
+diagnostics so we now run the editor on  the  file  we  were
+trying  to  compile,  fix  the  bug,  and run the C compiler
+again, this time referring to this command simply  as  ‘!c’,
+which repeats the last command which started with the letter
+‘c’.  If there were other commands starting  with  ‘c’  done
+recently  we  could  have  said  ‘!cc’ or even ‘!cc:p’ which
+would have printed the last command starting with ‘cc’ with‐
+out executing it.
+
+     After  this recompilation, we ran the resulting ‘a.out’
+file, and then noting that there still was a  bug,  ran  the
+editor  again.   After  fixing the program we ran the C com‐
+piler again, but tacked onto the command an extra  ‘−o  bug’
+telling  the  compiler  to place the resultant binary in the
+file ‘bug’ rather than ‘a.out’.   In  general,  the  history
+mechanisms may be used anywhere in the formation of new com‐
+mands and other characters may be placed  before  and  after
+the substituted commands.
+
+     We then ran the ‘size’ command to see how large the bi‐
+nary program images we have created were, and  then  an  ‘ls
+−l’  command with the same argument list, denoting the argu‐
+ment list ‘*’.  Finally we ran the program ‘bug’ to see that
+its output is indeed correct.
+
+     To  make  a  numbered listing of the program we ran the
+‘num’ command on the file ‘bug.c’.  In order to compress out
+blank lines in the output of ‘num’ we ran the output through
+the filter ‘ssp’, but misspelled it as spp.  To correct this
+we  used  a  shell  substitute, placing the old text and new
+text between ‘^’ characters.  This is similar to the substi‐
+tute  command  in the editor.  Finally, we repeated the same
+command with ‘!!’, but sent its output to the line printer.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐21
+
+
+
+     % cat bug.c
+     main()
+
+     {
+          printf("hello);
+     }
+     % cc !$
+     cc bug.c
+     "bug.c", line 4: newline in string or char constant
+     "bug.c", line 5: syntax error
+     % ed !$
+     ed bug.c
+     29
+     4s/);/"&/p
+             printf("hello");
+     w
+     30
+     q
+     % !c
+     cc bug.c
+     % a.out
+     hello% !e
+     ed bug.c
+     30
+     4s/lo/lo\\n/p
+             printf("hello\n");
+     w
+     32
+     q
+     % !c −o bug
+     cc bug.c −o bug
+     % size a.out bug
+     a.out: 2784+364+1028 = 4176b = 0x1050b
+     bug: 2784+364+1028 = 4176b = 0x1050b
+     % ls −l !*
+     ls −l a.out bug
+     −rwxr−xr−x 1 bill       3932 Dec 19 09:41 a.out
+     −rwxr−xr−x 1 bill       3932 Dec 19 09:42 bug
+     % bug
+     hello
+     % num bug.c | spp
+     spp: Command not found.
+     % ^spp^ssp
+     num bug.c | ssp
+         1     main()
+         3     {
+         4          printf("hello\n");
+         5     }
+     % !! | lpr
+     num bug.c | ssp | lpr
+     %
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐22                      An Introduction to the C shell
+
+
+     There are other mechanisms available for repeating com‐
+mands.   The [4mhistory[24m command prints out a number of previous
+commands with numbers  by  which  they  can  be  referenced.
+There  is  a way to refer to a previous command by searching
+for a string which appeared in it, and there are other, less
+useful,  ways  to  select arguments to include in a new com‐
+mand.  A complete description of  all  these  mechanisms  is
+given  in  the C shell manual pages in the UNIX Programmer’s
+Manual.
+
+[1m2.4.  Aliases[0m
+
+     The shell has an [4malias[24m mechanism which can be  used  to
+make  transformations on input commands.  This mechanism can
+be used to simplify the commands you type, to supply default
+arguments to commands, or to perform transformations on com‐
+mands and their arguments.  The alias facility is similar to
+a macro facility.  Some of the features obtained by aliasing
+can be obtained also using shell command  files,  but  these
+take  place  in another instance of the shell and cannot di‐
+rectly affect the current shells environment or involve com‐
+mands such as [4mcd[24m which must be done in the current shell.
+
+     As  an  example, suppose that there is a new version of
+the mail program on the system called ‘newmail’ you wish  to
+use,  rather  than the standard mail program which is called
+‘mail’.  If you place the shell command
+
+     alias mail newmail
+
+in your [4m.cshrc[24m file, the shell will transform an input  line
+of the form
+
+     mail bill
+
+into  a  call on ‘newmail’.  More generally, suppose we wish
+the command ‘ls’ to always show sizes of files, that  is  to
+always do ‘−s’.  We can do
+
+     alias ls ls −s
+
+or even
+
+     alias dir ls −s
+
+creating  a  new command syntax ‘dir’ which does an ‘ls −s’.
+If we say
+
+     dir ~bill
+
+then the shell will translate this to
+
+     ls −s /mnt/bill
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐23
+
+
+     Thus the [4malias[24m mechanism can be used to  provide  short
+names for commands, to provide default arguments, and to de‐
+fine new short commands in terms of other commands.   It  is
+also  possible to define aliases which contain multiple com‐
+mands or pipelines, showing where the arguments to the orig‐
+inal  command  are to be substituted using the facilities of
+the history mechanism.  Thus the definition
+
+     alias cd ´cd \!* ; ls ´
+
+would do an [4mls[24m command after each change directory  [4mcd[24m  com‐
+mand.   We enclosed the entire alias definition in ‘´’ char‐
+acters to prevent most substitutions from occurring and  the
+character ‘;’ from being recognized as a metacharacter.  The
+‘!’ here is escaped with a ‘\’ to prevent it from being  in‐
+terpreted  when  the  alias  command is typed in.  The ‘\!*’
+here substitutes the entire argument list to the  pre‐alias‐
+ing [4mcd[24m command, without giving an error if there were no ar‐
+guments.  The ‘;’ separating commands is used here to  indi‐
+cate that one command is to be done and then the next.  Sim‐
+ilarly the definition
+
+     alias whois ´grep \!^ /etc/passwd´
+
+defines a command which looks up its first argument  in  the
+password file.
+
+     [1mWarning: [22mThe shell currently reads the [4m.cshrc[24m file each
+time it starts up.  If you place a large number of  commands
+there,  shells  will  tend to start slowly.  A mechanism for
+saving the shell environment after reading the  [4m.cshrc[24m  file
+and  quickly  restoring it is under development, but for now
+you should try to limit the number of aliases you have to  a
+reasonable  number...  10 or 15 is reasonable, 50 or 60 will
+cause a noticeable delay in starting up shells, and make the
+system  seem  sluggish when you execute commands from within
+the editor and other programs.
+
+[1m2.5.  More redirection; >> and >&[0m
+
+     There are a few more notations useful to  the  terminal
+user which have not been introduced yet.
+
+     In  addition to the standard output, commands also have
+a [4mdiagnostic[24m [4moutput[24m which is normally directed to the termi‐
+nal even when the standard output is redirected to a file or
+a pipe.  It is occasionally desirable to direct the diagnos‐
+tic  output along with the standard output.  For instance if
+you want to redirect the output of a  long  running  command
+into  a file and wish to have a record of any error diagnos‐
+tic it produces you can do
+
+     command >& file
+
+
+
+
+
+
+
+
+
+
+USD:4‐24                      An Introduction to the C shell
+
+
+The ‘>&’ here tells the shell to route both  the  diagnostic
+output  and  the standard output into ‘file’.  Similarly you
+can give the command
+
+     command |& lpr
+
+to route both standard and  diagnostic  output  through  the
+pipe to the line printer daemon [4mlpr.‡[0m
+
+     Finally, it is possible to use the form
+
+     command >> file
+
+to place output at the end of an existing file.†
+
+[1m2.6.  Jobs; Background, Foreground, or Suspended[0m
+
+     When one or more commands are typed together as a pipe‐
+line or as a sequence of commands separated by semicolons, a
+single  [4mjob[24m is created by the shell consisting of these com‐
+mands together as a unit.  Single commands without pipes  or
+semicolons  create  the  simplest jobs.  Usually, every line
+typed to the shell creates a job.  Some  lines  that  create
+jobs (one per line) are
+
+     sort < data
+     ls −s | sort −n | head −5
+     mail harold
+
+
+     If  the  metacharacter  ‘&’  is typed at the end of the
+commands, then the job is started as a [4mbackground[24m job.  This
+means  that  the  shell does not wait for it to complete but
+immediately prompts and is ready for another  command.   The
+job  runs  [4min[24m  [4mthe[24m  [4mbackground[24m  at the same time that normal
+jobs, called [4mforeground[24m jobs, continue to be read  and  exe‐
+cuted by the shell one at a time.  Thus
+
+     du > usage &
+
+would run the [4mdu[24m program, which reports on the disk usage of
+your working directory (as well  as  any  directories  below
+it),  put  the  output  into  the  file  ‘usage’  and return
+───────────
+‡ A command of the form
+     command >&! file
+exists, and is used when [4mnoclobber[24m is set and [4mfile[0m
+already exists.
+† If [4mnoclobber[24m is set, then an error  will  result
+if  [4mfile[24m  does not exist, otherwise the shell will
+create [4mfile[24m if it doesn’t exist.  A form
+     command >>! file
+makes it not be an error for  file  to  not  exist
+when [4mnoclobber[24m is set.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐25
+
+
+immediately with a prompt for the next command  without  out
+waiting for [4mdu[24m to finish.  The [4mdu[24m program would continue ex‐
+ecuting in the background until it finished, even though you
+can type and execute more commands in the mean time.  When a
+background job terminates, a message is typed by  the  shell
+just  before  the  next  prompt telling you that the job has
+completed.  In the following example  the  [4mdu[24m  job  finishes
+sometime  during  the  execution of the [4mmail[24m command and its
+completion is reported just before the prompt after the [4mmail[0m
+job is finished.
+
+     % du > usage &
+     [1] 503
+     % mail bill
+     How do you know when a background job is finished?
+     EOT
+     [1] − Done       du > usage
+     %
+
+If  the  job  did  not terminate normally the ‘Done’ message
+might say something else like ‘Killed’.   If  you  want  the
+terminations  of  background jobs to be reported at the time
+they occur (possibly interrupting the output of other  fore‐
+ground  jobs), you can set the [4mnotify[24m variable.  In the pre‐
+vious example this would mean that the ‘Done’ message  might
+have come right in the middle of the message to Bill.  Back‐
+ground jobs are unaffected by any signals from the  keyboard
+like the STOP, INTERRUPT, or QUIT signals mentioned earlier.
+
+     Jobs  are  recorded  in  a table inside the shell until
+they terminate.  In this table, the shell remembers the com‐
+mand  names,  arguments  and the [4mprocess[24m [4mnumbers[24m of all com‐
+mands in the job as well as the working directory where  the
+job was started.  Each job in the table is either running [4min[0m
+[4mthe[24m [4mforeground[24m with the shell waiting for it  to  terminate,
+running  [4min[24m  [4mthe[24m [4mbackground,[24m or [4msuspended.[24m  Only one job can
+be running in the foreground at one time, but  several  jobs
+can  be  suspended or running in the background at once.  As
+each job is started, it is assigned a small identifying num‐
+ber  called  the [4mjob[24m [4mnumber[24m which can be used later to refer
+to the job in the commands described below.  Job numbers re‐
+main the same until the job terminates and then are re‐used.
+
+     When  a job is started in the background using ‘&’, its
+number, as well as the  process  numbers  of  all  its  (top
+level)  commands, is typed by the shell before prompting you
+for another command.  For example,
+
+     % ls −s | sort −n > usage &
+     [2] 2034 2035
+     %
+
+runs the ‘ls’ program with the ‘−s’ options, pipes this out‐
+put  into the ‘sort’ program with the ‘−n’ option which puts
+
+
+
+
+
+
+
+
+
+USD:4‐26                      An Introduction to the C shell
+
+
+its output into the file ‘usage’.  Since the ‘&’ was at  the
+end of the line, these two programs were started together as
+a background job.  After starting the job, the shell  prints
+the  job number in brackets (2 in this case) followed by the
+process number of each program started in the job.  Then the
+shell  immediates prompts for a new command, leaving the job
+running simultaneously.
+
+     As mentioned in section  1.8,  foreground  jobs  become
+[4msuspended[24m by typing ^Z which sends a STOP signal to the cur‐
+rently running foreground job.  A background job can  become
+suspended  by  using the [4mstop[24m command described below.  When
+jobs are suspended they merely stop any further progress un‐
+til  started  again,  either  in the foreground or the back‐
+ground.  The shell notices when a job  becomes  stopped  and
+reports  this  fact, much like it reports the termination of
+background jobs.  For foreground jobs this looks like
+
+     % du > usage
+     ^Z
+     Stopped
+     %
+
+‘Stopped’ message is typed by the shell when it notices that
+the [4mdu[24m program stopped.  For background jobs, using the [4mstop[0m
+command, it is
+
+     % sort usage &
+     [1] 2345
+     % stop %1
+     [1] + Stopped (signal)sort usage
+     %
+
+Suspending foreground jobs can be very useful when you  need
+to temporarily change what you are doing (execute other com‐
+mands) and then return to the suspended  job.   Also,  fore‐
+ground  jobs  can  be  suspended and then continued as back‐
+ground jobs using the [4mbg[24m command, allowing you  to  continue
+other  work  and stop waiting for the foreground job to fin‐
+ish.  Thus
+
+     % du > usage
+     ^Z
+     Stopped
+     % bg
+     [1] du > usage &
+     %
+
+starts ‘du’ in the foreground, stops it before it  finishes,
+then continues it in the background allowing more foreground
+commands to be executed.  This is especially helpful when  a
+foreground  job  ends up taking longer than you expected and
+you wish you had started it in the background in the  begin‐
+ning.
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐27
+
+
+     All  [4mjob[24m  [4mcontrol[24m  commands  can  take an argument that
+identifies a particular job.  All job name  arguments  begin
+with  the  character ‘%’, since some of the job control com‐
+mands also accept process numbers (printed by  the  [4mps[24m  com‐
+mand.)   The  default  job  (when  no  argument is given) is
+called the [4mcurrent[24m job and is identified by  a  ‘+’  in  the
+output  of  the [4mjobs[24m command, which shows you which jobs you
+have.  When only one job is stopped or running in the  back‐
+ground (the usual case) it is always the current job thus no
+argument is needed.  If a job is stopped  while  running  in
+the  foreground  it becomes the [4mcurrent[24m job and the existing
+current job becomes the [4mprevious[24m job − identified by  a  ‘−’
+in the output of [4mjobs.[24m  When the current job terminates, the
+previous job becomes the current job.  When given, the argu‐
+ment  is  either  ‘%−’  (indicating the previous job); ‘%#’,
+where # is the job number; ‘%pref’ where pref is some unique
+prefix of the command name and arguments of one of the jobs;
+or ‘%?’ followed by some string found in  only  one  of  the
+jobs.
+
+     The  [4mjobs[24m  command  types the table of jobs, giving the
+job number, commands and status (‘Stopped’ or ‘Running’)  of
+each  background or suspended job.  With the ‘−l’ option the
+process numbers are also typed.
+
+     % du > usage &
+     [1] 3398
+     % ls −s | sort −n > myfile &
+     [2] 3405
+     % mail bill
+     ^Z
+     Stopped
+     % jobs
+     [1] − Running    du > usage
+     [2]    Running   ls −s | sort −n > myfile
+     [3] + Stopped    mail bill
+     % fg %ls
+     ls −s | sort −n > myfile
+     % more myfile
+
+
+     The [4mfg[24m command runs a suspended or  background  job  in
+the  foreground.   It  is  used to restart a previously sus‐
+pended job or change a background job to run  in  the  fore‐
+ground  (allowing  signals  or input from the terminal).  In
+the above example we used [4mfg[24m to change the ‘ls’ job from the
+background  to the foreground since we wanted to wait for it
+to finish before looking at its output file.  The [4mbg[24m command
+runs  a suspended job in the background.  It is usually used
+after stopping the currently running foreground job with the
+STOP  signal.  The combination of the STOP signal and the [4mbg[0m
+command changes a foreground job into a background job.  The
+[4mstop[24m command suspends a background job.
+
+
+
+
+
+
+
+
+
+
+USD:4‐28                      An Introduction to the C shell
+
+
+     The  [4mkill[24m  command terminates a background or suspended
+job immediately.  In addition  to  jobs,  it  may  be  given
+process  numbers  as  arguments, as printed by [4mps.[24m  Thus, in
+the example above, the running [4mdu[24m command  could  have  been
+terminated by the command
+
+     % kill %1
+     [1]  Terminated  du > usage
+     %
+
+
+     The [4mnotify[24m command (not the variable mentioned earlier)
+indicates that the termination of a specific job  should  be
+reported  at the time it finishes instead of waiting for the
+next prompt.
+
+     If a job running in the background tries to read  input
+from  the terminal it is automatically stopped.  When such a
+job is then run in the foreground, input can be given to the
+job.  If desired, the job can be run in the background again
+until it requests input again.  This is illustrated  in  the
+following  sequence where the ‘s’ command in the text editor
+might take a long time.
+
+     % ed bigfile
+     120000
+     1,$s/thisword/thatword/
+     ^Z
+     Stopped
+     % bg
+     [1] ed bigfile &
+     %
+      . . .  some foreground commands
+     [1] Stopped (tty input)ed bigfile
+     % fg
+     ed bigfile
+     w
+     120000
+     q
+     %
+
+So after the ‘s’  command  was  issued,  the  ‘ed’  job  was
+stopped  with  ^Z  and  then put in the background using [4mbg.[0m
+Some time later when the ‘s’ command was finished, [4med[24m  tried
+to  read another command and was stopped because jobs in the
+background cannot read from the terminal.   The  [4mfg[24m  command
+returned  the ‘ed’ job to the foreground where it could once
+again accept commands from the terminal.
+
+     The command
+
+     stty tostop
+
+causes all background jobs run on your terminal to stop when
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐29
+
+
+they  are  about to write output to the terminal.  This pre‐
+vents messages from background jobs from interrupting  fore‐
+ground  job  output and allows you to run a job in the back‐
+ground without losing terminal output.  It also can be  used
+for  interactive  programs  that sometimes have long periods
+without interaction.  Thus each time it outputs a prompt for
+more  input  it will stop before the prompt.  It can then be
+run in the foreground using [4mfg,[24m more input can be given and,
+if  necessary  stopped and returned to the background.  This
+[4mstty[24m command might be a good thing to  put  in  your  [4m.login[0m
+file  if  you do not like output from background jobs inter‐
+rupting your work.  It also can reduce the  need  for  redi‐
+recting  the  output of background jobs if the output is not
+very big:
+
+     % stty tostop
+     % wc hugefile &
+     [1] 10387
+     % ed text
+     . . . some time later
+     q
+     [1] Stopped (tty output)wc hugefile
+     % fg wc
+     wc hugefile
+        13371   30123   302577
+     % stty −tostop
+
+Thus after some time the  ‘wc’  command,  which  counts  the
+lines,  words and characters in a file, had one line of out‐
+put.  When it  tried  to  write  this  to  the  terminal  it
+stopped.   By  restarting it in the foreground we allowed it
+to write on the terminal exactly when we were ready to  look
+at its output.  Programs which attempt to change the mode of
+the terminal will also block, whether or not [4mtostop[24m is  set,
+when they are not in the foreground, as it would be very un‐
+pleasant to have a background job change the  state  of  the
+terminal.
+
+     Since  the [4mjobs[24m command only prints jobs started in the
+currently executing shell, it knows nothing about background
+jobs  started in other login sessions or within shell files.
+The [4mps[24m can be used in this case to find out about background
+jobs not started in the current shell.
+
+[1m2.7.  Working Directories[0m
+
+     As  mentioned  in section 1.6, the shell is always in a
+particular [4mworking[24m [4mdirectory.[24m  The ‘change  directory’  com‐
+mand  [4mchdir[24m (its short form [4mcd[24m may also be used) changes the
+working directory of the shell, that is, changes the  direc‐
+tory you are located in.
+
+     It  is  useful to make a directory for each project you
+wish to work on and to  place  all  files  related  to  that
+
+
+
+
+
+
+
+
+
+USD:4‐30                      An Introduction to the C shell
+
+
+project  in  that  directory.  The ‘make directory’ command,
+[4mmkdir,[24m creates a new directory.  The [4mpwd[24m (‘print working di‐
+rectory’) command reports the absolute pathname of the work‐
+ing directory of the shell, that is, the directory  you  are
+located in.  Thus in the example below:
+
+     % pwd
+     /usr/bill
+     % mkdir newpaper
+     % chdir newpaper
+     % pwd
+     /usr/bill/newpaper
+     %
+
+the  user  has  created and moved to the directory [4mnewpaper.[0m
+where, for example, he might place a group of related files.
+
+     No matter where you have moved to in a directory  hier‐
+archy,  you can return to your ‘home’ login directory by do‐
+ing just
+
+     cd
+
+with no arguments.  The name ‘..’ always means the directory
+above the current one in the hierarchy, thus
+
+     cd ..
+
+changes  the  shell’s  working directory to the one directly
+above the current one.  The name ‘..’ can  be  used  in  any
+pathname, thus,
+
+     cd ../programs
+
+means  change  to  the directory ‘programs’ contained in the
+directory above the current one.  If you have several direc‐
+tories  for  different projects under, say, your home direc‐
+tory, this shorthand notation permits you to  switch  easily
+between them.
+
+     The  shell always remembers the pathname of its current
+working directory in the variable [4mcwd.[24m  The shell  can  also
+be  requested  to  remember  the previous directory when you
+change to a new working directory.  If the ‘push  directory’
+command  [4mpushd[24m is used in place of the [4mcd[24m command, the shell
+saves the name of the current working directory on a  [4mdirec‐[0m
+[4mtory[24m [4mstack[24m before changing to the new one.  You can see this
+list at any time by typing the ‘directories’ command [4mdirs.[0m
+
+     % pushd newpaper/references
+     ~/newpaper/references  ~
+     % pushd /usr/lib/tmac
+     /usr/lib/tmac  ~/newpaper/references  ~
+     % dirs
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐31
+
+
+     /usr/lib/tmac  ~/newpaper/references  ~
+     % popd
+     ~/newpaper/references  ~
+     % popd
+     ~
+     %
+
+The list is printed in a horizontal line,  reading  left  to
+right,  with  a  tilde (~) as shorthand for your home direc‐
+tory—in this  case  ‘/usr/bill’.   The  directory  stack  is
+printed  whenever  there is more than one entry on it and it
+changes.  It is also printed by a  [4mdirs[24m  command.   [4mDirs[24m  is
+usually  faster and more informative than [4mpwd[24m since it shows
+the current working directory as well as any other  directo‐
+ries remembered in the stack.
+
+     The  [4mpushd[24m command with no argument alternates the cur‐
+rent directory with the first directory in  the  list.   The
+‘pop directory’ [4mpopd[24m command without an argument returns you
+to the directory you were in prior to the current one,  dis‐
+carding  the previous current directory from the stack (for‐
+getting it).  Typing [4mpopd[24m several times in  a  series  takes
+you  backward  through  the  directories  you  had  been  in
+(changed to) by [4mpushd[24m command.  There are other  options  to
+[4mpushd[24m  and  [4mpopd[24m to manipulate the contents of the directory
+stack and to change to directories not at  the  top  of  the
+stack; see the [4mcsh[24m manual page for details.
+
+     Since  the  shell  remembers  the  working directory in
+which each job was started, it warns you when you  might  be
+confused  by  restarting a job in the foreground which has a
+different working directory than the current working  direc‐
+tory of the shell.  Thus if you start a background job, then
+change the shell’s working  directory  and  then  cause  the
+background job to run in the foreground, the shell warns you
+that the working directory of the  currently  running  fore‐
+ground job is different from that of the shell.
+
+     % dirs −l
+     /mnt/bill
+     % cd myproject
+     % dirs
+     ~/myproject
+     % ed prog.c
+     1143
+     ^Z
+     Stopped
+     % cd ..
+     % ls
+     myproject
+     textfile
+     % fg
+     ed prog.c (wd: ~/myproject)
+
+
+
+
+
+
+
+
+
+
+USD:4‐32                      An Introduction to the C shell
+
+
+This way the shell warns you when there is an implied change
+of working directory, even though no cd command was  issued.
+In   the   above   example   the   ‘ed’  job  was  still  in
+‘/mnt/bill/project’ even though the  shell  had  changed  to
+‘/mnt/bill’.   A  similar warning is given when such a fore‐
+ground job terminates or is suspended (using the  STOP  sig‐
+nal) since the return to the shell again implies a change of
+working directory.
+
+     % fg
+     ed prog.c (wd: ~/myproject)
+      . . . after some editing
+     q
+     (wd now: ~)
+     %
+
+These messages are sometimes confusing if you  use  programs
+that  change  their own working directories, since the shell
+only remembers which directory a job is started in, and  as‐
+sumes it stays there.  The ‘−l’ option of [4mjobs[24m will type the
+working directory of suspended or background jobs when it is
+different from the current working directory of the shell.
+
+[1m2.8.  Useful built‐in commands[0m
+
+     We  now  give  a few of the useful built‐in commands of
+the shell describing how they are used.
+
+     The [4malias[24m command described above is used to assign new
+aliases and to show the existing aliases.  With no arguments
+it prints the current aliases.  It may also  be  given  only
+one argument such as
+
+     alias ls
+
+to show the current alias for, e.g., ‘ls’.
+
+     The  [4mecho[24m  command  prints  its arguments.  It is often
+used in [4mshell[24m [4mscripts[24m or as an interactive  command  to  see
+what filename expansions will produce.
+
+     The  [4mhistory[24m command will show the contents of the his‐
+tory list.  The numbers given with the history events can be
+used  to  reference  previous  events which are difficult to
+reference using the contextual mechanisms introduced  above.
+There  is also a shell variable called [4mprompt.[24m  By placing a
+‘!’ character in its value the shell will  there  substitute
+the  number of the current command in the history list.  You
+can use this number to refer to this command  in  a  history
+substitution.  Thus you could
+
+     set prompt=´\! % ´
+
+Note  that  the  ‘!’  character  had to be [4mescaped[24m here even
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐33
+
+
+within ‘´’ characters.
+
+     The [4mlimit[24m command is used to restrict use of resources.
+With no arguments it prints the current limitations:
+
+     cputime   unlimited
+     filesize  unlimited
+     datasize  5616 kbytes
+     stacksize 512 kbytes
+     coredumpsizeunlimited
+
+Limits can be set, e.g.:
+
+     limit coredumpsize 128k
+
+Most  reasonable  units abbreviations will work; see the [4mcsh[0m
+manual page for more details.
+
+     The [4mlogout[24m command can be used  to  terminate  a  login
+shell which has [4mignoreeof[24m set.
+
+     The  [4mrehash[24m command causes the shell to recompute a ta‐
+ble of where commands are located.  This is necessary if you
+add  a  command to a directory in the current shell’s search
+path and wish the shell to  find  it,  since  otherwise  the
+hashing algorithm may tell the shell that the command wasn’t
+in that directory when the hash table was computed.
+
+     The [4mrepeat[24m command can be used to repeat a command sev‐
+eral  times.   Thus  to make 5 copies of the file [4mone[24m in the
+file [4mfive[24m you could do
+
+     repeat 5 cat one >> five
+
+
+     The [4msetenv[24m command can be used to set variables in  the
+environment.  Thus
+
+     setenv TERM adm3a
+
+will  set  the  value  of  the  environment variable TERM to
+‘adm3a’.  A user program [4mprintenv[24m exists  which  will  print
+out the environment.  It might then show:
+
+     % printenv
+     HOME=/usr/bill
+     SHELL=/bin/csh
+     PATH=:/usr/ucb:/bin:/usr/bin:/usr/local
+     TERM=adm3a
+     USER=bill
+     %
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐34                      An Introduction to the C shell
+
+
+     The  [4msource[24m  command  can  be used to force the current
+shell to read commands from a file.  Thus
+
+     source .cshrc
+
+can be used after editing in a change  to  the  [4m.cshrc[24m  file
+which you wish to take effect right away.
+
+     The  [4mtime[24m  command can be used to cause a command to be
+timed no matter how much CPU time it takes.  Thus
+
+     % time cp /etc/rc /usr/bill/rc
+     0.0u 0.1s 0:01 8% 2+1k 3+2io 1pf+0w
+     % time wc /etc/rc /usr/bill/rc
+          52    178   1347 /etc/rc
+          52    178   1347 /usr/bill/rc
+         104    356   2694 total
+     0.1u 0.1s 0:00 13% 3+3k 5+3io 7pf+0w
+     %
+
+indicates that the [4mcp[24m command used a  negligible  amount  of
+user  time  (u)  and  about 1/10th of a system time (s); the
+elapsed time was 1 second (0:01), there was an average  mem‐
+ory  usage of 2k bytes of program space and 1k bytes of data
+space over the cpu time involved  (2+1k);  the  program  did
+three  disk  reads and two disk writes (3+2io), and took one
+page fault and was not swapped  (1pf+0w).   The  word  count
+command  [4mwc[24m  on the other hand used 0.1 seconds of user time
+and 0.1 seconds of system time in  less  than  a  second  of
+elapsed  time.  The percentage ‘13%’ indicates that over the
+period when it was active the command ‘wc’ used  an  average
+of 13 percent of the available CPU cycles of the machine.
+
+     The  [4munalias[24m  and  [4munset[24m commands can be used to remove
+aliases and variable definitions from  the  shell,  and  [4mun‐[0m
+[4msetenv[24m removes variables from the environment.
+
+[1m2.9.  What else?[0m
+
+     This  concludes  the  basic discussion of the shell for
+terminal users.  There are more features of the shell to  be
+discussed  here, and all features of the shell are discussed
+in its manual pages.  One useful feature which is  discussed
+later  is  the [4mforeach[24m built‐in command which can be used to
+run the same command sequence with a number of different ar‐
+guments.
+
+     If you intend to use UNIX a lot you should look through
+the rest of this document and the  csh  manual  pages  (sec‐
+tion1)  to  become  familiar with the other facilities which
+are available to you.
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐35
+
+
+[1m3.  Shell control structures and command scripts[0m
+
+[1m3.1.  Introduction[0m
+
+     It is possible to place commands in files and to  cause
+shells to be invoked to read and execute commands from these
+files, which are called [4mshell[24m [4mscripts.[24m  We here detail those
+features of the shell useful to the writers of such scripts.
+
+[1m3.2.  Make[0m
+
+     It  is  important  to first note what shell scripts are
+[4mnot[24m useful for.  There is a program  called  [4mmake[24m  which  is
+very useful for maintaining a group of related files or per‐
+forming sets of operations on related files.  For instance a
+large  program  consisting of one or more files can have its
+dependencies described in a [4mmakefile[24m which contains  defini‐
+tions  of  the commands used to create these different files
+when changes occur.  Definitions of the means  for  printing
+listings,  cleaning  up the directory in which the files re‐
+side, and installing the resultant programs are easily,  and
+most  appropriately placed in this [4mmakefile.[24m  This format is
+superior and preferable to maintaining a group of shell pro‐
+cedures to maintain these files.
+
+     Similarly  when working on a document a [4mmakefile[24m may be
+created which defines how different versions of the document
+are  to  be  created and which options of [4mnroff[24m or [4mtroff[24m are
+appropriate.
+
+[1m3.3.  Invocation and the argv variable[0m
+
+     A [4mcsh[24m command script may be interpreted by saying
+
+     % csh script ...
+
+where [4mscript[24m is the name of the file containing a  group  of
+[4mcsh[24m  commands  and  ‘...’ is replaced by a sequence of argu‐
+ments.  The shell places these  arguments  in  the  variable
+[4margv[24m  and  then  begins  to  read  commands from the script.
+These parameters are then available through the same  mecha‐
+nisms which are used to reference any other shell variables.
+
+     If you make the file ‘script’ executable by doing
+
+     chmod 755 script
+
+and  place  a  shell  comment  at the beginning of the shell
+script (i.e. begin the file with a  ‘#’  character)  then  a
+‘/bin/csh’ will automatically be invoked to execute ‘script’
+when you type
+
+     script
+
+
+
+
+
+
+
+
+
+
+USD:4‐36                      An Introduction to the C shell
+
+
+If the file does not begin with  a  ‘#’  then  the  standard
+shell ‘/bin/sh’ will be used to execute it.  This allows you
+to convert your older shell scripts to use [4mcsh[24m at your  con‐
+venience.
+
+[1m3.4.  Variable substitution[0m
+
+     After  each input line is broken into words and history
+substitutions are done on it, the input line is parsed  into
+distinct commands.  Before each command is executed a mecha‐
+nism know as [4mvariable[24m [4msubstitution[24m is done on  these  words.
+Keyed  by  the  character ‘$’ this substitution replaces the
+names of variables by their values.  Thus
+
+     echo $argv
+
+when placed in a command  script  would  cause  the  current
+value of the variable [4margv[24m to be echoed to the output of the
+shell script.  It is an error for [4margv[24m to be unset  at  this
+point.
+
+     A number of notations are provided for accessing compo‐
+nents and attributes of variables.  The notation
+
+     $?name
+
+expands to ‘1’ if name is [4mset[24m or to ‘0’ if name is not  [4mset.[0m
+It  is  the  fundamental mechanism used for checking whether
+particular variables have been assigned values.   All  other
+forms of reference to undefined variables cause errors.
+
+     The notation
+
+     $#name
+
+expands  to  the  number  of  elements in the variable [4mname.[0m
+Thus
+
+     % set argv=(a b c)
+     % echo $?argv
+     1
+     % echo $#argv
+     3
+     % unset argv
+     % echo $?argv
+     0
+     % echo $argv
+     Undefined variable: argv.
+     %
+
+
+     It is also possible to access the components of a vari‐
+able which has several values.  Thus
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐37
+
+
+     $argv[1]
+
+gives  the  first  component of [4margv[24m or in the example above
+‘a’.  Similarly
+
+     $argv[$#argv]
+
+would give ‘c’, and
+
+     $argv[1−2]
+
+would give ‘a b’. Other notations useful  in  shell  scripts
+are
+
+     $[4mn[0m
+
+where [4mn[24m is an integer as a shorthand for
+
+     $argv[[4mn[24m]
+
+the [4mnth[24m parameter and
+
+     $*
+
+which is a shorthand for
+
+     $argv
+
+The form
+
+     $$
+
+expands  to  the process number of the current shell.  Since
+this process number is unique in the system it can  be  used
+in generation of unique temporary file names.  The form
+
+     $<
+
+is  quite  special and is replaced by the next line of input
+read from the shell’s standard input (not the script  it  is
+reading).  This is useful for writing shell scripts that are
+interactive, reading commands from  the  terminal,  or  even
+writing  a shell script that acts as a filter, reading lines
+from its input file.  Thus the sequence
+
+     echo ’yes or no?\c’
+     set a=($<)
+
+would write out the prompt ‘yes or no?’  without  a  newline
+and  then  read  the  answer into the variable ‘a’.  In this
+case ‘$#a’ would be ‘0’ if either a blank  line  or  end‐of‐
+file (^D) was typed.
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐38                      An Introduction to the C shell
+
+
+     One minor difference between ‘$[4mn[24m’ and ‘$argv[[4mn[24m]’ should
+be noted here.  The form ‘$argv[[4mn[24m]’ will yield an error if [4mn[0m
+is  not  in the range ‘1−$#argv’ while ‘$n’ will never yield
+an out of range subscript error.  This is for  compatibility
+with the way older shells handled parameters.
+
+     Another important point is that it is never an error to
+give a subrange of the form ‘n−’; if there are less  than  [4mn[0m
+components  of  the given variable then no words are substi‐
+tuted.  A range of the form ‘m−n’ likewise returns an  empty
+vector  without giving an error when [4mm[24m exceeds the number of
+elements of the given variable, provided the subscript [4mn[24m  is
+in range.
+
+[1m3.5.  Expressions[0m
+
+     In  order for interesting shell scripts to be construc‐
+ted it must be possible to evaluate expressions in the shell
+based  on  the values of variables.  In fact, all the arith‐
+metic operations of the language  C  are  available  in  the
+shell with the same precedence that they have in C.  In par‐
+ticular, the operations ‘==’ and ‘!=’  compare  strings  and
+the operators ‘&&’ and ‘||’ implement the boolean and/or op‐
+erations.  The special operators ‘=~’ and ‘!~’  are  similar
+to  ‘==’  and  ‘!=’ except that the string on the right side
+can have pattern matching characters (like *, ? or  [])  and
+the  test is whether the string on the left matches the pat‐
+tern on the right.
+
+     The shell also allows file enquiries of the form
+
+     −? filename
+
+where ‘?’ is replace by a number of single characters.   For
+instance the expression primitive
+
+     −e filename
+
+tell  whether  the file ‘filename’ exists.  Other primitives
+test for read, write and execute access to the file, whether
+it is a directory, or has non‐zero length.
+
+     It  is  possible  to  test whether a command terminates
+normally, by a primitive of the form ‘{ command }’ which re‐
+turns  true,  i.e.  ‘1’ if the command succeeds exiting nor‐
+mally with exit status 0, or ‘0’ if the  command  terminates
+abnormally  or  with exit status non‐zero.  If more detailed
+information about the execution status of a command  is  re‐
+quired,  it can be executed and the variable ‘$status’ exam‐
+ined in the next command.  Since ‘$status’ is set  by  every
+command, it is very transient.  It can be saved if it is in‐
+convenient to use it only in the single immediately  follow‐
+ing command.
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐39
+
+
+     For  a full list of expression components available see
+the manual section for the shell.
+
+[1m3.6.  Sample shell script[0m
+
+     A sample shell script which makes use of the expression
+mechanism  of  the  shell  and some of its control structure
+follows:
+
+     % cat copyc
+     #
+     # Copyc copies those C programs in the specified list
+     # to the directory ~/backup if they differ from the files
+     # already in ~/backup
+     #
+     set noglob
+     foreach i ($argv)
+
+             if ($i !~ *.c) continue  # not a .c file so do nothing
+
+             if (! −r ~/backup/$i:t) then
+                     echo $i:t not in backup... not cp\´ed
+                     continue
+             endif
+
+             cmp −s $i ~/backup/$i:t # to set $status
+
+             if ($status != 0) then
+                     echo new backup of $i
+                     cp $i ~/backup/$i:t
+             endif
+     end
+
+
+     This script makes use of  the  [4mforeach[24m  command,  which
+causes the shell to execute the commands between the [4mforeach[0m
+and the matching [4mend[24m for each of the  values  given  between
+‘(’ and ‘)’ with the named variable, in this case ‘i’ set to
+successive values in the list.  Within this loop we may  use
+the command [4mbreak[24m to stop executing the loop and [4mcontinue[24m to
+prematurely terminate one iteration and begin the next.  Af‐
+ter the [4mforeach[24m loop the iteration variable ([4mi[24m in this case)
+has the value at the last iteration.
+
+     We set the variable [4mnoglob[24m here to prevent filename ex‐
+pansion  of  the  members  of [4margv.[24m  This is a good idea, in
+general, if the arguments to a shell  script  are  filenames
+which  have  already  been  expanded or if the arguments may
+contain filename expansion metacharacters.  It is also  pos‐
+sible  to  quote  each  use of a ‘$’ variable expansion, but
+this is harder and less reliable.
+
+     The other control construct used here is a statement of
+the form
+
+
+
+
+
+
+
+
+
+USD:4‐40                      An Introduction to the C shell
+
+
+     [1mif [22m( expression ) [1mthen[0m
+          command
+          ...
+     [1mendif[0m
+
+The  placement  of  the keywords here is [1mnot [22mflexible due to
+the current implementation of the shell.†
+
+     The shell does have another form of the if statement of
+the form
+
+     [1mif [22m( expression ) [1mcommand[0m
+
+which can be written
+
+     [1mif [22m( expression ) \
+          command
+
+Here we have escaped the newline for the sake of appearance.
+The command must not involve ‘|’, ‘&’ or ‘;’ and must not be
+another control command.  The second form requires the final
+‘\’ to [1mimmediately [22mprecede the end‐of‐line.
+
+     The  more  general [4mif[24m statements above also admit a se‐
+quence of [4melse−if[24m pairs followed by a single [4melse[24m and an [4men‐[0m
+[4mdif,[24m e.g.:
+
+     [1mif [22m( expression ) [1mthen[0m
+          commands
+     [1melse if [22m(expression ) [1mthen[0m
+          commands
+     ...
+
+     [1melse[0m
+          commands
+     [1mendif[0m
+
+
+     Another  important  mechanism  used in shell scripts is
+the ‘:’ modifier.  We can use the modifier ‘:r’ here to  ex‐
+tract a root of a filename or ‘:e’ to extract the [4mextension.[0m
+───────────
+†The following two formats are not  currently  ac‐
+ceptable to the shell:
+
+     [1mif [22m( expression )        # [1mWon’t work![0m
+     [1mthen[0m
+          command
+          ...
+     [1mendif[0m
+
+and
+
+     [1mif [22m( expression ) [1mthen [22mcommand [1mendif         [22m# [1mWon’t work[0m
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐41
+
+
+Thus if the variable [4mi[24m has the value ‘/mnt/foo.bar’ then
+
+     % echo $i $i:r $i:e
+     /mnt/foo.bar /mnt/foo bar
+     %
+
+shows how the ‘:r’ modifier strips off the  trailing  ‘.bar’
+and the the ‘:e’ modifier leaves only the ‘bar’.  Other mod‐
+ifiers will take off the last component of a pathname  leav‐
+ing  the  head ‘:h’ or all but the last component of a path‐
+name leaving the tail ‘:t’.  These modifiers are  fully  de‐
+scribed in the [4mcsh[24m manual pages in the User’s Reference Man‐
+ual.  It is also possible to use  the  [4mcommand[24m  [4msubstitution[0m
+mechanism  described  in  the  next major section to perform
+modifications on strings to then reenter the  shell’s  envi‐
+ronment.   Since  each  usage of this mechanism involves the
+creation of a new process, it is much more expensive to  use
+than  the ‘:’ modification mechanism.‡ Finally, we note that
+the character ‘#’ lexically introduces a  shell  comment  in
+shell  scripts  (but not from the terminal).  All subsequent
+characters on the input line after a ‘#’  are  discarded  by
+the shell.  This character can be quoted using ‘´’ or ‘\’ to
+place it in an argument word.
+
+[1m3.7.  Other control structures[0m
+
+     The shell also has control structures [4mwhile[24m and  [4mswitch[0m
+similar to those of C.  These take the forms
+
+     [1mwhile [22m( expression )
+          commands
+     [1mend[0m
+
+and
+
+
+
+
+
+
+
+
+
+
+───────────
+‡  It  is  also important to note that the current
+implementation of the shell limits the  number  of
+‘:’ modifiers on a ‘$’ substitution to 1.  Thus
+
+     % echo $i $i:h:t
+     /a/b/c /a/b:t
+     %
+
+does not do what one would expect.
+
+
+
+
+
+
+
+
+
+USD:4‐42                      An Introduction to the C shell
+
+
+     [1mswitch [22m( word )
+
+     [1mcase [22mstr1:
+          commands
+          [1mbreaksw[0m
+
+      ...
+
+     [1mcase [22mstrn:
+          commands
+          [1mbreaksw[0m
+
+     [1mdefault:[0m
+          commands
+          [1mbreaksw[0m
+
+     [1mendsw[0m
+
+For  details  see the manual section for [4mcsh.[24m  C programmers
+should note that we use [4mbreaksw[24m to exit from a [4mswitch[24m  while
+[4mbreak[24m  exits  a  [4mwhile[24m or [4mforeach[24m loop.  A common mistake to
+make in [4mcsh[24m scripts is to use [4mbreak[24m rather than  [4mbreaksw[24m  in
+switches.
+
+     Finally, [4mcsh[24m allows a [4mgoto[24m statement, with labels look‐
+ing like they do in C, i.e.:
+
+     loop:
+          commands
+          [1mgoto [22mloop
+
+
+[1m3.8.  Supplying input to commands[0m
+
+     Commands run from shell scripts receive by default  the
+standard  input  of  the  shell which is running the script.
+This is different from previous shells running  under  UNIX.
+It  allows  shell scripts to fully participate in pipelines,
+but mandates extra notation for commands which are  to  take
+inline data.
+
+     Thus  we  need a metanotation for supplying inline data
+to commands in shell scripts.  As an example, consider  this
+script  which  runs the editor to delete leading blanks from
+the lines in each argument file:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐43
+
+
+     % cat deblank
+     # deblank −− remove leading blanks
+     foreach i ($argv)
+     ed − $i << ´EOF´
+     1,$s/^[ ]*//
+     w
+     q
+     ´EOF´
+     end
+     %
+
+The notation ‘<< ´EOF´’ means that the  standard  input  for
+the  [4med[24m command is to come from the text in the shell script
+file up to the next line consisting of exactly ‘´EOF´’.  The
+fact  that  the  ‘EOF’  is  enclosed in ‘´’ characters, i.e.
+quoted, causes the shell to not perform  variable  substitu‐
+tion  on  the intervening lines.  In general, if any part of
+the word following the ‘<<’ which the shell uses  to  termi‐
+nate  the  text  to  be  given to the command is quoted then
+these substitutions will not be  performed.   In  this  case
+since  we used the form ‘1,$’ in our editor script we needed
+to insure that this ‘$’ was not  variable  substituted.   We
+could  also have insured this by preceding the ‘$’ here with
+a ‘\’, i.e.:
+
+     1,\$s/^[ ]*//
+
+but quoting the ‘EOF’ terminator is a more reliable  way  of
+achieving the same thing.
+
+[1m3.9.  Catching interrupts[0m
+
+     If  our  shell  script  creates temporary files, we may
+wish to catch interruptions of the shell script so  that  we
+can clean up these files.  We can then do
+
+     onintr label
+
+where  [4mlabel[24m  is a label in our program.  If an interrupt is
+received the shell will do a ‘goto label’ and we can  remove
+the  temporary  files  and then do an [4mexit[24m command (which is
+built in to the shell) to exit from the shell script.  If we
+wish to exit with a non‐zero status we can do
+
+     exit(1)
+
+e.g. to exit with status ‘1’.
+
+[1m3.10.  What else?[0m
+
+     There are other features of the shell useful to writers
+of shell procedures.  The [4mverbose[24m and [4mecho[24m options  and  the
+related  [4m−v[24m  and [4m−x[24m command line options can be used to help
+trace the actions of the shell.  The [4m−n[24m  option  causes  the
+
+
+
+
+
+
+
+
+
+USD:4‐44                      An Introduction to the C shell
+
+
+shell  only to read commands and not to execute them and may
+sometimes be of use.
+
+     One other thing to note is that [4mcsh[24m  will  not  execute
+shell  scripts  which  do  not begin with the character ‘#’,
+that is shell scripts that do  not  begin  with  a  comment.
+Similarly,  the  ‘/bin/sh’  on your system may well defer to
+‘csh’ to interpret shell scripts which begin with ‘#’.  This
+allows shell scripts for both shells to live in harmony.
+
+     There  is  also  another  quotation mechanism using ‘"’
+which allows only some of the expansion mechanisms  we  have
+so far discussed to occur on the quoted string and serves to
+make this string into a single word as ‘´’ does.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐45
+
+
+[1m4.  Other, less commonly used, shell features[0m
+
+[1m4.1.  Loops at the terminal; variables as vectors[0m
+
+     It is occasionally useful to use  the  [4mforeach[24m  control
+structure  at  the terminal to aid in performing a number of
+similar commands.  For instance, there  were  at  one  point
+three  shells  in  use on the Cory UNIX system at Cory Hall,
+‘/bin/sh’, ‘/bin/nsh’, and ‘/bin/csh’.  To count the  number
+of  persons  using each shell one could have issued the com‐
+mands
+
+     % grep −c csh$ /etc/passwd
+     27
+     % grep −c nsh$ /etc/passwd
+     128
+     % grep −c −v sh$ /etc/passwd
+     430
+     %
+
+Since these commands are very similar we can use [4mforeach[24m  to
+do this more easily.
+
+     % foreach i (´sh$´ ´csh$´ ´−v sh$´)
+     ? grep −c $i /etc/passwd
+     ? end
+     27
+     128
+     430
+     %
+
+Note  here  that  the shell prompts for input with ‘? ’ when
+reading the body of the loop.
+
+     Very useful with  loops  are  variables  which  contain
+lists of filenames or other words.  You can, for example, do
+
+     % set a=(`ls`)
+     % echo $a
+     csh.n csh.rm
+     % ls
+     csh.n
+     csh.rm
+     % echo $#a
+     2
+     %
+
+The  [4mset[24m  command here gave the variable [4ma[24m a list of all the
+filenames in the current directory as value.   We  can  then
+iterate over these names to perform any chosen function.
+
+     The  output  of a command within ‘`’ characters is con‐
+verted by the shell to a list of words.  You can also  place
+the  ‘`’  quoted  string  within ‘"’ characters to take each
+
+
+
+
+
+
+
+
+
+USD:4‐46                      An Introduction to the C shell
+
+
+(non‐empty) line as a component of the variable;  preventing
+the lines from being split into words at blanks and tabs.  A
+modifier ‘:x’ exists which can be used later to expand  each
+component of the variable into another variable splitting it
+into separate words at embedded blanks and tabs.
+
+[1m4.2.  Braces { ... } in argument expansion[0m
+
+     Another form of filename expansion, alluded  to  before
+involves the characters ‘{’ and ‘}’.  These characters spec‐
+ify that the contained strings, separated by ‘,’ are  to  be
+consecutively substituted into the containing characters and
+the results expanded left to right.  Thus
+
+     A{str1,str2,...strn}B
+
+expands to
+
+     Astr1B Astr2B ... AstrnB
+
+This expansion occurs before the other filename  expansions,
+and  may  be applied recursively (i.e. nested).  The results
+of each expanded string are sorted separately, left to right
+order  being preserved.  The resulting filenames are not re‐
+quired to exist if no other expansion mechanisms  are  used.
+This means that this mechanism can be used to generate argu‐
+ments which are not filenames, but which have common parts.
+
+     A typical use of this would be
+
+     mkdir ~/{hdrs,retrofit,csh}
+
+to make subdirectories ‘hdrs’, ‘retrofit’ and ‘csh’ in  your
+home directory.  This mechanism is most useful when the com‐
+mon prefix is longer than in this example, i.e.
+
+     chown root /usr/{ucb/{ex,edit},lib/{ex?.?*,how_ex}}
+
+
+[1m4.3.  Command substitution[0m
+
+     A command enclosed in ‘`’ characters is replaced,  just
+before  filenames are expanded, by the output from that com‐
+mand.  Thus it is possible to do
+
+     set pwd=`pwd`
+
+to save the current directory in the variable [4mpwd[24m or to do
+
+     ex `grep −l TRACE *.c`
+
+to run the editor [4mex[24m  supplying  as  arguments  those  files
+whose  names  end  in  ‘.c’ which have the string ‘TRACE’ in
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐47
+
+
+them.*
+
+[1m4.4.  Other details not covered here[0m
+
+     In particular circumstances it may be necessary to know
+the  exact  nature and order of different substitutions per‐
+formed by the shell.  The exact meaning of certain  combina‐
+tions  of  quotations is also occasionally important.  These
+are detailed fully in its manual section.
+
+     The shell has a number of  command  line  option  flags
+mostly  of use in writing UNIX programs, and debugging shell
+scripts.  See the csh(1) manual section for a list of  these
+options.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+───────────
+*Command expansion also occurs in input redirected
+with ‘<<’ and within ‘"’ quotations.  Refer to the
+shell manual section for full details.
+
+
+
+
+
+
+
+
+
+USD:4‐48                      An Introduction to the C shell
+
+
+[1mAppendix − Special characters[0m
+
+The  following table lists the special characters of [4mcsh[24m and
+the UNIX system, giving for each the section(s) in which  it
+is  discussed.   A number of these characters also have spe‐
+cial meaning in expressions.  See the [4mcsh[24m manual section for
+a complete list.
+
+Syntactic metacharacters
+
+     ;    2.4  separates commands to be executed sequentially
+     |    1.5  separates commands in a pipeline
+     ( )  2.2,3.6   brackets expressions and variable values
+     &    2.5  follows commands to be executed without waiting for completion
+
+
+Filename metacharacters
+
+     /    1.6  separates components of a file’s pathname
+     .    1.6  separates root parts of a file name from extensions
+     ?    1.6  expansion character matching any single character
+     *    1.6  expansion character matching any sequence of characters
+     [ ]  1.6  expansion sequence matching any single character from a set
+     ~    1.6  used at the beginning of a filename to indicate home directories
+     { }  4.2  used to specify groups of arguments with common parts
+
+
+Quotation metacharacters
+
+     \    1.7  prevents meta‐meaning of following single character
+     ´    1.7  prevents meta‐meaning of a group of characters
+     "    4.3  like ´, but allows variable and command expansion
+
+
+Input/output metacharacters
+
+     <    1.5  indicates redirected input
+     >    1.3  indicates redirected output
+
+
+Expansion/substitution metacharacters
+
+     $    3.4  indicates variable substitution
+     !    2.3  indicates history substitution
+     :    3.6  precedes substitution modifiers
+     ^    2.3  used in special forms of history substitution
+     `    4.3  indicates command substitution
+
+
+Other metacharacters
+
+
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐49
+
+
+     #    1.3,3.6   begins scratch file names; indicates shell comments
+     −    1.2  prefixes option (flag) arguments to commands
+     %    2.6  prefixes job name specifications
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐50                      An Introduction to the C shell
+
+
+[1mGlossary[0m
+
+     This glossary lists the most important terms introduced
+in the introduction to the shell  and  gives  references  to
+sections of the shell document for further information about
+them.  References of the form ‘pr  (1)’  indicate  that  the
+command  [4mpr[24m  is in the UNIX User Reference manual in section
+1.  You can look at an online copy of its manual page by do‐
+ing
+
+     man 1 pr
+
+References  of the form (2.5) indicate that more information
+can be found in section 2.5 of this manual.
+
+[1m.              [22mYour current directory has the  name  ‘.’  as
+               well  as the name printed by the command [4mpwd;[0m
+               see also [4mdirs.[24m  The current directory ‘.’  is
+               usually  the  first  [4mcomponent[24m  of the search
+               path contained in  the  variable  [4mpath[24m,  thus
+               commands  which  are  in  ‘.’ are found first
+               (2.2).  The character ‘.’  is  also  used  in
+               separating  [4mcomponents[24m  of  filenames  (1.6).
+               The character ‘.’ at the beginning of a  [4mcom‐[0m
+               [4mponent[24m of a [4mpathname[24m is treated specially and
+               not  matched  by   the   [4mfilename[24m   [4mexpansion[0m
+               metacharacters  ‘?’,  ‘*’,  and ‘[’ ‘]’ pairs
+               (1.6).
+
+[1m..             [22mEach directory has a file ‘..’ in it which is
+               a  reference  to its parent directory.  After
+               changing into the directory with [4mchdir[24m, i.e.
+
+                    chdir paper
+
+               you can return to the parent directory by do‐
+               ing
+
+                    chdir ..
+
+               The  current  directory  is  printed  by  [4mpwd[0m
+               (2.7).
+
+a.out          Compilers which create executable images cre‐
+               ate them, by default, in the file [4ma.out.[24m  for
+               historical reasons (2.3).
+
+absolute pathname
+               A [4mpathname[24m which begins with a ‘/’  is  [4mabso‐[0m
+               [4mlute[24m  since it specifies the [4mpath[24m of directo‐
+               ries from the beginning of the entire  direc‐
+               tory  system  −  called  the  [4mroot[24m directory.
+               [4mPathname[24ms which are not [4mabsolute[24m  are  called
+               [4mrelative[24m    (see   definition   of   [4mrelative[0m
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐51
+
+
+               [4mpathname[24m) (1.6).
+
+alias          An [4malias[24m specifies  a  shorter  or  different
+               name  for a UNIX command, or a transformation
+               on a command to be performed  in  the  shell.
+               The  shell  has  a command [4malias[24m which estab‐
+               lishes [4maliases[24m and can  print  their  current
+               values.   The  command [4munalias[24m is used to re‐
+               move [4maliases[24m (2.4).
+
+argument       Commands in UNIX receive a list  of  [4margument[0m
+               words.  Thus the command
+
+                    echo a b c
+
+               consists of the [4mcommand[24m [4mname[24m ‘echo’ and three
+               [4margument[24m words ‘a’, ‘b’ and ‘c’.  The set  of
+               [4marguments[24m  after  the [4mcommand[24m [4mname[24m is said to
+               be the [4margument[24m [4mlist[24m of the command (1.1).
+
+argv           The list of arguments to a command written in
+               the  shell  language (a shell script or shell
+               procedure) is stored  in  a  variable  called
+               [4margv[24m  within  the  shell.  This name is taken
+               from the conventional name in the C  program‐
+               ming language (3.4).
+
+background     Commands  started without waiting for them to
+               complete  are  called   [4mbackground[24m   commands
+               (2.6).
+
+base           A  filename  is  sometimes thought of as con‐
+               sisting of a [4mbase[24m part, before any ‘.’  char‐
+               acter,  and an [4mextension[24m − the part after the
+               ‘.’.  See [4mfilename[24m and  [4mextension[24m  (1.6)  and
+               basename (1).
+
+bg             The [4mbg[24m command causes a [4msuspended[24m job to con‐
+               tinue execution in the [4mbackground[24m (2.6).
+
+bin            A directory containing binaries  of  programs
+               and shell scripts to be executed is typically
+               called a [4mbin[24m directory.  The standard  system
+               [4mbin[24m  directories  are  ‘/bin’  containing the
+               most heavily  used  commands  and  ‘/usr/bin’
+               which  contains  most  other  user  programs.
+               Programs developed at  UC  Berkeley  live  in
+               ‘/usr/ucb’,  while  locally  written programs
+               live in ‘/usr/local’.  Games are kept in  the
+               directory  ‘/usr/games’.  You can place bina‐
+               ries in any directory.  If you wish  to  exe‐
+               cute  them often, the name of the directories
+               should be a [4mcomponent[24m of the variable [4mpath[24m.
+
+
+
+
+
+
+
+
+
+
+USD:4‐52                      An Introduction to the C shell
+
+
+break          [4mBreak[24m is a builtin command used to exit  from
+               loops  within  the  control  structure of the
+               shell (3.7).
+
+breaksw        The [4mbreaksw[24m builtin command is used  to  exit
+               from a [4mswitch[24m control structure, like a [4mbreak[0m
+               exits from loops (3.7).
+
+builtin        A command executed directly by the  shell  is
+               called  a  [4mbuiltin[24m command.  Most commands in
+               UNIX are not built into the shell, but rather
+               exist  as  files  in  [4mbin[24m directories.  These
+               commands are accessible because the  directo‐
+               ries  in  which  they reside are named in the
+               [4mpath[24m variable.
+
+case           A [4mcase[24m command is used as a label in a [4mswitch[0m
+               statement  in  the shell’s control structure,
+               similar to that of the language  C.   Details
+               are  given  in  the  shell documentation ‘csh
+               (1)’ (3.7).
+
+cat            The [4mcat[24m program catenates a list of specified
+               files  on the [4mstandard[24m [4moutput[24m.  It is usually
+               used to look at the contents of a single file
+               on the terminal, to ‘cat a file’ (1.8, 2.3).
+
+cd             The  [4mcd[24m command is used to change the [4mworking[0m
+               [4mdirectory[24m.  With  no  arguments,  [4mcd[24m  changes
+               your [4mworking[24m [4mdirectory[24m to be your [4mhome[24m direc‐
+               tory (2.4, 2.7).
+
+chdir          The [4mchdir[24m command is a synonym for [4mcd[24m.  [4mCd[24m is
+               usually used because it is easier to type.
+
+chsh           The  [4mchsh[24m command is used to change the shell
+               which you use on UNIX.  By default, you use a
+               different  version of the shell which resides
+               in ‘/bin/sh’.  You can change your  shell  to
+               ‘/bin/csh’ by doing
+
+                    chsh your‐login‐name /bin/csh
+
+               Thus I would do
+
+                    chsh bill /bin/csh
+
+               It  is  only  necessary to do this once.  The
+               next time you log in to UNIX after doing this
+               command,  you  will  be using [4mcsh[24m rather than
+               the shell in ‘/bin/sh’ (1.9).
+
+cmp            [4mCmp[24m is a program which compares files.  It is
+               usually  used  on  binary files, or to see if
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐53
+
+
+               two files are identical (3.6).  For comparing
+               text  files  the  program  [4mdiff[24m, described in
+               ‘diff (1)’ is used.
+
+command        A function performed by the system, either by
+               the shell (a builtin [4mcommand[24m) or by a program
+               residing in a file in a directory within  the
+               UNIX system, is called a [4mcommand[24m (1.1).
+
+command name
+               When  a  command  is issued, it consists of a
+               [4mcommand[24m [4mname[24m, which is the first word of  the
+               command,  followed by arguments.  The conven‐
+               tion on UNIX is that the first word of a com‐
+               mand  names  the  function  to  be  performed
+               (1.1).
+
+command substitution
+               The replacement of a command enclosed in  ‘`’
+               characters by the text output by that command
+               is called [4mcommand[24m [4msubstitution[24m (4.3).
+
+component      A part of a [4mpathname[24m between  ‘/’  characters
+               is  called  a  [4mcomponent[24m of that [4mpathname[24m.  A
+               variable which has multiple strings as  value
+               is  said  to  have  several  [4mcomponent[24ms; each
+               string is a [4mcomponent[24m of the variable.
+
+continue       A builtin command which causes  execution  of
+               the  enclosing [4mforeach[24m or [4mwhile[24m loop to cycle
+               prematurely.  Similar to the [4mcontinue[24m command
+               in the programming language C (3.6).
+
+control‐       Certain  special  characters,  called [4mcontrol[0m
+               characters, are produced by holding down  the
+               CONTROL  key  on your terminal and simultane‐
+               ously pressing another character,  much  like
+               the  SHIFT  key is used to produce upper case
+               characters. Thus  [4mcontrol‐[24mc  is  produced  by
+               holding  down  the CONTROL key while pressing
+               the ‘c’ key.  Usually UNIX prints a caret (^)
+               followed by the corresponding letter when you
+               type a [4mcontrol[24m character (e.g. ‘^C’ for  [4mcon‐[0m
+               [4mtrol‐[24mc (1.8).
+
+core dump      When  a  program  terminates  abnormally, the
+               system places an image of its  current  state
+               in  a  file named ‘core’.  This [4mcore[24m [4mdump[24m can
+               be examined with  the  system  debugger  ‘adb
+               (1)’  or ‘sdb (1)’ in order to determine what
+               went wrong with the program  (1.8).   If  the
+               shell produces a message of the form
+
+
+
+
+
+
+
+
+
+
+
+USD:4‐54                      An Introduction to the C shell
+
+
+                    Illegal instruction (core dumped)
+
+               (where  ‘Illegal  instruction’ is only one of
+               several possible messages), you should report
+               this to the author of the program or a system
+               administrator, saving the ‘core’ file.
+
+cp             The [4mcp[24m (copy) program is  used  to  copy  the
+               contents  of  one file into another file.  It
+               is one of the most commonly  used  UNIX  com‐
+               mands (1.6).
+
+csh            The name of the shell program that this docu‐
+               ment describes.
+
+.cshrc         The file [4m.cshrc[24m in  your  [4mhome[24m  directory  is
+               read  by  each  shell as it begins execution.
+               It is usually used to change the  setting  of
+               the variable [4mpath[24m and to set [4malias[24m parameters
+               which are to take effect globally (2.1).
+
+cwd            The [4mcwd[24m variable in the shell holds the [4mabso‐[0m
+               [4mlute[24m  [4mpathname[24m  of the current [4mworking[24m [4mdirec‐[0m
+               [4mtory[24m.  It is changed by  the  shell  whenever
+               your  current  [4mworking[24m  [4mdirectory[24m changes and
+               should not be changed otherwise (2.2).
+
+date           The [4mdate[24m command prints the current date  and
+               time (1.3).
+
+debugging      [4mDebugging[24m  is  the process of correcting mis‐
+               takes in programs  and  shell  scripts.   The
+               shell has several options and variables which
+               may be used to aid in shell [4mdebugging[24m (4.4).
+
+default:       The  label  [4mdefault:[24m  is  used  within  shell
+               [4mswitch[24m statements, as it is in the C language
+               to label the code to be executed if  none  of
+               the [4mcase[24m labels matches the value switched on
+               (3.7).
+
+DELETE         The DELETE or RUBOUT key on the terminal nor‐
+               mally  causes  an interrupt to be sent to the
+               current job.  Many users change the interrupt
+               character to be ^C.
+
+detached       A command that continues running in the [4mback‐[0m
+               [4mground[24m after you logout is  said  to  be  [4mde‐[0m
+               [4mtached[24m.
+
+diagnostic     An error message produced by a program is of‐
+               ten referred to as a [4mdiagnostic[24m.  Most  error
+               messages are not written to the [4mstandard[24m [4mout‐[0m
+               [4mput[24m, since that is often directed  away  from
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐55
+
+
+               the terminal (1.3, 1.5).  Error messsages are
+               instead  written  to  the  [4mdiagnostic[24m  [4moutput[0m
+               which may be directed away from the terminal,
+               but usually is not.   Thus  [4mdiagnostics[24m  will
+               usually appear on the terminal (2.5).
+
+directory      A  structure  which  contains  files.  At any
+               time you  are  in  one  particular  [4mdirectory[0m
+               whose  names  can  be  printed by the command
+               [4mpwd[24m.  The [4mchdir[24m command will  change  you  to
+               another [4mdirectory[24m, and make the files in that
+               [4mdirectory[24m visible. The [4mdirectory[24m in which you
+               are  when you first login is your [4mhome[24m direc‐
+               tory (1.1, 2.7).
+
+directory stack
+               The shell saves the names of previous [4mworking[0m
+               [4mdirectories[24m  in  the [4mdirectory[24m [4mstack[24m when you
+               change your current [4mworking[24m [4mdirectory[24m via the
+               [4mpushd[24m  command.   The  [4mdirectory[24m [4mstack[24m can be
+               printed by using the [4mdirs[24m command, which  in‐
+               cludes  your current [4mworking[24m [4mdirectory[24m as the
+               first directory name on the left (2.7).
+
+dirs           The [4mdirs[24m command prints the shell’s [4mdirectory[0m
+               [4mstack[24m (2.7).
+
+du             The [4mdu[24m command is a program (described in ‘du
+               (1)’) which prints the number of disk  blocks
+               is  all  directories below and including your
+               current [4mworking[24m [4mdirectory[24m (2.6).
+
+echo           The [4mecho[24m command prints its  arguments  (1.6,
+               3.6).
+
+else           The  [4melse[24m  command  is  part of the ‘if‐then‐
+               else‐endif’ control command construct (3.6).
+
+endif          If an [4mif[24m statement is  ended  with  the  word
+               [4mthen[24m, all lines following the [4mif[24m up to a line
+               starting with the word [4mendif[24m or [4melse[24m are exe‐
+               cuted  if  the  condition between parentheses
+               after the [4mif[24m is true (3.6).
+
+EOF            An [4mend[24m‐[4mof[24m‐[4mfile[24m is generated by  the  terminal
+               by  a control‐d, and whenever a command reads
+               to the end of a file which it has been  given
+               as  input.   Commands  receiving input from a
+               [4mpipe[24m receive an [4mend[24m‐[4mof[24m‐[4mfile[24m when the  command
+               sending  them input completes.  Most commands
+               terminate when they receive  an  [4mend[24m‐[4mof[24m‐[4mfile[24m.
+               The shell has an option to ignore [4mend[24m‐[4mof[24m‐[4mfile[0m
+               from a terminal input which may help you keep
+               from  logging  out accidentally by typing too
+
+
+
+
+
+
+
+
+
+USD:4‐56                      An Introduction to the C shell
+
+
+               many control‐d’s (1.1, 1.8, 3.8).
+
+escape         A character ‘\’ used to prevent  the  special
+               meaning  of a metacharacter is said to [4mescape[0m
+               the character from its special meaning.  Thus
+
+                    echo \*
+
+               will echo the character ‘*’ while just
+
+                    echo *
+
+               will echo the names of the file in  the  cur‐
+               rent  directory.   In this example, \ [4mescape[24ms
+               ‘*’ (1.7).   There  is  also  a  non‐printing
+               character called [4mescape[24m, usually labelled ESC
+               or ALTMODE on terminal keyboards.  Some older
+               UNIX  systems  use this character to indicate
+               that output is to be [4msuspended[24m.  Most systems
+               use control‐s to stop the output and control‐
+               q to start it.
+
+/etc/passwd    This file contains information about the  ac‐
+               counts  currently on the system.  It consists
+               of a line for each account with fields  sepa‐
+               rated  by ‘:’ characters (1.8).  You can look
+               at this file by saying
+
+                    cat /etc/passwd
+
+               The commands [4mfinger[24m and [4mgrep[24m are  often  used
+               to  search for information in this file.  See
+               ‘finger (1)’, ‘passwd(5)’, and ‘grep (1)’ for
+               more details.
+
+exit           The [4mexit[24m command is used to force termination
+               of a shell script,  and  is  built  into  the
+               shell (3.9).
+
+exit status    A  command  which discovers a problem may re‐
+               flect this back to the  command  (such  as  a
+               shell)  which invoked (executed) it.  It does
+               this by returning a non‐zero  number  as  its
+               [4mexit[24m  [4mstatus[24m,  a status of zero being consid‐
+               ered ‘normal termination’.  The [4mexit[24m  command
+               can  be  used to force a shell command script
+               to give a non‐zero [4mexit[24m [4mstatus[24m (3.6).
+
+expansion      The replacement of strings in the shell input
+               which contain metacharacters by other strings
+               is referred to as the process  of  [4mexpansion[24m.
+               Thus  the  replacement  of  the word ‘*’ by a
+               sorted list of files in the current directory
+               is  a  ‘filename  expansion’.   Similarly the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐57
+
+
+               replacement of the  characters  ‘!!’  by  the
+               text of the last command is a ‘history expan‐
+               sion’.  [4mExpansions[24m are also  referred  to  as
+               [4msubstitutions[24m (1.6, 3.4, 4.2).
+
+expressions    [4mExpressions[24m  are used in the shell to control
+               the conditional structures used in the  writ‐
+               ing  of shell scripts and in calculating val‐
+               ues for these scripts.  The operators  avail‐
+               able  in  shell  [4mexpressions[24m are those of the
+               language C (3.5).
+
+extension      Filenames often consist of a [4mbase[24m name and an
+               [4mextension[24m separated by the character ‘.’.  By
+               convention, groups  of  related  files  often
+               share  the  same [4mroot[24m name.  Thus if ‘prog.c’
+               were a C program, then the  object  file  for
+               this  program  would  be  stored in ‘prog.o’.
+               Similarly a  paper  written  with  the  ‘−me’
+               nroff  macro  package might be stored in ‘pa‐
+               per.me’ while a formatted version of this pa‐
+               per  might  be kept in ‘paper.out’ and a list
+               of spelling errors in ‘paper.errs’ (1.6).
+
+fg             The [4mjob[24m [4mcontrol[24m command [4mfg[24m is used to  run  a
+               [4mbackground[24m or [4msuspended[24m job in the [4mforeground[0m
+               (1.8, 2.6).
+
+filename       Each file in UNIX has a name consisting of up
+               to  14 characters and not including the char‐
+               acter ‘/’ which is used in [4mpathname[24m building.
+               Most  [4mfilenames[24m do not begin with the charac‐
+               ter ‘.’, and contain only letters and  digits
+               with  perhaps  a ‘.’ separating the [4mbase[24m por‐
+               tion of the [4mfilename[24m from an [4mextension[24m (1.6).
+
+filename expansion
+               [4mFilename[24m [4mexpansion[24m  uses  the  metacharacters
+               ‘*’,  ‘?’ and ‘[’ and ‘]’ to provide a conve‐
+               nient  mechanism  for  naming  files.   Using
+               [4mfilename[24m [4mexpansion[24m it is easy to name all the
+               files in the current directory, or all  files
+               which have a common [4mroot[24m name. Other [4mfilename[0m
+               [4mexpansion[24m mechanisms  use  the  metacharacter
+               ‘~’  and allow files in other users’ directo‐
+               ries to be named easily (1.6, 4.2).
+
+flag           Many UNIX commands accept arguments which are
+               not the names of files or other users but are
+               used to modify the action  of  the  commands.
+               These are referred to as [4mflag[24m options, and by
+               convention consist of  one  or  more  letters
+               preceded  by  the  character ‘−’ (1.2).  Thus
+               the [4mls[24m (list files)  command  has  an  option
+
+
+
+
+
+
+
+
+
+USD:4‐58                      An Introduction to the C shell
+
+
+               ‘−s’  to  list  the  sizes of files.  This is
+               specified
+
+                    ls −s
+
+
+foreach        The [4mforeach[24m command is used in shell  scripts
+               and  at the terminal to specify repetition of
+               a sequence of commands while the value  of  a
+               certain shell variable ranges through a spec‐
+               ified list (3.6, 4.1).
+
+foreground     When commands are executing in the normal way
+               such  that  the  shell is waiting for them to
+               finish before prompting for  another  command
+               they  are  said to be [4mforeground[24m [4mjobs[24m or [4mrun‐[0m
+               [4mning[24m [4min[24m [4mthe[24m [4mforeground[24m.  This is  as  opposed
+               to   [4mbackground[24m.    [4mForeground[24m  jobs  can  be
+               stopped by signals from the  terminal  caused
+               by typing different control characters at the
+               keyboard (1.8, 2.6).
+
+goto           The shell has a command [4mgoto[24m  used  in  shell
+               scripts  to transfer control to a given label
+               (3.7).
+
+grep           The [4mgrep[24m command searches through a  list  of
+               argument files for a specified string.  Thus
+
+                    grep bill /etc/passwd
+
+               will  print each line in the file [4m/etc/passwd[0m
+               which contains the string ‘bill’.   Actually,
+               [4mgrep[24m  scans  for  [4mregular[24m  [4mexpressions[24m in the
+               sense of the editors ‘ed (1)’ and  ‘ex  (1)’.
+               [4mGrep[24m  stands  for  ‘globally find [4mregular[24m [4mex‐[0m
+               [4mpression[24m and print’ (2.4).
+
+head           The [4mhead[24m command prints the first  few  lines
+               of one or more files.  If you have a bunch of
+               files containing text which you are wondering
+               about it is sometimes useful to run [4mhead[24m with
+               these files as arguments.  This will  usually
+               show  enough of what is in these files to let
+               you decide which you are interested in (1.5).
+               [4mHead[24m is also used to describe the part  of  a
+               [4mpathname[24m  before  and  including the last ‘/’
+               character.  The [4mtail[24m of  a  [4mpathname[24m  is  the
+               part  after  the last ‘/’.  The ‘:h’ and ‘:t’
+               modifiers allow the [4mhead[24m or [4mtail[24m of  a  [4mpath‐[0m
+               [4mname[24m  stored  in  a shell variable to be used
+               (3.6).
+
+
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐59
+
+
+history        The [4mhistory[24m mechanism  of  the  shell  allows
+               previous  commands  to  be repeated, possibly
+               after modification to correct typing mistakes
+               or to change the meaning of the command.  The
+               shell has a [4mhistory[24m [4mlist[24m where these commands
+               are  kept,  and a [4mhistory[24m variable which con‐
+               trols how large this list is (2.3).
+
+home directory
+               Each user has  a  [4mhome[24m  [4mdirectory[24m,  which  is
+               given  in  your  entry  in the password file,
+               [4m/etc/passwd[24m.  This is the directory which you
+               are  placed  in when you first login.  The [4mcd[0m
+               or [4mchdir[24m command with no arguments takes  you
+               back   to   this  directory,  whose  name  is
+               recorded in the shell variable [4mhome[24m.  You can
+               also  access  the  [4mhome[24m  [4mdirectories[24m of other
+               users in forming filenames using  a  [4mfilename[0m
+               [4mexpansion[24m  notation  and  the  character  ‘~’
+               (1.6).
+
+if             A conditional command within the  shell,  the
+               [4mif[24m  command  is used in shell command scripts
+               to make decisions about what course of action
+               to take next (3.6).
+
+ignoreeof      Normally, your shell will exit, printing ‘lo‐
+               gout’ if you type a control‐d at a prompt  of
+               ‘%  ’.   This  is the way you usually log off
+               the system.  You can [4mset[24m the [4mignoreeof[24m  vari‐
+               able if you wish in your [4m.login[24m file and then
+               use the command [4mlogout[24m to  logout.   This  is
+               useful if you sometimes accidentally type too
+               many control‐d characters,  logging  yourself
+               off (2.2).
+
+input          Many  commands  on UNIX take information from
+               the terminal or from files  which  they  then
+               act  on.   This  information is called [4minput[24m.
+               Commands normally read for [4minput[24m  from  their
+               [4mstandard[24m [4minput[24m which is, by default, the ter‐
+               minal.  This [4mstandard[24m [4minput[24m can be redirected
+               from  a  file using a shell metanotation with
+               the character ‘<’.  Many commands  will  also
+               read from a file specified as argument.  Com‐
+               mands placed in [4mpipelines[24m will read from  the
+               output  of  the previous command in the [4mpipe‐[0m
+               [4mline[24m.  The leftmost  command  in  a  [4mpipeline[0m
+               reads  from the terminal if you neither redi‐
+               rect its [4minput[24m nor give it a filename to  use
+               as  [4mstandard[24m [4minput[24m.  Special mechanisms exist
+               for supplying  input  to  commands  in  shell
+               scripts (1.5, 3.8).
+
+
+
+
+
+
+
+
+
+
+USD:4‐60                      An Introduction to the C shell
+
+
+interrupt      An [4minterrupt[24m is a signal to a program that is
+               generated by typing ^C. (On older versions of
+               UNIX  the  RUBOUT or DELETE key were used for
+               this purpose.)  It causes  most  programs  to
+               stop  execution.   Certain  programs, such as
+               the shell and the editors, handle  an  [4minter‐[0m
+               [4mrupt[24m  in  special  ways,  usually by stopping
+               what they are doing and prompting for another
+               command.   While  the  shell is executing an‐
+               other command and waiting for it  to  finish,
+               the shell does not listen to [4minterrupts.[24m  The
+               shell often wakes up when you  hit  [4minterrupt[0m
+               because  many  commands die when they receive
+               an [4minterrupt[24m (1.8, 3.9).
+
+job            One or more commands typed on the same  input
+               line  separated  by ‘|’ or ‘;’ characters are
+               run together and are called  a  [4mjob[24m.   Simple
+               commands run by themselves without any ‘|’ or
+               ‘;’ characters are the simplest  [4mjobs.[24m   [4mJobs[0m
+               are  classified as [4mforeground[24m, [4mbackground[24m, or
+               [4msuspended[24m (2.6).
+
+job control    The builtin functions that control the execu‐
+               tion of jobs are called [4mjob[24m [4mcontrol[24m commands.
+               These are [4mbg,[24m [4mfg,[24m [4mstop,[24m [4mkill[24m (2.6).
+
+job number     When each job is started  it  is  assigned  a
+               small  number  called  a  [4mjob[24m [4mnumber[24m which is
+               printed next to the job in the output of  the
+               [4mjobs[24m command.  This number, preceded by a ‘%’
+               character, can be used as an argument to  [4mjob[0m
+               [4mcontrol[24m  commands  to indicate a specific job
+               (2.6).
+
+jobs           The [4mjobs[24m command prints a table showing  jobs
+               that  are either running in the [4mbackground[24m or
+               are [4msuspended[24m (2.6).
+
+kill           A command which sends a signal to a job caus‐
+               ing it to terminate (2.6).
+
+.login         The  file  [4m.login[24m  in  your [4mhome[24m directory is
+               read by the shell each time you login to UNIX
+               and  the  commands there are executed.  There
+               are a number of commands which  are  usefully
+               placed  here,  especially [4mset[24m commands to the
+               shell itself (2.1).
+
+login shell    The shell that is started  on  your  terminal
+               when  you  login  is called your [4mlogin[24m [4mshell[24m.
+               It is different from other shells  which  you
+               may  run  (e.g.  on shell scripts) in that it
+               reads the [4m.login[24m file before reading commands
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐61
+
+
+               from  the  terminal  and it reads the [4m.logout[0m
+               file after you logout (2.1).
+
+logout         The [4mlogout[24m command causes a  login  shell  to
+               exit.  Normally, a login shell will exit when
+               you hit control‐d generating an  [4mend[24m‐[4mof[24m‐[4mfile,[0m
+               but  if  you have set [4mignoreeof[24m in you [4m.login[0m
+               file then this will not work and you must use
+               [4mlogout[24m to log off the UNIX system (2.8).
+
+.logout        When  you log off of UNIX the shell will exe‐
+               cute commands from the file [4m.logout[24m  in  your
+               [4mhome[24m directory after it prints ‘logout’.
+
+lpr            The  command  [4mlpr[24m is the line printer daemon.
+               The standard input of [4mlpr[24m spooled and printed
+               on  the UNIX line printer.  You can also give
+               [4mlpr[24m a list of filenames as  arguments  to  be
+               printed.  It is most common to use [4mlpr[24m as the
+               last component of a [4mpipeline[24m (2.3).
+
+ls             The [4mls[24m (list files) command  is  one  of  the
+               most  commonly  used  UNIX commands.  With no
+               argument filenames it prints the names of the
+               files  in  the  current  directory.  It has a
+               number of useful [4mflag[24m arguments, and can also
+               be  given  the  names of directories as argu‐
+               ments, in which case it lists  the  names  of
+               the files in these directories (1.2).
+
+mail           The  [4mmail[24m program is used to send and receive
+               messages from other UNIX  users  (1.1,  2.1),
+               whether they are logged on or not.
+
+make           The  [4mmake[24m  command is used to maintain one or
+               more related files and to organize  functions
+               to be performed on these files.  In many ways
+               [4mmake[24m is easier to use, and more helpful  than
+               shell command scripts (3.2).
+
+makefile       The  file  containing  commands  for  [4mmake[24m is
+               called [4mmakefile[24m or [4mMakefile[24m (3.2).
+
+manual         The [4mmanual[24m often referred  to  is  the  ‘UNIX
+               manual’.   It  contains  8  numbered sections
+               with a description of each UNIX program (sec‐
+               tion  1), system call (section 2), subroutine
+               (section 3), device (section 4), special data
+               structure (section 5), game (section 6), mis‐
+               cellaneous item (section 7) and system admin‐
+               istration  program  (section  8).   There are
+               also supplementary documents  (tutorials  and
+               reference  guides)  for  individual  programs
+               which require explanation in more detail.  An
+
+
+
+
+
+
+
+
+
+USD:4‐62                      An Introduction to the C shell
+
+
+               online  version  of  the [4mmanual[24m is accessible
+               through the [4mman[24m command.   Its  documentation
+               can be obtained online via
+
+                    man man
+
+               If  you can’t decide what manual page to look
+               in, try the [4mapropos[24m(1) command.  The  supple‐
+               mentary  documents  are  in subdirectories of
+               /usr/doc.
+
+metacharacter
+               Many characters which are neither letters nor
+               digits  have  special  meaning  either to the
+               shell  or  to  UNIX.   These  characters  are
+               called [4mmetacharacters[24m.  If it is necessary to
+               place these characters in arguments  to  com‐
+               mands without them having their special mean‐
+               ing then they must be [4mquoted[24m.  An example  of
+               a [4mmetacharacter[24m is the character ‘>’ which is
+               used to indicate placement of output  into  a
+               file.  For the purposes of the [4mhistory[24m mecha‐
+               nism, most unquoted [4mmetacharacters[24m form sepa‐
+               rate  words  (1.4).   The  appendix  to  this
+               user’s manual  lists  the  [4mmetacharacters[24m  in
+               groups by their function.
+
+mkdir          The [4mmkdir[24m command is used to create a new di‐
+               rectory.
+
+modifier       Substitutions  with  the  [4mhistory[24m  mechanism,
+               keyed  by  the character ‘!’  or of variables
+               using the metacharacter ‘$’, are  often  sub‐
+               jected to modifications, indicated by placing
+               the character ‘:’ after the substitution  and
+               following this with the [4mmodifier[24m itself.  The
+               [4mcommand[24m [4msubstitution[24m mechanism  can  also  be
+               used  to  perform  modification  in a similar
+               way, but this notation is less clear (3.6).
+
+more           The program [4mmore[24m writes a file on your termi‐
+               nal  allowing you to control how much text is
+               displayed at a time.  [4mMore[24m can  move  through
+               the  file  screenful  by  screenful,  line by
+               line, search forward for a string,  or  start
+               again  at  the  beginning of the file.  It is
+               generally the easiest way of viewing  a  file
+               (1.8).
+
+noclobber      The  shell has a variable [4mnoclobber[24m which may
+               be set in the file [4m.login[24m to prevent acciden‐
+               tal  destruction  of  files by the ‘>’ output
+               redirection metasyntax  of  the  shell  (2.2,
+               2.5).
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐63
+
+
+noglob         The  shell variable [4mnoglob[24m is set to suppress
+               the [4mfilename[24m [4mexpansion[24m of arguments  contain‐
+               ing the metacharacters ‘~’, ‘*’, ‘?’, ‘[’ and
+               ‘]’ (3.6).
+
+notify         The [4mnotify[24m command tells the shell to  report
+               on  the  termination of a specific [4mbackground[0m
+               [4mjob[24m at the exact time it occurs as opposed to
+               waiting  until just before the next prompt to
+               report the termination.  The [4mnotify[24m variable,
+               if set, causes the shell to always report the
+               termination of [4mbackground[24m jobs  exactly  when
+               they occur (2.6).
+
+onintr         The  [4monintr[24m  command  is built into the shell
+               and is used to control the action of a  shell
+               command  script  when  an [4minterrupt[24m signal is
+               received (3.9).
+
+output         Many commands in UNIX result in some lines of
+               text  which  are  called  their [4moutput.[24m  This
+               [4moutput[24m is usually placed on what is known  as
+               the  [4mstandard[24m  [4moutput[24m  which is normally con‐
+               nected to the user’s terminal.  The shell has
+               a  syntax  using  the  metacharacter  ‘>’ for
+               redirecting the [4mstandard[24m [4moutput[24m of a  command
+               to  a  file  (1.3).  Using the [4mpipe[24m mechanism
+               and the metacharacter ‘|’ it is also possible
+               for the [4mstandard[24m [4moutput[24m of one command to be‐
+               come the [4mstandard[24m [4minput[24m  of  another  command
+               (1.5).   Certain  commands  such  as the line
+               printer daemon [4mp[24m do not place  their  results
+               on  the  [4mstandard[24m  [4moutput[24m  but rather in more
+               useful places such as  on  the  line  printer
+               (2.3).   Similarly  the  [4mwrite[24m command places
+               its output on another user’s terminal  rather
+               than  its  [4mstandard[24m  [4moutput[24m  (2.3).  Commands
+               also have  a  [4mdiagnostic[24m  [4moutput[24m  where  they
+               write  their  error messages.  Normally these
+               go to the terminal even if the [4mstandard[24m  [4mout‐[0m
+               [4mput[24m  has  been sent to a file or another com‐
+               mand, but it is possible to direct error  di‐
+               agnostics  along with [4mstandard[24m [4moutput[24m using a
+               special metanotation (2.5).
+
+path           The shell has a variable [4mpath[24m which gives the
+               names of the directories in which it searches
+               for the commands which it is given.   It  al‐
+               ways checks first to see if the command it is
+               given is built into the  shell.   If  it  is,
+               then it need not search for the command as it
+               can do it internally.  If the command is  not
+               builtin,  then  the shell searches for a file
+               with  the  name  given   in   each   of   the
+
+
+
+
+
+
+
+
+
+USD:4‐64                      An Introduction to the C shell
+
+
+               directories  in  the  [4mpath[24m  variable, left to
+               right.  Since the normal  definition  of  the
+               [4mpath[24m variable is
+
+                    path (. /usr/ucb /bin /usr/bin)
+
+               the  shell  normally looks in the current di‐
+               rectory, and then in the standard system  di‐
+               rectories  ‘/usr/ucb’,  ‘/bin’ and ‘/usr/bin’
+               for the named command (2.2).  If the  command
+               cannot be found the shell will print an error
+               diagnostic.  Scripts of shell  commands  will
+               be  executed using another shell to interpret
+               them if they have ‘execute’  permission  set.
+               This  is  normally  true because a command of
+               the form
+
+                    chmod 755 script
+
+               was executed to turn this execute  permission
+               on  (3.3).   If you add new commands to a di‐
+               rectory in the [4mpath[24m,  you  should  issue  the
+               command [4mrehash[24m (2.2).
+
+pathname       A list of names, separated by ‘/’ characters,
+               forms a [4mpathname.[24m   Each  [4mcomponent,[24m  between
+               successive  ‘/’ characters, names a directory
+               in which the  next  [4mcomponent[24m  file  resides.
+               [4mPathnames[24m  which begin with the character ‘/’
+               are interpreted relative to the  [4mroot[24m  direc‐
+               tory in the file system.  Other [4mpathnames[24m are
+               interpreted relative to the current directory
+               as  reported by [4mpwd.[24m  The last component of a
+               [4mpathname[24m may name a  directory,  but  usually
+               names a file.
+
+pipeline       A  group  of commands which are connected to‐
+               gether, the [4mstandard[24m [4moutput[24m of each connected
+               to  the [4mstandard[24m [4minput[24m of the next, is called
+               a [4mpipeline.[24m  The [4mpipe[24m mechanism used to  con‐
+               nect these commands is indicated by the shell
+               metacharacter ‘|’ (1.5, 2.3).
+
+popd           The [4mpopd[24m command changes the shell’s  [4mworking[0m
+               [4mdirectory[24m  to the directory you most recently
+               left using the [4mpushd[24m command.  It returns  to
+               the  directory  without  having  to  type its
+               name, forgetting  the  name  of  the  current
+               [4mworking[24m [4mdirectory[24m before doing so (2.7).
+
+port           The  part  of a computer system to which each
+               terminal is connected is called a [4mport[24m.  Usu‐
+               ally  the system has a fixed number of [4mports[24m,
+               some of  which  are  connected  to  telephone
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐65
+
+
+               lines  for  dial‐up access, and some of which
+               are permanently wired  directly  to  specific
+               terminals.
+
+pr             The [4mpr[24m command is used to prepare listings of
+               the contents of files with headers giving the
+               name  of  the  file  and the date and time at
+               which the file was last modified (2.3).
+
+printenv       The [4mprintenv[24m command is  used  to  print  the
+               current  setting of variables in the environ‐
+               ment (2.8).
+
+process        An instance of a running program is called  a
+               [4mprocess[24m  (2.6).   UNIX assigns each [4mprocess[24m a
+               unique number when it is started − called the
+               [4mprocess[24m  [4mnumber[24m.  [4mProcess[24m [4mnumbers[24m can be used
+               to stop individual [4mprocesses[24m using  the  [4mkill[0m
+               or  [4mstop[24m commands when the [4mprocesses[24m are part
+               of a detached [4mbackground[24m job.
+
+program        Usually synonymous  with  [4mcommand[24m;  a  binary
+               file or shell command script which performs a
+               useful function is often called a [4mprogram[24m.
+
+prompt         Many programs will print a [4mprompt[24m on the ter‐
+               minal  when they expect input.  Thus the edi‐
+               tor ‘ex (1)’ will print a ‘:’ when it expects
+               input.  The shell [4mprompts[24m for input with ‘% ’
+               and occasionally with ‘? ’ when reading  com‐
+               mands from the terminal (1.1).  The shell has
+               a variable [4mprompt[24m which may be set to a  dif‐
+               ferent  value  to  change  the  shell’s  main
+               [4mprompt[24m.  This is mostly used  when  debugging
+               the shell (2.8).
+
+pushd          The  [4mpushd[24m  command, which means ‘push direc‐
+               tory’, changes the shell’s [4mworking[24m  [4mdirectory[0m
+               and also remembers the current [4mworking[24m [4mdirec‐[0m
+               [4mtory[24m before the change is made, allowing  you
+               to  return to the same directory via the [4mpopd[0m
+               command  later  without  retyping  its   name
+               (2.7).
+
+ps             The  [4mps[24m command is used to show the processes
+               you are currently running.  Each  process  is
+               shown  with its unique process number, an in‐
+               dication of the terminal name it is  attached
+               to, an indication of the state of the process
+               (whether it  is  running,  stopped,  awaiting
+               some  event  (sleeping),  and  whether  it is
+               swapped out), and the amount of CPU  time  it
+               has  used  so far.  The command is identified
+               by printing some of the words  used  when  it
+
+
+
+
+
+
+
+
+
+USD:4‐66                      An Introduction to the C shell
+
+
+               was  invoked  (2.6).  Shells, such as the [4mcsh[0m
+               you use to run the [4mps[24m command, are  not  nor‐
+               mally shown in the output.
+
+pwd            The  [4mpwd[24m  command prints the full [4mpathname[24m of
+               the  current  [4mworking[24m  [4mdirectory[24m.   The  [4mdirs[0m
+               builtin  command  is  usually  a  better  and
+               faster choice.
+
+quit           The [4mquit[24m signal, generated by a control‐\, is
+               used to terminate programs which are behaving
+               unreasonably.  It normally  produces  a  core
+               image file (1.8).
+
+quotation      The  process by which metacharacters are pre‐
+               vented their special meaning, usually by  us‐
+               ing  the  character  ‘´ in pairs, or by using
+               the character ‘\’, is referred to  as  [4mquota‐[0m
+               [4mtion[24m (1.7).
+
+redirection    The  routing  of input or output from or to a
+               file is known as [4mredirection[24m of input or out‐
+               put (1.3).
+
+rehash         The [4mrehash[24m command tells the shell to rebuild
+               its internal  table  of  which  commands  are
+               found  in  which  directories  in  your [4mpath[24m.
+               This is necessary when a new program  is  in‐
+               stalled in one of these directories (2.8).
+
+relative pathname
+               A [4mpathname[24m which does not begin with a ‘/’ is
+               called a [4mrelative[24m [4mpathname[24m since it is inter‐
+               preted [4mrelative[24m to the current [4mworking[24m [4mdirec‐[0m
+               [4mtory[24m.  The first [4mcomponent[24m of such a [4mpathname[0m
+               refers to some file or directory in the [4mwork‐[0m
+               [4ming[24m [4mdirectory[24m, and subsequent [4mcomponents[24m  be‐
+               tween ‘/’ characters refer to directories be‐
+               low the [4mworking[24m  [4mdirectory[24m.   [4mPathnames[24m  that
+               are  not  [4mrelative[24m  are called [4mabsolute[24m [4mpath‐[0m
+               [4mnames[24m (1.6).
+
+repeat         The [4mrepeat[24m command iterates another command a
+               specified number of times.
+
+root           The  directory  that is at the top of the en‐
+               tire directory structure is called  the  [4mroot[0m
+               directory  since  it is the ‘root’ of the en‐
+               tire tree structure of directories.  The name
+               used  in  [4mpathnames[24m  to  indicate the [4mroot[24m is
+               ‘/’.  [4mPathnames[24m starting with ‘/’ are said to
+               be  [4mabsolute[24m since they start at the [4mroot[24m di‐
+               rectory.  [4mRoot[24m is also used as the part of  a
+               [4mpathname[24m  that  is  left  after  removing the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐67
+
+
+               [4mextension[24m.  See [4mfilename[24m for a further expla‐
+               nation (1.6).
+
+RUBOUT         The  RUBOUT  or  DELETE  key is often used to
+               erase the previously  typed  character;  some
+               users  prefer the BACKSPACE for this purpose.
+               On older versions of UNIX this key served  as
+               the INTR character.
+
+scratch file   Files  whose  names  begin with a ‘#’ are re‐
+               ferred to as [4mscratch[24m [4mfiles[24m,  since  they  are
+               automatically  removed  by the system after a
+               couple of days of non‐use, or more frequently
+               if disk space becomes tight (1.3).
+
+script         Sequences  of shell commands placed in a file
+               are called shell command [4mscripts[24m.  It is  of‐
+               ten  possible  to  perform simple tasks using
+               these [4mscripts[24m without writing a program in  a
+               language such as C, by using the shell to se‐
+               lectively run other programs (3.3, 3.10).
+
+set            The builtin [4mset[24m command is used to assign new
+               values  to  shell  variables  and to show the
+               values of the current variables.  Many  shell
+               variables  have  special meaning to the shell
+               itself.  Thus by using the  [4mset[24m  command  the
+               behavior of the shell can be affected (2.1).
+
+setenv         Variables  in  the  environment ‘environ (5)’
+               can be changed by using  the  [4msetenv[24m  builtin
+               command  (2.8).   The [4mprintenv[24m command can be
+               used to print the value of the  variables  in
+               the environment.
+
+shell          A  [4mshell[24m  is  a command language interpreter.
+               It is possible to  write  and  run  your  own
+               [4mshell[24m,  as  [4mshells[24m  are no different than any
+               other programs as far as the system  is  con‐
+               cerned.   This  manual deals with the details
+               of one particular [4mshell[24m, called [4mcsh.[0m
+
+shell script   See [4mscript[24m (3.3, 3.10).
+
+signal         A [4msignal[24m in UNIX is a short message  that  is
+               sent  to a running program which causes some‐
+               thing to happen to that process.  [4mSignals[24m are
+               sent either by typing special [4mcontrol[24m charac‐
+               ters on the keyboard or by using the [4mkill[24m  or
+               [4mstop[24m commands (1.8, 2.6).
+
+sort           The [4msort[24m program sorts a sequence of lines in
+               ways that can be controlled by argument [4mflags[0m
+               (1.5).
+
+
+
+
+
+
+
+
+
+USD:4‐68                      An Introduction to the C shell
+
+
+source         The  [4msource[24m  command causes the shell to read
+               commands from a specified file.  It  is  most
+               useful for reading files such as [4m.cshrc[24m after
+               changing them (2.8).
+
+special character
+               See [4mmetacharacters[24m and the appendix  to  this
+               manual.
+
+standard       We  refer  often  to  the  [4mstandard[24m [4minput[24m and
+               [4mstandard[24m [4moutput[24m of commands.  See  [4minput[24m  and
+               [4moutput[24m (1.3, 3.8).
+
+status         A  command  normally returns a [4mstatus[24m when it
+               finishes.  By convention a [4mstatus[24m of zero in‐
+               dicates that the command succeeded.  Commands
+               may return non‐zero [4mstatus[24m to  indicate  that
+               some  abnormal event has occurred.  The shell
+               variable [4mstatus[24m is set to the [4mstatus[24m returned
+               by  the  last  command.  It is most useful in
+               shell commmand scripts (3.6).
+
+stop           The [4mstop[24m command causes a [4mbackground[24m  job  to
+               become [4msuspended[24m (2.6).
+
+string         A  sequential  group  of characters taken to‐
+               gether is called a [4mstring[24m.  [4mStrings[24m can  con‐
+               tain any printable characters (2.2).
+
+stty           The  [4mstty[24m  program changes certain parameters
+               inside UNIX which determine how your terminal
+               is  handled.   See  ‘stty (1)’ for a complete
+               description (2.6).
+
+substitution   The shell implements a  number  of  [4msubstitu‐[0m
+               [4mtions[24m  where sequences indicated by metachar‐
+               acters are replaced by other sequences.   No‐
+               table  examples of this are history [4msubstitu‐[0m
+               [4mtion[24m keyed by the metacharacter ‘!’ and vari‐
+               able  [4msubstitution[24m indicated by ‘$’.  We also
+               refer to [4msubstitutions[24m as [4mexpansions[24m (3.4).
+
+suspended      A job becomes [4msuspended[24m after a  STOP  signal
+               is  sent  to it, either by typing a [4mcontrol[24m‐z
+               at the terminal (for [4mforeground[24m jobs)  or  by
+               using the [4mstop[24m command (for [4mbackground[24m jobs).
+               When [4msuspended[24m, a job temporarily stops  run‐
+               ning  until  it is restarted by either the [4mfg[0m
+               or [4mbg[24m command (2.6).
+
+switch         The [4mswitch[24m command of the  shell  allows  the
+               shell  to select one of a number of sequences
+               of commands based on an argument string.   It
+               is  similar  to  the  [4mswitch[24m statement in the
+
+
+
+
+
+
+
+
+
+An Introduction to the C shell                      USD:4‐69
+
+
+               language C (3.7).
+
+termination    When a command which is being  executed  fin‐
+               ishes we say it undergoes [4mtermination[24m or [4mter‐[0m
+               [4mminates.[24m  Commands  normally  terminate  when
+               they  read an [4mend[24m‐[4mof[24m‐[4mfile[24m from their [4mstandard[0m
+               [4minput[24m.  It is also possible to terminate com‐
+               mands  by  sending  them an [4minterrupt[24m or [4mquit[0m
+               signal (1.8).  The  [4mkill[24m  program  terminates
+               specified jobs (2.6).
+
+then           The  [4mthen[24m command is part of the shell’s ‘if‐
+               then‐else‐endif’ control  construct  used  in
+               command scripts (3.6).
+
+time           The  [4mtime[24m  command can be used to measure the
+               amount of CPU and real  time  consumed  by  a
+               specified  command  as  well as the amount of
+               disk i/o, memory utilized, and number of page
+               faults  and  swaps taken by the command (2.1,
+               2.8).
+
+tset           The [4mtset[24m program  is  used  to  set  standard
+               erase  and  kill  characters  and to tell the
+               system what kind of terminal you  are  using.
+               It is often invoked in a [4m.login[24m file (2.1).
+
+tty            The word [4mtty[24m is a historical abbreviation for
+               ‘teletype’ which is frequently used  in  UNIX
+               to  indicate the [4mport[24m to which a given termi‐
+               nal is connected.  The [4mtty[24m command will print
+               the  name  of  the  [4mtty[24m or [4mport[24m to which your
+               terminal is presently connected.
+
+unalias        The [4munalias[24m command removes aliases (2.8).
+
+UNIX           UNIX is an  operating  system  on  which  [4mcsh[0m
+               runs.   UNIX  provides facilities which allow
+               [4mcsh[24m to invoke other programs such as  editors
+               and  text  formatters  which  you may wish to
+               use.
+
+unset          The [4munset[24m command removes the definitions  of
+               shell variables (2.2, 2.8).
+
+variable expansion
+               See [4mvariables[24m and [4mexpansion[24m (2.2, 3.4).
+
+variables      [4mVariables[24m  in [4mcsh[24m hold one or more strings as
+               value.  The most common use of  [4mvariables[24m  is
+               in  controlling  the  behavior  of the shell.
+               See [4mpath[24m, [4mnoclobber[24m, and [4mignoreeof[24m for  exam‐
+               ples.   [4mVariables[24m  such as [4margv[24m are also used
+               in  writing  shell  programs  (shell  command
+
+
+
+
+
+
+
+
+
+USD:4‐70                      An Introduction to the C shell
+
+
+               scripts) (2.2).
+
+verbose        The  [4mverbose[24m  shell  variable  can  be set to
+               cause commands to be echoed  after  they  are
+               history  expanded.   This  is often useful in
+               debugging shell scripts.  The  [4mverbose[24m  vari‐
+               able  is  set  by the shell’s [4m−v[24m command line
+               option (3.10).
+
+wc             The [4mwc[24m program calculates the number of char‐
+               acters,  words,  and lines in the files whose
+               names are given as arguments (2.6).
+
+while          The [4mwhile[24m builtin control construct  is  used
+               in shell command scripts (3.7).
+
+word           A sequence of characters which forms an argu‐
+               ment to a command is  called  a  [4mword[24m.   Many
+               characters which are neither letters, digits,
+               ‘−’, ‘.’ nor ‘/’ form [4mwords[24m all by themselves
+               even  if  they  are not surrounded by blanks.
+               Any sequence of characters may be made into a
+               [4mword[24m  by  surrounding  it with ‘´’ characters
+               except for the characters ‘´’ and  ‘!’  which
+               require   special   treatment   (1.1).   This
+               process  of  placing  special  characters  in
+               [4mwords[24m without their special meaning is called
+               [4mquoting[24m.
+
+working directory
+               At any given time you are in  one  particular
+               directory,  called  your  [4mworking[24m  [4mdirectory[24m.
+               This directory’s name is printed by  the  [4mpwd[0m
+               command  and  the  files listed by [4mls[24m are the
+               ones in this directory.  You can change [4mwork‐[0m
+               [4ming[24m [4mdirectories[24m using [4mchdir[24m.
+
+write          The  [4mwrite[24m command is an obsolete way of com‐
+               municating with other users who are logged in
+               to  UNIX (you have to take turns typing).  If
+               you are both  using  display  terminals,  use
+               [4mtalk[24m(1), which is much more pleasant.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
